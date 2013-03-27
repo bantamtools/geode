@@ -1,11 +1,11 @@
 #ifdef USE_OPENMESH
 
 #include "triangulator.h"
-#include <other/core/structure/Tuple.h>
-#include <other/core/mesh/TriangleMesh.h>
-#include <other/core/array/Array.h>
-#include <other/core/utility/stl.h>
-#include <other/core/geometry/Segment2d.h>
+#include <othercore/structure/Tuple.h>
+#include <othercore/mesh/TriangleMesh.h>
+#include <othercore/array/Array.h>
+#include <othercore/utility/stl.h>
+#include <othercore/geometry/Segment2d.h>
 
 namespace other {
 

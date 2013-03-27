@@ -7,10 +7,10 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/Array.h>
-#include <other/core/force/Force.h>
-#include <other/core/vector/Vector.h>
-#include <other/core/geometry/Box.h>
+#include <othercore/array/Array.h>
+#include <othercore/force/Force.h>
+#include <othercore/vector/Vector.h>
+#include <othercore/geometry/Box.h>
 namespace other{
 
 template<class TV> struct SpringInfo {

@@ -1,7 +1,7 @@
 // Base 64 encoding and decoding
 #pragma once
 
-#include <other/core/array/RawArray.h>
+#include <othercore/array/RawArray.h>
 #include <string>
 namespace other {
 

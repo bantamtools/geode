@@ -1,11 +1,11 @@
 //#####################################################################
 // Class FrameImplicit
 //#####################################################################
-#include <other/core/geometry/FrameImplicit.h>
-#include <other/core/array/Array.h>
-#include <other/core/array/Array2d.h>
-#include <other/core/array/Array3d.h>
-#include <other/core/python/Class.h>
+#include <othercore/geometry/FrameImplicit.h>
+#include <othercore/array/Array.h>
+#include <othercore/array/Array2d.h>
+#include <othercore/array/Array3d.h>
+#include <othercore/python/Class.h>
 namespace other{
 
 typedef real T;

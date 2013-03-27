@@ -3,7 +3,7 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/ArrayExpression.h>
+#include <othercore/array/ArrayExpression.h>
 #include <boost/type_traits/add_const.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 #include <boost/type_traits/add_reference.hpp>

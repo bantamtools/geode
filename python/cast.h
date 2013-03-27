@@ -3,7 +3,7 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/python/Object.h>
+#include <othercore/python/Object.h>
 namespace other {
 
 #ifdef OTHER_PYTHON

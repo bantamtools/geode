@@ -3,9 +3,9 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/force/Force.h>
-#include <other/core/mesh/forward.h>
-#include <other/core/vector/forward.h>
+#include <othercore/force/Force.h>
+#include <othercore/mesh/forward.h>
+#include <othercore/vector/forward.h>
 namespace other{
 
 template<class TV>

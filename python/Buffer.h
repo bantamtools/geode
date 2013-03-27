@@ -9,9 +9,9 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/python/config.h>
-#include <other/core/python/forward.h>
-#include <other/core/utility/config.h>
+#include <othercore/python/config.h>
+#include <othercore/python/forward.h>
+#include <othercore/utility/config.h>
 #include <boost/mpl/assert.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/type_traits/has_trivial_destructor.hpp>

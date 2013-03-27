@@ -7,10 +7,10 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/NestedArray.h>
-#include <other/core/python/Object.h>
-#include <other/core/vector/Vector.h>
-#include <other/core/structure/Hashtable.h>
+#include <othercore/array/NestedArray.h>
+#include <othercore/python/Object.h>
+#include <othercore/vector/Vector.h>
+#include <othercore/structure/Hashtable.h>
 
 namespace other {
 

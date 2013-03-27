@@ -1,10 +1,10 @@
 //#####################################################################
 // Class ConstitutiveModel
 //##################################################################### 
-#include <other/core/force/ConstitutiveModel.h>
-#include <other/core/force/DiagonalizedIsotropicStressDerivative.h>
-#include <other/core/python/Class.h>
-#include <other/core/vector/DiagonalMatrix.h>
+#include <othercore/force/ConstitutiveModel.h>
+#include <othercore/force/DiagonalizedIsotropicStressDerivative.h>
+#include <othercore/python/Class.h>
+#include <othercore/vector/DiagonalMatrix.h>
 namespace other{
 
 typedef real T;

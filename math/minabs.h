@@ -8,7 +8,7 @@
 #pragma once
 
 #include <cmath>
-#include <other/core/math/min.h>
+#include <othercore/math/min.h>
 namespace other {
 
 // a should already be nonnegative

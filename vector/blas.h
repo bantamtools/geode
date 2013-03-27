@@ -24,9 +24,9 @@ extern "C" {
 }
 #endif
 #endif
-#include <other/core/array/RawArray.h>
-#include <other/core/array/Array2d.h>
-#include <other/core/geometry/Box.h>
+#include <othercore/array/RawArray.h>
+#include <othercore/array/Array2d.h>
+#include <othercore/geometry/Box.h>
 #include <boost/preprocessor/cat.hpp>
 namespace other{
 

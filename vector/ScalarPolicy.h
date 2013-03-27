@@ -3,8 +3,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/vector/forward.h>
-#include <other/core/array/forward.h>
+#include <othercore/vector/forward.h>
+#include <othercore/array/forward.h>
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/not.hpp>
 #include <boost/type_traits/add_const.hpp>

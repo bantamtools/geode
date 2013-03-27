@@ -3,9 +3,9 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/forward.h>
-#include <other/core/geometry/Box.h>
-#include <other/core/vector/Vector3d.h>
+#include <othercore/array/forward.h>
+#include <othercore/geometry/Box.h>
+#include <othercore/vector/Vector3d.h>
 namespace other {
 
 OTHER_EXPORT PyObject* to_python(const Segment<Vector<real,3>>& seg);

@@ -3,8 +3,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/Array.h>
-#include <other/core/math/min.h>
+#include <othercore/array/Array.h>
+#include <othercore/math/min.h>
 #include <algorithm>
 #include <functional>
 namespace other {

@@ -3,9 +3,9 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/geometry/forward.h>
-#include <other/core/vector/Vector3d.h>
-#include <other/core/math/Zero.h>
+#include <othercore/geometry/forward.h>
+#include <othercore/vector/Vector3d.h>
+#include <othercore/math/Zero.h>
 namespace other{
 
 template<class T> inline Vector<T,3> normal(const Vector<T,3>& x0,const Vector<T,3>& x1,const Vector<T,3>& x2)

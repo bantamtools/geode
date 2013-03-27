@@ -1,16 +1,16 @@
 //#####################################################################
 // Class Springs
 //#####################################################################
-#include <other/core/force/Springs.h>
-#include <other/core/array/NdArray.h>
-#include <other/core/array/ProjectedArray.h>
-#include <other/core/array/view.h>
-#include <other/core/structure/Hashtable.h>
-#include <other/core/math/cube.h>
-#include <other/core/python/Class.h>
-#include <other/core/vector/SolidMatrix.h>
-#include <other/core/vector/SymmetricMatrix.h>
-#include <other/core/vector/normalize.h>
+#include <othercore/force/Springs.h>
+#include <othercore/array/NdArray.h>
+#include <othercore/array/ProjectedArray.h>
+#include <othercore/array/view.h>
+#include <othercore/structure/Hashtable.h>
+#include <othercore/math/cube.h>
+#include <othercore/python/Class.h>
+#include <othercore/vector/SolidMatrix.h>
+#include <othercore/vector/SymmetricMatrix.h>
+#include <othercore/vector/normalize.h>
 namespace other{
 
 typedef real T;

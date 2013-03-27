@@ -3,9 +3,9 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/forward.h>
-#include <other/core/utility/config.h>
-#include <other/core/vector/forward.h>
+#include <othercore/array/forward.h>
+#include <othercore/utility/config.h>
+#include <othercore/vector/forward.h>
 namespace other {
 
 OTHER_CORE_EXPORT Frame<Vector<real,2> > rigid_register(RawArray<const Vector<real,2> > X0,RawArray<const Vector<real,2> > X1);

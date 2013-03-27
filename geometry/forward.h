@@ -3,8 +3,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/utility/forward.h>
-#include <other/core/vector/ScalarPolicy.h>
+#include <othercore/utility/forward.h>
+#include <othercore/vector/ScalarPolicy.h>
 namespace other {
 
 template<class TV> class Box;

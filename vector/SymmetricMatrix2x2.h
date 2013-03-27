@@ -3,8 +3,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/vector/Vector2d.h>
-#include <other/core/math/small_sort.h>
+#include <othercore/vector/Vector2d.h>
+#include <othercore/math/small_sort.h>
 namespace other {
 
 template<class T> struct IsScalarBlock<SymmetricMatrix<T,2> >:public IsScalarBlock<T>{};

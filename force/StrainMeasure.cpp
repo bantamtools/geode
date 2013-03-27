@@ -1,16 +1,16 @@
 //#####################################################################
 // Class StrainMeasure
 //#####################################################################
-#include <other/core/force/StrainMeasure.h>
-#include <other/core/array/sort.h>
-#include <other/core/array/view.h>
-#include <other/core/python/Class.h>
-#include <other/core/vector/Matrix2x2.h>
-#include <other/core/vector/Matrix3x2.h>
-#include <other/core/vector/Matrix3x3.h>
-#include <other/core/vector/UpperTriangularMatrix2x2.h>
-#include <other/core/vector/UpperTriangularMatrix3x3.h>
-#include <other/core/utility/Log.h>
+#include <othercore/force/StrainMeasure.h>
+#include <othercore/array/sort.h>
+#include <othercore/array/view.h>
+#include <othercore/python/Class.h>
+#include <othercore/vector/Matrix2x2.h>
+#include <othercore/vector/Matrix3x2.h>
+#include <othercore/vector/Matrix3x3.h>
+#include <othercore/vector/UpperTriangularMatrix2x2.h>
+#include <othercore/vector/UpperTriangularMatrix3x3.h>
+#include <othercore/utility/Log.h>
 namespace other{
 
 using Log::cout;

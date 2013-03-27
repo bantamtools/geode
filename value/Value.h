@@ -3,17 +3,17 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/value/forward.h>
-#include <other/core/python/Object.h>
-#include <other/core/python/try_convert.h>
-#include <other/core/python/ExceptionValue.h>
-#include <other/core/utility/Optional.h>
-#include <other/core/vector/Vector.h>
+#include <othercore/value/forward.h>
+#include <othercore/python/Object.h>
+#include <othercore/python/try_convert.h>
+#include <othercore/python/ExceptionValue.h>
+#include <othercore/utility/Optional.h>
+#include <othercore/vector/Vector.h>
 #include <boost/type_traits/is_const.hpp>
 #include <boost/type_traits/is_reference.hpp>
 extern void wrap_value_base();
 
-#include <other/core/python/Ptr.h>
+#include <othercore/python/Ptr.h>
 #include <vector>
 
 namespace other {

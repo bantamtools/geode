@@ -9,7 +9,7 @@
 
 #define ENABLED 0
 
-#include <other/core/python/wrap.h>
+#include <othercore/python/wrap.h>
 
 #if ! Enabled
 
@@ -18,11 +18,11 @@ static void run_tests()
 
 #else
 
-#include <other/core/vector/DiagonalMatrix.h>
-#include <other/core/vector/Matrix.h>
-#include <other/core/vector/SymmetricMatrix.h>
-#include <other/core/random/Random.h>
-#include <other/core/utility/Log.h>
+#include <othercore/vector/DiagonalMatrix.h>
+#include <othercore/vector/Matrix.h>
+#include <othercore/vector/SymmetricMatrix.h>
+#include <othercore/random/Random.h>
+#include <othercore/utility/Log.h>
 #include <limits>
 #include <boost/preprocessor/arithmetic/mul.hpp>
 #include <boost/preprocessor/repetition/repeat.hpp>

@@ -3,8 +3,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/ArrayIter.h>
-#include <other/core/utility/remove_const_reference.h>
+#include <othercore/array/ArrayIter.h>
+#include <othercore/utility/remove_const_reference.h>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 #include <boost/static_assert.hpp>

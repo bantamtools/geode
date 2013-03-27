@@ -3,12 +3,12 @@
 //##################################################################### 
 #pragma once
 
-#include <other/core/geometry/Box.h>
-#include <other/core/math/constants.h>
-#include <other/core/math/pow.h>
-#include <other/core/python/repr.h>
-#include <other/core/utility/format.h>
-#include <other/core/array/Array.h>
+#include <othercore/geometry/Box.h>
+#include <othercore/math/constants.h>
+#include <othercore/math/pow.h>
+#include <othercore/python/repr.h>
+#include <othercore/utility/format.h>
+#include <othercore/array/Array.h>
 namespace other{
 
 template<class TV>

@@ -1,15 +1,15 @@
 //#####################################################################
 // Class SimplexTree
 //#####################################################################
-#include <other/core/geometry/SimplexTree.h>
-#include <other/core/geometry/Ray.h>
-#include <other/core/geometry/Sphere.h>
-#include <other/core/geometry/Segment2d.h>
-#include <other/core/geometry/Segment3d.h>
-#include <other/core/geometry/Triangle2d.h>
-#include <other/core/geometry/Triangle3d.h>
-#include <other/core/array/IndirectArray.h>
-#include <other/core/python/Class.h>
+#include <othercore/geometry/SimplexTree.h>
+#include <othercore/geometry/Ray.h>
+#include <othercore/geometry/Sphere.h>
+#include <othercore/geometry/Segment2d.h>
+#include <othercore/geometry/Segment3d.h>
+#include <othercore/geometry/Triangle2d.h>
+#include <othercore/geometry/Triangle3d.h>
+#include <othercore/array/IndirectArray.h>
+#include <othercore/python/Class.h>
 
 // Windows silliness
 #undef small

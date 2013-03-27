@@ -3,9 +3,9 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/vector/ArithmeticPolicy.h>
-#include <other/core/vector/Vector1d.h>
-#include <other/core/math/robust.h>
+#include <othercore/vector/ArithmeticPolicy.h>
+#include <othercore/vector/Vector1d.h>
+#include <othercore/math/robust.h>
 namespace other {
 
 using std::log;

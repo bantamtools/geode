@@ -1,10 +1,10 @@
 //#####################################################################
 // Class Force
 //#####################################################################
-#include <other/core/force/Force.h>
-#include <other/core/python/Class.h>
-#include <other/core/vector/SolidMatrix.h>
-#include <other/core/vector/SymmetricMatrix.h>
+#include <othercore/force/Force.h>
+#include <othercore/python/Class.h>
+#include <othercore/vector/SolidMatrix.h>
+#include <othercore/vector/SymmetricMatrix.h>
 namespace other {
 
 typedef real T;

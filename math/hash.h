@@ -3,7 +3,7 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/utility/config.h>
+#include <othercore/utility/config.h>
 #include <boost/static_assert.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/utility/enable_if.hpp>

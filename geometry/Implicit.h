@@ -3,9 +3,9 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/geometry/Box.h>
-#include <other/core/python/Object.h>
-#include <other/core/vector/Vector.h>
+#include <othercore/geometry/Box.h>
+#include <othercore/python/Object.h>
+#include <othercore/vector/Vector.h>
 namespace other{
 
 template<class TV>

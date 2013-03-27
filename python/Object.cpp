@@ -1,8 +1,8 @@
 //#####################################################################
 // Class Object
 //#####################################################################
-#include <other/core/python/Object.h>
-#include <other/core/python/Class.h>
+#include <othercore/python/Object.h>
+#include <othercore/python/Class.h>
 #include <cassert>
 namespace other {
 

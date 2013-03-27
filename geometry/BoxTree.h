@@ -13,11 +13,11 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/Array.h>
-#include <other/core/geometry/Box.h>
-#include <other/core/python/Object.h>
-#include <other/core/vector/Vector.h>
-#include <other/core/utility/range.h>
+#include <othercore/array/Array.h>
+#include <othercore/geometry/Box.h>
+#include <othercore/python/Object.h>
+#include <othercore/vector/Vector.h>
+#include <othercore/utility/range.h>
 namespace other{
 
 template<class TV> class BoxTree : public Object

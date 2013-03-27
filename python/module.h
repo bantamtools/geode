@@ -12,8 +12,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/python/config.h>
-#include <other/core/utility/config.h>
+#include <othercore/python/config.h>
+#include <othercore/utility/config.h>
 #include <stdexcept>
 namespace other {
 

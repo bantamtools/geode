@@ -10,7 +10,7 @@
  *   string path = resource("images","metal.jpg");
  */
 
-#include <other/core/utility/path.h>
+#include <othercore/utility/path.h>
 namespace other {
 
 using std::string;

@@ -1,6 +1,6 @@
 // Current time
 
-#include <other/core/utility/time.h>
+#include <othercore/utility/time.h>
 #if defined(_WIN32)
 #pragma comment(lib, "winmm.lib")
 #include <windows.h>

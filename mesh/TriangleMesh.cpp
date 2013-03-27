@@ -1,12 +1,12 @@
 //#####################################################################
 // Class TriangleMesh
 //#####################################################################
-#include <other/core/mesh/TriangleMesh.h>
-#include <other/core/mesh/SegmentMesh.h>
-#include <other/core/array/sort.h>
-#include <other/core/array/view.h>
-#include <other/core/structure/Hashtable.h>
-#include <other/core/python/Class.h>
+#include <othercore/mesh/TriangleMesh.h>
+#include <othercore/mesh/SegmentMesh.h>
+#include <othercore/array/sort.h>
+#include <othercore/array/view.h>
+#include <othercore/structure/Hashtable.h>
+#include <othercore/python/Class.h>
 namespace other {
 
 using std::cout;

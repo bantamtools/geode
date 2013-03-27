@@ -1,21 +1,21 @@
 #ifdef USE_OPENMESH
-#include <other/core/openmesh/TriMesh.h>
-#include <other/core/openmesh/color_cast.h>
-#include <other/core/array/view.h>
-#include <other/core/utility/prioritize.h>
-#include <other/core/python/Class.h>
-#include <other/core/math/isfinite.h>
-#include <other/core/math/copysign.h>
-#include <other/core/structure/UnionFind.h>
-#include <other/core/geometry/SimplexTree.h>
-#include <other/core/geometry/Ray.h>
+#include <othercore/openmesh/TriMesh.h>
+#include <othercore/openmesh/color_cast.h>
+#include <othercore/array/view.h>
+#include <othercore/utility/prioritize.h>
+#include <othercore/python/Class.h>
+#include <othercore/math/isfinite.h>
+#include <othercore/math/copysign.h>
+#include <othercore/structure/UnionFind.h>
+#include <othercore/geometry/SimplexTree.h>
+#include <othercore/geometry/Ray.h>
 #include <boost/algorithm/string.hpp>
-#include <other/core/utility/path.h>
-#include <other/core/vector/Rotation.h>
-#include <other/core/utility/stl.h>
-#include <other/core/openmesh/triangulator.h>
-#include <other/core/vector/Frame.h>
-#include <other/core/vector/convert.h>
+#include <othercore/utility/path.h>
+#include <othercore/vector/Rotation.h>
+#include <othercore/utility/stl.h>
+#include <othercore/openmesh/triangulator.h>
+#include <othercore/vector/Frame.h>
+#include <othercore/vector/convert.h>
 #include <queue>
 #include <iostream>
 namespace other {
@@ -1627,7 +1627,7 @@ template class PolyMeshT<AttribKernelT<FinalMeshItemsT<other::MeshTraits,true>,T
 }
 */
 
-#include <other/core/python/function.h>
+#include <othercore/python/function.h>
 
 using namespace other;
 

@@ -3,13 +3,13 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/structure/forward.h>
+#include <othercore/structure/forward.h>
 #include <iostream> // needed to avoid header bug on Mac OS X
-#include <other/core/math/choice.h>
-#include <other/core/math/hash.h>
-#include <other/core/python/from_python.h>
-#include <other/core/python/to_python.h>
-#include <other/core/utility/stream.h>
+#include <othercore/math/choice.h>
+#include <othercore/math/hash.h>
+#include <othercore/python/from_python.h>
+#include <othercore/python/to_python.h>
+#include <othercore/utility/stream.h>
 namespace other {
 
 template<class T0>

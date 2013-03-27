@@ -2,7 +2,7 @@
 // Function wrap_function
 //#####################################################################
 #ifdef OTHER_PYTHON
-#include <other/core/python/wrap_function.h>
+#include <othercore/python/wrap_function.h>
 namespace other {
 
 struct PythonFunction {

@@ -1,7 +1,7 @@
 //#####################################################################
 // Class Matrix<T,4>
 //#####################################################################
-#include <other/core/vector/Matrix4x4.h>
+#include <othercore/vector/Matrix4x4.h>
 namespace other{
 
 template<class T> Matrix<T,4> Matrix<T,4>::

@@ -3,8 +3,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/geometry/Implicit.h>
-#include <other/core/vector/Frame.h>
+#include <othercore/geometry/Implicit.h>
+#include <othercore/vector/Frame.h>
 namespace other{
 
 template<class TV>

@@ -3,17 +3,17 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/vector/Vector2d.h>
-#include <other/core/math/clamp.h>
-#include <other/core/math/inverse.h>
-#include <other/core/math/argmax.h>
-#include <other/core/math/argmin.h>
-#include <other/core/math/isnan.h>
-#include <other/core/math/max.h>
-#include <other/core/math/maxabs.h>
-#include <other/core/math/min.h>
-#include <other/core/math/sqr.h>
-#include <other/core/math/wrap.h>
+#include <othercore/vector/Vector2d.h>
+#include <othercore/math/clamp.h>
+#include <othercore/math/inverse.h>
+#include <othercore/math/argmax.h>
+#include <othercore/math/argmin.h>
+#include <othercore/math/isnan.h>
+#include <othercore/math/max.h>
+#include <othercore/math/maxabs.h>
+#include <othercore/math/min.h>
+#include <othercore/math/sqr.h>
+#include <othercore/math/wrap.h>
 #include <cmath>
 namespace other {
 

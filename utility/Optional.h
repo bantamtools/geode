@@ -21,7 +21,7 @@ template<class T> struct Optional: public boost::optional<T> {
 
 #else // Windows version
 
-#include <other/core/utility/safe_bool.h>
+#include <othercore/utility/safe_bool.h>
 #include <boost/scoped_ptr.hpp>
 namespace other {
 

@@ -1,16 +1,16 @@
 //#####################################################################
 // Class Image
 //#####################################################################
-#include <other/core/geometry/Box.h>
-#include <other/core/image/Image.h>
-#include <other/core/image/JpgFile.h>
-#include <other/core/image/PngFile.h>
-#include <other/core/image/ExrFile.h>
-#include <other/core/python/Class.h>
-#include <other/core/python/stl.h>
-#include <other/core/random/Random.h>
-#include <other/core/utility/path.h>
-#include <other/core/utility/Log.h>
+#include <othercore/geometry/Box.h>
+#include <othercore/image/Image.h>
+#include <othercore/image/JpgFile.h>
+#include <othercore/image/PngFile.h>
+#include <othercore/image/ExrFile.h>
+#include <othercore/python/Class.h>
+#include <othercore/python/stl.h>
+#include <othercore/random/Random.h>
+#include <othercore/utility/path.h>
+#include <othercore/utility/Log.h>
 #include <cmath>
 
 namespace other {

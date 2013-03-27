@@ -1,9 +1,9 @@
 // Convenience functions for generating platonic solids
 
-#include <other/core/geometry/platonic.h>
-#include <other/core/mesh/TriangleSubdivision.h>
-#include <other/core/python/wrap.h>
-#include <other/core/vector/normalize.h>
+#include <othercore/geometry/platonic.h>
+#include <othercore/mesh/TriangleSubdivision.h>
+#include <othercore/python/wrap.h>
+#include <othercore/vector/normalize.h>
 namespace other {
 
 typedef real T;

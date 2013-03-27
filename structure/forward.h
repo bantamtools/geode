@@ -3,7 +3,7 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/utility/config.h> // Must be included first
+#include <othercore/utility/config.h> // Must be included first
 #include <boost/mpl/and.hpp>
 namespace other{
 

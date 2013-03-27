@@ -1,8 +1,8 @@
 // SSE helper routines
 #pragma once
 
-#include <other/core/math/copysign.h>
-#include <other/core/math/isfinite.h>
+#include <othercore/math/copysign.h>
+#include <othercore/math/isfinite.h>
 #include <boost/type_traits/is_fundamental.hpp>
 #include <iostream>
 

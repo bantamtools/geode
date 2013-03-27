@@ -1,6 +1,6 @@
 #pragma once
 
-#include <other/core/mesh/forward.h>
+#include <othercore/mesh/forward.h>
 
 // OpenMesh includes
 #include <cstddef>
@@ -23,31 +23,31 @@
 #pragma warning( pop )
 #endif
 
-#include <other/core/utility/config.h>
-#include <other/core/utility/Hasher.h>
-#include <other/core/utility/tr1.h>
-#include <other/core/math/lerp.h>
-#include <other/core/image/color_utils.h>
-#include <other/core/utility/const_cast.h>
-#include <other/core/utility/range.h>
+#include <othercore/utility/config.h>
+#include <othercore/utility/Hasher.h>
+#include <othercore/utility/tr1.h>
+#include <othercore/math/lerp.h>
+#include <othercore/image/color_utils.h>
+#include <othercore/utility/const_cast.h>
+#include <othercore/utility/range.h>
 
-#include <other/core/python/from_python.h>
-#include <other/core/python/to_python.h>
-#include <other/core/python/stl.h>
-#include <other/core/python/Object.h>
-#include <other/core/python/Ptr.h>
-#include <other/core/python/Ref.h>
+#include <othercore/python/from_python.h>
+#include <othercore/python/to_python.h>
+#include <othercore/python/stl.h>
+#include <othercore/python/Object.h>
+#include <othercore/python/Ptr.h>
+#include <othercore/python/Ref.h>
 
-#include <other/core/array/Array.h>
-#include <other/core/array/RawField.h>
-#include <other/core/vector/Vector.h>
+#include <othercore/array/Array.h>
+#include <othercore/array/RawField.h>
+#include <othercore/vector/Vector.h>
 
-#include <other/core/geometry/Box.h>
-#include <other/core/geometry/Plane.h>
-#include <other/core/geometry/Triangle3d.h>
-#include <other/core/geometry/Segment3d.h>
-#include <other/core/random/Random.h>
-#include <other/core/structure/Hashtable.h>
+#include <othercore/geometry/Box.h>
+#include <othercore/geometry/Plane.h>
+#include <othercore/geometry/Triangle3d.h>
+#include <othercore/geometry/Segment3d.h>
+#include <othercore/random/Random.h>
+#include <othercore/structure/Hashtable.h>
 
 #include <boost/function.hpp>
 

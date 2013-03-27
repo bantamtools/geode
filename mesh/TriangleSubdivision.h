@@ -7,11 +7,11 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/mesh/TriangleMesh.h>
-#include <other/core/python/Object.h>
-#include <other/core/python/Ptr.h>
-#include <other/core/python/Ref.h>
-#include <other/core/vector/Vector.h>
+#include <othercore/mesh/TriangleMesh.h>
+#include <othercore/python/Object.h>
+#include <othercore/python/Ptr.h>
+#include <othercore/python/Ref.h>
+#include <othercore/vector/Vector.h>
 namespace other {
 
 class TriangleSubdivision : public Object {

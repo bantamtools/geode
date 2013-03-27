@@ -3,7 +3,7 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/vector/Vector.h>
+#include <othercore/vector/Vector.h>
 #include <cfloat>
 namespace other {
 

@@ -1,7 +1,7 @@
 //#####################################################################
 // Conversion for functions
 //#####################################################################
-#include <other/core/python/function.h>
+#include <othercore/python/function.h>
 namespace other {
 
 #ifdef OTHER_PYTHON

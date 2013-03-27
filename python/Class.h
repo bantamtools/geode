@@ -27,16 +27,16 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/python/config.h>
-#include <other/core/python/wrap.h>
-#include <other/core/python/Object.h>
-#include <other/core/utility/Enumerate.h>
+#include <othercore/python/config.h>
+#include <othercore/python/wrap.h>
+#include <othercore/python/Object.h>
+#include <othercore/utility/Enumerate.h>
 #ifdef OTHER_PYTHON
-#include <other/core/python/wrap_constructor.h>
-#include <other/core/python/wrap_field.h>
-#include <other/core/python/wrap_method.h>
-#include <other/core/python/wrap_property.h>
-#include <other/core/python/wrap_call.h>
+#include <othercore/python/wrap_constructor.h>
+#include <othercore/python/wrap_field.h>
+#include <othercore/python/wrap_method.h>
+#include <othercore/python/wrap_property.h>
+#include <othercore/python/wrap_call.h>
 #endif
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/void.hpp>

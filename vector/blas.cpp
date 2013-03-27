@@ -3,7 +3,7 @@
 //#####################################################################
 #include "blas.h"
 #ifdef OTHER_BLAS
-#include <other/core/python/from_python.h>
+#include <othercore/python/from_python.h>
 #ifdef USE_MKL
 #define ILAENV ::ilaenv
 #else

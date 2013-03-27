@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
-#include <other/core/utility/stl.h>
+#include <othercore/utility/stl.h>
 namespace other {
 
 using boost::shared_ptr;

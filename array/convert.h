@@ -5,12 +5,12 @@
 // Include this header if you need to register array conversion for new types.
 //
 //#####################################################################
-#include <other/core/array/Array.h>
-#include <other/core/array/Array2d.h>
-#include <other/core/array/Array3d.h>
-#include <other/core/array/Array4d.h>
-#include <other/core/array/NdArray.h>
-#include <other/core/python/numpy.h>
+#include <othercore/array/Array.h>
+#include <othercore/array/Array2d.h>
+#include <othercore/array/Array3d.h>
+#include <othercore/array/Array4d.h>
+#include <othercore/array/NdArray.h>
+#include <othercore/python/numpy.h>
 namespace other {
 
 #ifdef OTHER_PYTHON

@@ -1,12 +1,12 @@
 //#####################################################################
 // Class Segment<Vector<T,3> >
 //##################################################################### 
-#include <other/core/geometry/Segment3d.h>
-#include <other/core/array/Array.h>
-#include <other/core/math/clamp.h>
-#include <other/core/structure/Tuple.h>
-#include <other/core/vector/Vector.h>
-#include <other/core/utility/Log.h>
+#include <othercore/geometry/Segment3d.h>
+#include <othercore/array/Array.h>
+#include <othercore/math/clamp.h>
+#include <othercore/structure/Tuple.h>
+#include <othercore/vector/Vector.h>
+#include <othercore/utility/Log.h>
 namespace other{
 
 #ifdef OTHER_PYTHON

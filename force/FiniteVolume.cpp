@@ -1,20 +1,20 @@
 //#####################################################################
-#include <other/core/force/FiniteVolume.h>
-#include <other/core/force/AnisotropicConstitutiveModel.h>
-#include <other/core/force/IsotropicConstitutiveModel.h>
-#include <other/core/force/DiagonalizedStressDerivative.h>
-#include <other/core/force/DiagonalizedIsotropicStressDerivative.h>
-#include <other/core/force/PlasticityModel.h>
-#include <other/core/force/StrainMeasure.h>
-#include <other/core/structure/Hashtable.h>
-#include <other/core/math/Factorial.h>
-#include <other/core/python/Class.h>
-#include <other/core/vector/DiagonalMatrix.h>
-#include <other/core/vector/Matrix.h>
-#include <other/core/vector/SolidMatrix.h>
-#include <other/core/vector/SymmetricMatrix.h>
-#include <other/core/vector/UpperTriangularMatrix.h>
-#include <other/core/utility/Log.h>
+#include <othercore/force/FiniteVolume.h>
+#include <othercore/force/AnisotropicConstitutiveModel.h>
+#include <othercore/force/IsotropicConstitutiveModel.h>
+#include <othercore/force/DiagonalizedStressDerivative.h>
+#include <othercore/force/DiagonalizedIsotropicStressDerivative.h>
+#include <othercore/force/PlasticityModel.h>
+#include <othercore/force/StrainMeasure.h>
+#include <othercore/structure/Hashtable.h>
+#include <othercore/math/Factorial.h>
+#include <othercore/python/Class.h>
+#include <othercore/vector/DiagonalMatrix.h>
+#include <othercore/vector/Matrix.h>
+#include <othercore/vector/SolidMatrix.h>
+#include <othercore/vector/SymmetricMatrix.h>
+#include <othercore/vector/UpperTriangularMatrix.h>
+#include <othercore/utility/Log.h>
 namespace other{
 
 using Log::cout;

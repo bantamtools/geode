@@ -1,7 +1,7 @@
 //#####################################################################
 // Class Buffer
 //#####################################################################
-#include <other/core/python/Buffer.h>
+#include <othercore/python/Buffer.h>
 using namespace other;
 
 // Must match memory allocation routine in header

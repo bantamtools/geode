@@ -1,8 +1,8 @@
 //#####################################################################
 // Class Gravity
 //#####################################################################
-#include <other/core/force/Gravity.h>
-#include <other/core/python/Class.h>
+#include <othercore/force/Gravity.h>
+#include <othercore/python/Class.h>
 namespace other{
 
 typedef real T;

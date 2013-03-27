@@ -1,4 +1,4 @@
-#include <other/core/vector/Vector.h>
+#include <othercore/vector/Vector.h>
 namespace other{
 // Maximize a functional over a sphere using pattern search
 template<class score_t> static double spherical_pattern_maximize(const score_t& score, Vector<real,3>& n, double tol) {

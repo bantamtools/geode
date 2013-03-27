@@ -7,8 +7,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/RawArray.h>
-#include <other/core/python/Object.h>
+#include <othercore/array/RawArray.h>
+#include <othercore/python/Object.h>
 namespace other {
 
 template<class TV>

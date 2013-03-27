@@ -5,7 +5,7 @@
 // we need config.h to not undefine far, which is used in jpeglib.h
 #define LEAVE_WINDOWS_DEFINES_ALONE
 #endif
-#include <other/core/python/config.h>
+#include <othercore/python/config.h>
 #ifdef USE_LIBJPEG
 extern "C"{
 #ifdef _WIN32
@@ -17,9 +17,9 @@ extern "C"{
 #undef HAVE_PROTOTYPES
 #undef HAVE_STDLIB_H
 #endif
-#include <other/core/python/Class.h>
-#include <other/core/image/Image.h>
-#include <other/core/image/MovFile.h>
+#include <othercore/python/Class.h>
+#include <othercore/image/Image.h>
+#include <othercore/image/MovFile.h>
 #include <boost/detail/endian.hpp>
 #include <string>
 #include <iostream>

@@ -1,8 +1,8 @@
 // Link two properties together: when one changes, the other will
 #pragma once
 
-#include <other/core/value/Prop.h>
-#include <other/core/value/Listen.h>
+#include <othercore/value/Prop.h>
+#include <othercore/value/Listen.h>
 namespace other {
 
 class PropLink : public Object {

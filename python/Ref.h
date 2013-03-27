@@ -16,12 +16,12 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/python/forward.h>
-#include <other/core/python/exceptions.h>
-#include <other/core/python/new.h>
-#include <other/core/python/to_python.h>
-#include <other/core/math/hash.h>
-#include <other/core/utility/debug.h>
+#include <othercore/python/forward.h>
+#include <othercore/python/exceptions.h>
+#include <othercore/python/new.h>
+#include <othercore/python/to_python.h>
+#include <othercore/math/hash.h>
+#include <othercore/utility/debug.h>
 #include <boost/mpl/assert.hpp>
 #include <boost/mpl/or.hpp>
 #include <boost/type_traits/is_same.hpp>

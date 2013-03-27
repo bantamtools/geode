@@ -1,6 +1,6 @@
 #pragma once
 
-#include <other/core/vector/Vector.h>
+#include <othercore/vector/Vector.h>
 namespace other {
 
 OTHER_CORE_EXPORT Vector<real,3> hsv_to_rgb(Vector<real,3> cin);

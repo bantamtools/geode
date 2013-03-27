@@ -1,12 +1,12 @@
 //#####################################################################
 // Class Segment<Vector<T,2> >  
 //##################################################################### 
-#include <other/core/geometry/Segment2d.h>
-#include <other/core/array/Array.h>
-#include <other/core/array/IndirectArray.h>
-#include <other/core/geometry/Ray.h>
-#include <other/core/structure/Tuple.h>
-#include <other/core/utility/Log.h>
+#include <othercore/geometry/Segment2d.h>
+#include <othercore/array/Array.h>
+#include <othercore/array/IndirectArray.h>
+#include <othercore/geometry/Ray.h>
+#include <othercore/structure/Tuple.h>
+#include <othercore/utility/Log.h>
 namespace other {
 
 #ifdef OTHER_PYTHON

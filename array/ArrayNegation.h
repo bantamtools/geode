@@ -3,8 +3,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/ArrayExpression.h>
-#include <other/core/vector/ArithmeticPolicy.h>
+#include <othercore/array/ArrayExpression.h>
+#include <othercore/vector/ArithmeticPolicy.h>
 namespace other {
 
 template<class TArray> class ArrayNegation;

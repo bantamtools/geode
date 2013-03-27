@@ -1,14 +1,14 @@
 //#####################################################################
 // Header Register
 //#####################################################################
-#include <other/core/array/RawArray.h>
-#include <other/core/array/Array2d.h>
-#include <other/core/python/wrap.h>
-#include <other/core/vector/Register.h>
-#include <other/core/vector/Frame.h>
-#include <other/core/vector/DiagonalMatrix.h>
-#include <other/core/vector/Matrix.h>
-#include <other/core/vector/SymmetricMatrix.h>
+#include <othercore/array/RawArray.h>
+#include <othercore/array/Array2d.h>
+#include <othercore/python/wrap.h>
+#include <othercore/vector/Register.h>
+#include <othercore/vector/Frame.h>
+#include <othercore/vector/DiagonalMatrix.h>
+#include <othercore/vector/Matrix.h>
+#include <othercore/vector/SymmetricMatrix.h>
 namespace other{
 
 typedef real T;

@@ -1,18 +1,18 @@
 //#####################################################################
 // Class TriangleSubdivision
 //#####################################################################
-#include <other/core/mesh/TriangleSubdivision.h>
-#include <other/core/mesh/SegmentMesh.h>
-#include <other/core/array/Array2d.h>
-#include <other/core/array/NdArray.h>
-#include <other/core/array/view.h>
-#include <other/core/array/IndirectArray.h>
-#include <other/core/math/constants.h>
-#include <other/core/math/cube.h>
-#include <other/core/python/Class.h>
-#include <other/core/structure/Hashtable.h>
-#include <other/core/utility/tr1.h>
-#include <other/core/vector/SparseMatrix.h>
+#include <othercore/mesh/TriangleSubdivision.h>
+#include <othercore/mesh/SegmentMesh.h>
+#include <othercore/array/Array2d.h>
+#include <othercore/array/NdArray.h>
+#include <othercore/array/view.h>
+#include <othercore/array/IndirectArray.h>
+#include <othercore/math/constants.h>
+#include <othercore/math/cube.h>
+#include <othercore/python/Class.h>
+#include <othercore/structure/Hashtable.h>
+#include <othercore/utility/tr1.h>
+#include <othercore/vector/SparseMatrix.h>
 namespace other{
 
 typedef real T;

@@ -1,9 +1,9 @@
 //#####################################################################
 // File Exceptions
 //#####################################################################
-#include <other/core/python/exceptions.h>
-#include <other/core/python/wrap.h>
-#include <other/core/utility/tr1.h>
+#include <othercore/python/exceptions.h>
+#include <othercore/python/wrap.h>
+#include <othercore/utility/tr1.h>
 #include <iostream>
 namespace other {
 

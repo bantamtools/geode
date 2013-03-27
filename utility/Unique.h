@@ -1,7 +1,7 @@
 #pragma once
 
-#include <other/core/utility/move.h>
-#include <other/core/utility/safe_bool.h>
+#include <othercore/utility/move.h>
+#include <othercore/utility/safe_bool.h>
 #include <algorithm>
 namespace other {
 

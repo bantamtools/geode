@@ -3,14 +3,14 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/structure/Empty.h>
-#include <other/core/structure/Singleton.h>
-#include <other/core/structure/Pair.h>
-#include <other/core/structure/Triple.h>
-#include <other/core/structure/Quad.h>
-#include <other/core/structure/Quintuple.h>
-#include <other/core/utility/Enumerate.h>
-#include <other/core/vector/forward.h>
+#include <othercore/structure/Empty.h>
+#include <othercore/structure/Singleton.h>
+#include <othercore/structure/Pair.h>
+#include <othercore/structure/Triple.h>
+#include <othercore/structure/Quad.h>
+#include <othercore/structure/Quintuple.h>
+#include <othercore/utility/Enumerate.h>
+#include <othercore/vector/forward.h>
 namespace other {
 
 OTHER_CORE_EXPORT void OTHER_NORETURN(throw_tuple_mismatch_error(int expected, int got));

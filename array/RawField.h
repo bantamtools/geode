@@ -7,7 +7,7 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/RawArray.h>
+#include <othercore/array/RawArray.h>
 namespace other {
 
 template<class T,class Id> struct HasCheapCopy<RawField<T,Id> >:public mpl::true_{};

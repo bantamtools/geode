@@ -3,11 +3,11 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/utility/config.h>
-#include <other/core/utility/overload.h>
-#include <other/core/utility/str.h>
-#include <other/core/utility/stl.h>
-#include <other/core/utility/macro_map.h>
+#include <othercore/utility/config.h>
+#include <othercore/utility/overload.h>
+#include <othercore/utility/str.h>
+#include <othercore/utility/stl.h>
+#include <othercore/utility/macro_map.h>
 namespace other {
 
 OTHER_CORE_EXPORT void debug_print_single(const char* prefix);

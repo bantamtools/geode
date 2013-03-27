@@ -3,9 +3,9 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/geometry/Box.h>
-#include <other/core/vector/Vector.h>
-#include <other/core/vector/normalize.h>
+#include <othercore/geometry/Box.h>
+#include <othercore/vector/Vector.h>
+#include <othercore/vector/normalize.h>
 #include <cmath>
 #include <limits>
 namespace other{

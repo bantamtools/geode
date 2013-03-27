@@ -3,8 +3,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/vector/Vector.h>
-#include <other/core/vector/VectorPolicy.h>
+#include <othercore/vector/Vector.h>
+#include <othercore/vector/VectorPolicy.h>
 namespace other {
 
 template<class TV> struct IsScalarBlock<Twist<TV> >:public IsScalarBlock<TV>{};

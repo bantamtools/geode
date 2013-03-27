@@ -1,7 +1,7 @@
 // Safe bool utility types and functions
 #pragma once
 
-#include <other/core/utility/config.h>
+#include <othercore/utility/config.h>
 namespace other {
 
 struct SafeBoolHelper{ OTHER_CORE_EXPORT void F(); };

@@ -1,10 +1,10 @@
 // Header wrap: various functions for adding objects to the current module
 #pragma once
 
-#include <other/core/python/config.h>
-#include <other/core/utility/config.h>
+#include <othercore/python/config.h>
+#include <othercore/utility/config.h>
 #ifdef OTHER_PYTHON
-#include <other/core/python/wrap_function.h>
+#include <othercore/python/wrap_function.h>
 #endif
 namespace other {
 namespace python {

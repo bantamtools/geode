@@ -3,11 +3,11 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/geometry/forward.h>
-#include <other/core/geometry/BoxTree.h>
-#include <other/core/mesh/SegmentMesh.h>
-#include <other/core/mesh/TriangleMesh.h>
-#include <other/core/math/constants.h>
+#include <othercore/geometry/forward.h>
+#include <othercore/geometry/BoxTree.h>
+#include <othercore/mesh/SegmentMesh.h>
+#include <othercore/mesh/TriangleMesh.h>
+#include <othercore/math/constants.h>
 #include <vector>
 namespace other{
 

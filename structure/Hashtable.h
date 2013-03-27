@@ -7,11 +7,11 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/forward.h>
-#include <other/core/array/Array.h>
+#include <othercore/array/forward.h>
+#include <othercore/array/Array.h>
 
-#include <other/core/math/hash.h>
-#include <other/core/math/integer_log.h>
+#include <othercore/math/hash.h>
+#include <othercore/math/integer_log.h>
 #include <vector>
 
 namespace other {

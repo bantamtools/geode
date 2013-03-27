@@ -1,8 +1,8 @@
 // Set colors on a TriMesh
 #pragma once
 
-#include <other/core/openmesh/TriMesh.h>
-#include <other/core/utility/compose.h>
+#include <othercore/openmesh/TriMesh.h>
+#include <othercore/utility/compose.h>
 #include <boost/function.hpp>
 
 #ifdef USE_OPENMESH

@@ -3,10 +3,10 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/vector/ScalarPolicy.h>
-#include <other/core/math/hash.h>
-#include <other/core/utility/debug.h>
-#include <other/core/utility/stream.h>
+#include <othercore/vector/ScalarPolicy.h>
+#include <othercore/math/hash.h>
+#include <othercore/utility/debug.h>
+#include <othercore/utility/stream.h>
 #include <cmath>
 #include <cassert>
 #include <iostream>

@@ -1,7 +1,7 @@
 //#####################################################################
 // Class NdArray
 //#####################################################################
-#include <other/core/array/convert.h>
+#include <othercore/array/convert.h>
 namespace other {
 
 NDARRAY_CONVERSIONS(int)

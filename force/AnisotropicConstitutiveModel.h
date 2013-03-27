@@ -3,8 +3,8 @@
 //##################################################################### 
 #pragma once
 
-#include <other/core/force/ConstitutiveModel.h>
-#include <other/core/force/DiagonalizedStressDerivative.h>
+#include <othercore/force/ConstitutiveModel.h>
+#include <othercore/force/DiagonalizedStressDerivative.h>
 namespace other{
 
 template<class T,int d>

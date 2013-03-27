@@ -3,8 +3,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/utility/config.h>
-#include <other/core/utility/forward.h>
+#include <othercore/utility/config.h>
+#include <othercore/utility/forward.h>
 #include <boost/mpl/and.hpp>
 namespace other {
 

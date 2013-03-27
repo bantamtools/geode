@@ -11,9 +11,9 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/python/config.h>
-#include <other/core/python/new.h>
-#include <other/core/python/Ref.h>
+#include <othercore/python/config.h>
+#include <othercore/python/new.h>
+#include <othercore/python/Ref.h>
 namespace other {
 
 using std::ostream;

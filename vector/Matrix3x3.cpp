@@ -1,15 +1,15 @@
 //#####################################################################
 // Class Matrix3x3
 //#####################################################################
-#include <other/core/vector/Matrix.h>
-#include <other/core/vector/DiagonalMatrix3x3.h>
-#include <other/core/vector/Rotation.h>
-#include <other/core/vector/SymmetricMatrix3x3.h>
-#include <other/core/vector/UpperTriangularMatrix3x3.h>
-#include <other/core/array/RawArray.h>
-#include <other/core/math/maxabs.h>
-#include <other/core/math/minabs.h>
-#include <other/core/utility/Log.h>
+#include <othercore/vector/Matrix.h>
+#include <othercore/vector/DiagonalMatrix3x3.h>
+#include <othercore/vector/Rotation.h>
+#include <othercore/vector/SymmetricMatrix3x3.h>
+#include <othercore/vector/UpperTriangularMatrix3x3.h>
+#include <othercore/array/RawArray.h>
+#include <othercore/math/maxabs.h>
+#include <othercore/math/minabs.h>
+#include <othercore/utility/Log.h>
 namespace other {
 //#####################################################################
 // Constructor

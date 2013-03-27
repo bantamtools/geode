@@ -15,13 +15,13 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/NestedArray.h>
-#include <other/core/array/Array2d.h>
-#include <other/core/structure/Hashtable.h>
-#include <other/core/python/Object.h>
-#include <other/core/vector/Matrix.h>
-#include <other/core/vector/Vector.h>
-#include <other/core/structure/Triple.h>
+#include <othercore/array/NestedArray.h>
+#include <othercore/array/Array2d.h>
+#include <othercore/structure/Hashtable.h>
+#include <othercore/python/Object.h>
+#include <othercore/vector/Matrix.h>
+#include <othercore/vector/Vector.h>
+#include <othercore/structure/Triple.h>
 namespace other {
 
 class SolidMatrixStructure : public Object {

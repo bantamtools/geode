@@ -1,15 +1,15 @@
 //#####################################################################
 // Class BoxTree
 //#####################################################################
-#include <other/core/geometry/BoxTree.h>
-#include <other/core/array/IndirectArray.h>
-#include <other/core/array/ProjectedArray.h>
-#include <other/core/array/sort.h>
-#include <other/core/geometry/Box.h>
-#include <other/core/geometry/Sphere.h>
-#include <other/core/geometry/traverse.h>
-#include <other/core/math/integer_log.h>
-#include <other/core/python/Class.h>
+#include <othercore/geometry/BoxTree.h>
+#include <othercore/array/IndirectArray.h>
+#include <othercore/array/ProjectedArray.h>
+#include <othercore/array/sort.h>
+#include <othercore/geometry/Box.h>
+#include <othercore/geometry/Sphere.h>
+#include <othercore/geometry/traverse.h>
+#include <othercore/math/integer_log.h>
+#include <othercore/python/Class.h>
 namespace other{
 using std::cout;
 using std::endl;

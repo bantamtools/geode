@@ -3,9 +3,9 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/geometry/Box.h>
-#include <other/core/geometry/Plane.h>
-#include <other/core/math/constants.h>
+#include <othercore/geometry/Box.h>
+#include <othercore/geometry/Plane.h>
+#include <othercore/math/constants.h>
 namespace other{
 
 template<class T>

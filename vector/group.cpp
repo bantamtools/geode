@@ -1,7 +1,7 @@
 // Various groups
 
-#include <other/core/vector/group.h>
-#include <other/core/vector/Rotation.h>
+#include <othercore/vector/group.h>
+#include <othercore/vector/Rotation.h>
 namespace other {
 
 typedef real T;

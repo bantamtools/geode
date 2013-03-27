@@ -9,8 +9,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/utility/forward.h>
-#include <other/core/math/max.h>
+#include <othercore/utility/forward.h>
+#include <othercore/math/max.h>
 #include <new>
 namespace other {
 
@@ -74,4 +74,4 @@ OTHER_DEFINE_NEW((class A0,class A1,class A2,class A3,class A4,class A5,class A6
 #undef OTHER_DEFINE_NEW
 
 }
-#include <other/core/python/Ref.h>
+#include <othercore/python/Ref.h>

@@ -1,9 +1,9 @@
 //#####################################################################
 // File interrupts
 //#####################################################################
-#include <other/core/utility/interrupts.h>
-#include <other/core/python/exceptions.h>
-#include <other/core/python/config.h>
+#include <othercore/utility/interrupts.h>
+#include <othercore/python/exceptions.h>
+#include <othercore/python/config.h>
 #include <vector>
 namespace other{
 

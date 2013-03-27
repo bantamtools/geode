@@ -3,10 +3,10 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/vector/Matrix.h>
-#include <other/core/vector/Vector3d.h>
-#include <other/core/math/min.h>
-#include <other/core/math/minabs.h>
+#include <othercore/vector/Matrix.h>
+#include <othercore/vector/Vector3d.h>
+#include <othercore/math/min.h>
+#include <othercore/math/minabs.h>
 namespace other {
 
 using ::std::log;

@@ -1,9 +1,9 @@
 //#####################################################################
 // Module utility
 //#####################################################################
-#include <other/core/utility/Log.h>
-#include <other/core/utility/openmp.h>
-#include <other/core/python/wrap.h>
+#include <othercore/utility/Log.h>
+#include <othercore/utility/openmp.h>
+#include <othercore/python/wrap.h>
 #include <vector>
 namespace other {
 

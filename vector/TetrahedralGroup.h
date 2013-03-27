@@ -3,7 +3,7 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/vector/Rotation.h>
+#include <othercore/vector/Rotation.h>
 namespace other {
 
 template<class T>

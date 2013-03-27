@@ -1,8 +1,8 @@
 // Flood fills on TriMeshes
 #pragma once
 
-#include <other/core/openmesh/TriMesh.h>
-#include <other/core/structure/Tuple.h>
+#include <othercore/openmesh/TriMesh.h>
+#include <othercore/structure/Tuple.h>
 
 #ifdef USE_OPENMESH
 namespace other {

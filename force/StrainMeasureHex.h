@@ -3,9 +3,9 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/Array.h>
-#include <other/core/vector/Matrix.h>
-#include <other/core/vector/SymmetricMatrix.h>
+#include <othercore/array/Array.h>
+#include <othercore/vector/Matrix.h>
+#include <othercore/vector/SymmetricMatrix.h>
 namespace other{
 
 class StrainMeasureHex : public Object {

@@ -1,8 +1,8 @@
 //#####################################################################
 // Macro OTHER_DEBUG_PRINT
 //#####################################################################
-#include <other/core/utility/DebugPrint.h>
-#include <other/core/utility/Log.h>
+#include <othercore/utility/DebugPrint.h>
+#include <othercore/utility/Log.h>
 #include <cstdarg>
 namespace other {
 

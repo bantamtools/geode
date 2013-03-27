@@ -1,8 +1,8 @@
 //#####################################################################
 // Function hash
 //#####################################################################
-#include <other/core/math/hash.h>
-#include <other/core/array/RawArray.h>
+#include <othercore/math/hash.h>
+#include <othercore/array/RawArray.h>
 namespace other {
 
 static Hash hash_string(size_t size,const char* s) {

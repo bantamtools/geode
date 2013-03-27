@@ -3,7 +3,7 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/python/config.h> // Must be included first
+#include <othercore/python/config.h> // Must be included first
 
 namespace other {
 #if defined(OTHER_FLOAT)

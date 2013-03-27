@@ -3,8 +3,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/force/Force.h>
-#include <other/core/force/StrainMeasureHex.h>
+#include <othercore/force/Force.h>
+#include <othercore/force/StrainMeasureHex.h>
 namespace other{
 
 class LinearFiniteVolumeHex:public Force<Vector<real,3> >

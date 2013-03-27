@@ -16,13 +16,13 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/python/config.h>
-#include <other/core/python/exceptions.h>
-#include <other/core/python/from_python.h>
-#include <other/core/python/to_python.h>
-#include <other/core/python/outer_wrapper.h>
-#include <other/core/utility/config.h>
-#include <other/core/utility/Enumerate.h>
+#include <othercore/python/config.h>
+#include <othercore/python/exceptions.h>
+#include <othercore/python/from_python.h>
+#include <othercore/python/to_python.h>
+#include <othercore/python/outer_wrapper.h>
+#include <othercore/utility/config.h>
+#include <othercore/utility/Enumerate.h>
 #include <boost/mpl/bool.hpp>
 namespace other {
 

@@ -1,7 +1,7 @@
 //#####################################################################
 // Class Ray
 //#####################################################################
-#include <other/core/geometry/Ray.h>
+#include <othercore/geometry/Ray.h>
 namespace other{
 
 template<> void Ray<Vector<real,2> >::compute_lazy_box_intersection_acceleration_data() const {

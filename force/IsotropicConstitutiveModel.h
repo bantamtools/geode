@@ -3,7 +3,7 @@
 //##################################################################### 
 #pragma once
 
-#include <other/core/force/ConstitutiveModel.h>
+#include <othercore/force/ConstitutiveModel.h>
 namespace other{
 
 template<class T,int d>

@@ -7,10 +7,10 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/python/config.h>
-#include <other/core/python/from_python.h>
-#include <other/core/python/utility.h>
-#include <other/core/utility/Enumerate.h>
+#include <othercore/python/config.h>
+#include <othercore/python/from_python.h>
+#include <othercore/python/utility.h>
+#include <othercore/utility/Enumerate.h>
 namespace other {
 
 namespace mpl = boost::mpl;

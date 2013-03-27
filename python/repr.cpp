@@ -1,9 +1,9 @@
 //#####################################################################
 // Function repr
 //#####################################################################
-#include <other/core/python/repr.h>
-#include <other/core/python/from_python.h>
-#include <other/core/utility/format.h>
+#include <othercore/python/repr.h>
+#include <othercore/python/from_python.h>
+#include <othercore/utility/format.h>
 #include <cstdio>
 namespace other {
 

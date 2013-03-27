@@ -3,9 +3,9 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/utility/format.h>
-#include <other/core/utility/tr1.h>
-#include <other/core/value/Prop.h>
+#include <othercore/utility/format.h>
+#include <othercore/utility/tr1.h>
+#include <othercore/value/Prop.h>
 #include <stdexcept>
 #include <string>
 #include <vector>

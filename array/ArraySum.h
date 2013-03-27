@@ -3,8 +3,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/forward.h>
-#include <other/core/vector/ArithmeticPolicy.h>
+#include <othercore/array/forward.h>
+#include <othercore/vector/ArithmeticPolicy.h>
 #include <cassert>
 namespace other {
 

@@ -3,7 +3,7 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/forward.h>
+#include <othercore/array/forward.h>
 namespace other{
 
 class PolygonMesh;

@@ -3,7 +3,7 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/vector/Vector3d.h>
+#include <othercore/vector/Vector3d.h>
 namespace other {
 
 template<class T> struct IsScalarBlock<Quaternion<T> >:public IsScalarBlock<T>{};

@@ -9,10 +9,10 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/python/config.h>
-#include <other/core/python/exceptions.h>
-#include <other/core/python/utility.h>
-#include <other/core/utility/config.h>
+#include <othercore/python/config.h>
+#include <othercore/python/exceptions.h>
+#include <othercore/python/utility.h>
+#include <othercore/utility/config.h>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/utility/enable_if.hpp>
 namespace other {

@@ -9,8 +9,8 @@
 #pragma once
 
 #include <sstream>
-#include <other/core/utility/stl.h>
-#include <other/core/python/Ref.h>
+#include <othercore/utility/stl.h>
+#include <othercore/python/Ref.h>
 namespace other{
 
 using std::string;

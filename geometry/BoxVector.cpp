@@ -1,14 +1,14 @@
 //#####################################################################
 // Class Box
 //#####################################################################
-#include <other/core/geometry/Box.h>
-#include <other/core/geometry/AnalyticImplicit.h>
-#include <other/core/geometry/Ray.h>
-#include <other/core/python/from_python.h>
-#include <other/core/python/exceptions.h>
-#include <other/core/math/cube.h>
-#include <other/core/utility/format.h>
-#include <other/core/structure/Tuple.h>
+#include <othercore/geometry/Box.h>
+#include <othercore/geometry/AnalyticImplicit.h>
+#include <othercore/geometry/Ray.h>
+#include <othercore/python/from_python.h>
+#include <othercore/python/exceptions.h>
+#include <othercore/math/cube.h>
+#include <othercore/utility/format.h>
+#include <othercore/structure/Tuple.h>
 namespace other {
 
 typedef real T;

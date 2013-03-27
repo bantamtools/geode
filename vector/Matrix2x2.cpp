@@ -1,9 +1,9 @@
 //#####################################################################
 // Class Matrix2x2
 //#####################################################################
-#include <other/core/vector/Matrix2x2.h>
-#include <other/core/vector/DiagonalMatrix2x2.h>
-#include <other/core/vector/SymmetricMatrix2x2.h>
+#include <othercore/vector/Matrix2x2.h>
+#include <othercore/vector/DiagonalMatrix2x2.h>
+#include <othercore/vector/SymmetricMatrix2x2.h>
 namespace other{
 
 template<class T> void Matrix<T,2>::

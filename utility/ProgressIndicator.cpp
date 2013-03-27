@@ -1,8 +1,8 @@
 //#####################################################################
 // Class ProgressIndicator
 //#####################################################################
-#include <other/core/utility/ProgressIndicator.h>
-#include <other/core/utility/Log.h>
+#include <othercore/utility/ProgressIndicator.h>
+#include <othercore/utility/Log.h>
 namespace other {
 
 ProgressIndicator::ProgressIndicator(const int total, const bool brief)

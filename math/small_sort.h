@@ -7,8 +7,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/math/min.h>
-#include <other/core/math/max.h>
+#include <othercore/math/min.h>
+#include <othercore/math/max.h>
 #include <algorithm>
 namespace other {
 

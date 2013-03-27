@@ -3,19 +3,19 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/vector/ScalarPolicy.h>
-#include <other/core/vector/Vector0d.h>
-#include <other/core/math/inverse.h>
-#include <other/core/math/clamp.h>
-#include <other/core/math/argmax.h>
-#include <other/core/math/argmin.h>
-#include <other/core/math/isnan.h>
-#include <other/core/math/max.h>
-#include <other/core/math/min.h>
-#include <other/core/math/sign.h>
-#include <other/core/math/sqr.h>
-#include <other/core/utility/debug.h>
-#include <other/core/utility/STATIC_ASSERT_SAME.h>
+#include <othercore/vector/ScalarPolicy.h>
+#include <othercore/vector/Vector0d.h>
+#include <othercore/math/inverse.h>
+#include <othercore/math/clamp.h>
+#include <othercore/math/argmax.h>
+#include <othercore/math/argmin.h>
+#include <othercore/math/isnan.h>
+#include <othercore/math/max.h>
+#include <othercore/math/min.h>
+#include <othercore/math/sign.h>
+#include <othercore/math/sqr.h>
+#include <othercore/utility/debug.h>
+#include <othercore/utility/STATIC_ASSERT_SAME.h>
 #include <boost/mpl/less_equal.hpp>
 #include <cmath>
 namespace other {

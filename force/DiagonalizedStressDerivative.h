@@ -3,8 +3,8 @@
 //##################################################################### 
 #pragma once
 
-#include <other/core/vector/forward.h>
-#include <other/core/utility/debug.h>
+#include <othercore/vector/forward.h>
+#include <othercore/utility/debug.h>
 namespace other{
 
 template<class T,int d> class DiagonalizedStressDerivative;

@@ -1,12 +1,12 @@
-#include <other/core/force/LinearFiniteVolume.h>
-#include <other/core/array/view.h>
-#include <other/core/math/Factorial.h>
-#include <other/core/python/Class.h>
-#include <other/core/utility/const_cast.h>
-#include <other/core/vector/normalize.h>
-#include <other/core/vector/SolidMatrix.h>
-#include <other/core/vector/SymmetricMatrix.h>
-#include <other/core/vector/UpperTriangularMatrix.h>
+#include <othercore/force/LinearFiniteVolume.h>
+#include <othercore/array/view.h>
+#include <othercore/math/Factorial.h>
+#include <othercore/python/Class.h>
+#include <othercore/utility/const_cast.h>
+#include <othercore/vector/normalize.h>
+#include <othercore/vector/SolidMatrix.h>
+#include <othercore/vector/SymmetricMatrix.h>
+#include <othercore/vector/UpperTriangularMatrix.h>
 namespace other{
 
 typedef real T;

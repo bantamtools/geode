@@ -1,12 +1,12 @@
 //#####################################################################
 // Class Rotation
 //#####################################################################
-#include <other/core/python/from_python.h>
-#include <other/core/array/convert.h>
-#include <other/core/vector/Matrix.h>
-#include <other/core/vector/Rotation.h>
-#include <other/core/python/numpy.h>
-#include <other/core/python/wrap.h>
+#include <othercore/python/from_python.h>
+#include <othercore/array/convert.h>
+#include <othercore/vector/Matrix.h>
+#include <othercore/vector/Rotation.h>
+#include <othercore/python/numpy.h>
+#include <othercore/python/wrap.h>
 namespace other{
 
 typedef real T;

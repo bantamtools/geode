@@ -1,12 +1,12 @@
-#include <other/core/array/Array.h>
-#include <other/core/value/Value.h>
-#include <other/core/value/Action.h>
-#include <other/core/value/Prop.h>
-#include <other/core/value/convert.h>
-#include <other/core/python/Class.h>
-#include <other/core/python/stl.h>
-#include <other/core/python/wrap.h>
-#include <other/core/utility/const_cast.h>
+#include <othercore/array/Array.h>
+#include <othercore/value/Value.h>
+#include <othercore/value/Action.h>
+#include <othercore/value/Prop.h>
+#include <othercore/value/convert.h>
+#include <othercore/python/Class.h>
+#include <othercore/python/stl.h>
+#include <othercore/python/wrap.h>
+#include <othercore/utility/const_cast.h>
 #include <iostream>
 namespace other {
 

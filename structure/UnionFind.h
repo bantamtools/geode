@@ -3,9 +3,9 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/structure/Tuple.h>
-#include <other/core/array/ConstantMap.h>
-#include <other/core/array/Array.h>
+#include <othercore/structure/Tuple.h>
+#include <othercore/array/ConstantMap.h>
+#include <othercore/array/Array.h>
 namespace other{
 
 template<class Derived,class Parents,class Ranks>

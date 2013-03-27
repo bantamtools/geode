@@ -1,8 +1,8 @@
 //#####################################################################
 // Class Implicit
 //#####################################################################
-#include <other/core/geometry/Implicit.h>
-#include <other/core/python/Class.h>
+#include <othercore/geometry/Implicit.h>
+#include <othercore/python/Class.h>
 namespace other{
 
 typedef real T;

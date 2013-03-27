@@ -1,14 +1,14 @@
 //#####################################################################
 // Function format
 //#####################################################################
-#include <other/core/utility/format.h>
-#include <other/core/python/wrap.h>
+#include <othercore/utility/format.h>
+#include <othercore/python/wrap.h>
 #include <vector>
 #include <cstdarg>
 #include <cstdio>
 
 //These needed so test functions will compile without python
-#include <other/core/utility/debug.h>
+#include <othercore/utility/debug.h>
 #include <iostream>
 
 // Windows silliness

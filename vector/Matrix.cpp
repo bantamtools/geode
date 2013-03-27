@@ -1,10 +1,10 @@
 //#####################################################################
 // Class Matrix
 //#####################################################################
-#include <other/core/vector/Matrix.h>
-#include <other/core/array/convert.h>
-#include <other/core/python/numpy.h>
-#include <other/core/python/wrap.h>
+#include <othercore/vector/Matrix.h>
+#include <othercore/array/convert.h>
+#include <othercore/python/numpy.h>
+#include <othercore/python/wrap.h>
 namespace other {
 
 #ifdef OTHER_PYTHON

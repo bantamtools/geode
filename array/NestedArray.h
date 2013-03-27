@@ -9,7 +9,7 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/Array.h>
+#include <othercore/array/Array.h>
 namespace other {
 
 OTHER_CORE_EXPORT Array<int> nested_array_offsets(RawArray<const int> lengths);

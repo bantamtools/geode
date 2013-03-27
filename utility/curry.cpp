@@ -1,6 +1,6 @@
 // A simpler version of boost::bind
 
-#include <other/core/utility/curry.h>
+#include <othercore/utility/curry.h>
 namespace other {
 
 namespace {

@@ -1,10 +1,10 @@
 //#####################################################################
 // Class Box<T>
 //#####################################################################
-#include <other/core/geometry/BoxScalar.h>
-#include <other/core/python/exceptions.h>
-#include <other/core/structure/Tuple.h>
-#include <other/core/vector/Vector.h>
+#include <othercore/geometry/BoxScalar.h>
+#include <othercore/python/exceptions.h>
+#include <othercore/structure/Tuple.h>
+#include <othercore/vector/Vector.h>
 namespace other {
 
 #ifdef OTHER_PYTHON

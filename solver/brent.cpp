@@ -7,10 +7,10 @@
 // guarantee implied provided you keep this notice in all copies.
 // *****END NOTICE************
 
-#include <other/core/solver/brent.h>
-#include <other/core/python/function.h>
-#include <other/core/python/wrap.h>
-#include <other/core/math/copysign.h>
+#include <othercore/solver/brent.h>
+#include <othercore/python/function.h>
+#include <othercore/python/wrap.h>
+#include <othercore/math/copysign.h>
 
 
 // Windows silliness

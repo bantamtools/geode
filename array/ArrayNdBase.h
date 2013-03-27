@@ -3,8 +3,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/Array.h>
-#include <other/core/math/isnan.h>
+#include <othercore/array/Array.h>
+#include <othercore/math/isnan.h>
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/or.hpp>
 namespace other {

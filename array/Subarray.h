@@ -7,9 +7,9 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/forward.h>
-#include <other/core/vector/Vector.h>
-#include <other/core/utility/str.h>
+#include <othercore/array/forward.h>
+#include <othercore/vector/Vector.h>
+#include <othercore/utility/str.h>
 #include <iomanip>
 namespace other {
 

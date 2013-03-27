@@ -1,8 +1,8 @@
 #pragma once
 
-#include <other/core/python/config.h> // Must be included first
-#include <other/core/utility/pass.h>
-#include <other/core/utility/tr1.h>
+#include <othercore/python/config.h> // Must be included first
+#include <othercore/utility/pass.h>
+#include <othercore/utility/tr1.h>
 #include <vector>
 #include <deque>
 #include <queue>
@@ -12,10 +12,10 @@
 #include <algorithm>
 #include <iostream>
 #include <boost/type_traits.hpp>
-#include <other/core/utility/remove_const_reference.h>
-#include <other/core/math/hash.h>
+#include <othercore/utility/remove_const_reference.h>
+#include <othercore/math/hash.h>
 #include <boost/shared_ptr.hpp>
-#include <other/core/utility/equals.h>
+#include <othercore/utility/equals.h>
 
 namespace other {
 

@@ -16,11 +16,11 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/python/config.h>
-#include <other/core/python/exceptions.h>
-#include <other/core/python/Object.h>
-#include <other/core/utility/config.h>
-#include <other/core/utility/validity.h>
+#include <othercore/python/config.h>
+#include <othercore/python/exceptions.h>
+#include <othercore/python/Object.h>
+#include <othercore/utility/config.h>
+#include <othercore/utility/validity.h>
 #include <boost/type_traits/is_base_of.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <string>

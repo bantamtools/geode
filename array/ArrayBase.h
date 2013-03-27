@@ -3,27 +3,27 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/forward.h>
-#include <other/core/array/ArrayAbs.h>
-#include <other/core/array/ArrayDifference.h>
-#include <other/core/array/ArrayLeftMultiple.h>
-#include <other/core/array/ArrayNegation.h>
-#include <other/core/array/ArrayPlusScalar.h>
-#include <other/core/array/ArrayProduct.h>
-#include <other/core/array/ArraySum.h>
-#include <other/core/structure/forward.h>
-#include <other/core/math/hash.h>
-#include <other/core/math/max.h>
-#include <other/core/math/maxabs.h>
-#include <other/core/math/maxmag.h>
-#include <other/core/math/min.h>
-#include <other/core/math/minmag.h>
-#include <other/core/math/inverse.h>
-#include <other/core/math/isnan.h>
-#include <other/core/vector/magnitude.h>
-#include <other/core/vector/Dot.h>
-#include <other/core/vector/ScalarPolicy.h>
-#include <other/core/utility/STATIC_ASSERT_SAME.h>
+#include <othercore/array/forward.h>
+#include <othercore/array/ArrayAbs.h>
+#include <othercore/array/ArrayDifference.h>
+#include <othercore/array/ArrayLeftMultiple.h>
+#include <othercore/array/ArrayNegation.h>
+#include <othercore/array/ArrayPlusScalar.h>
+#include <othercore/array/ArrayProduct.h>
+#include <othercore/array/ArraySum.h>
+#include <othercore/structure/forward.h>
+#include <othercore/math/hash.h>
+#include <othercore/math/max.h>
+#include <othercore/math/maxabs.h>
+#include <othercore/math/maxmag.h>
+#include <othercore/math/min.h>
+#include <othercore/math/minmag.h>
+#include <othercore/math/inverse.h>
+#include <othercore/math/isnan.h>
+#include <othercore/vector/magnitude.h>
+#include <othercore/vector/Dot.h>
+#include <othercore/vector/ScalarPolicy.h>
+#include <othercore/utility/STATIC_ASSERT_SAME.h>
 #include <boost/mpl/identity.hpp>
 #include <boost/type_traits/is_class.hpp>
 #include <boost/type_traits/is_const.hpp>
@@ -632,9 +632,9 @@ template<class T,class TArray> static inline Hash hash_reduce(const ArrayBase<T,
 }
 
 }
-#include <other/core/array/IdentityMap.h>
-#include <other/core/array/ProjectedArray.h>
-#include <other/core/array/Array.h>
+#include <othercore/array/IdentityMap.h>
+#include <othercore/array/ProjectedArray.h>
+#include <othercore/array/Array.h>
 namespace other {
 
 template<class T_,class TArray> inline IndirectArray<TArray,IdentityMap> ArrayBase<T_,TArray>::prefix(const int prefix_size) const {

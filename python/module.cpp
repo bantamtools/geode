@@ -1,13 +1,13 @@
 //#####################################################################
 // Module Python
 //#####################################################################
-#include <other/core/utility/config.h>
+#include <othercore/utility/config.h>
 #define OTHER_IMPORT_NUMPY
-#include <other/core/python/module.h>
-#include <other/core/python/enum.h>
-#include <other/core/python/numpy.h>
-#include <other/core/python/stl.h>
-#include <other/core/python/wrap.h>
+#include <othercore/python/module.h>
+#include <othercore/python/enum.h>
+#include <othercore/python/numpy.h>
+#include <othercore/python/stl.h>
+#include <othercore/python/wrap.h>
 namespace other {
 
 #ifdef OTHER_PYTHON

@@ -1,7 +1,7 @@
 //#####################################################################
 // Class TetraehdralGroup
 //#####################################################################
-#include <other/core/vector/TetrahedralGroup.h>
+#include <othercore/vector/TetrahedralGroup.h>
 namespace other {
 //#####################################################################
 // source: http://www.math.sunysb.edu/~tony/bintet

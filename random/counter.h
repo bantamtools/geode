@@ -3,8 +3,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/random/forward.h>
-#include <other/core/math/uint128.h>
+#include <othercore/random/forward.h>
+#include <othercore/math/uint128.h>
 namespace other {
 
 // Note that we put key first to match currying, unlike Salmon et al.

@@ -1,4 +1,4 @@
-#include <other/core/utility/CloneArray.h>
+#include <othercore/utility/CloneArray.h>
 namespace other {
 
 CloneArray<CloneableBase>::

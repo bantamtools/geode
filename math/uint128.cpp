@@ -1,10 +1,10 @@
 //#####################################################################
 // Class uint128_t
 //#####################################################################
-#include <other/core/math/uint128.h>
-#include <other/core/python/stl.h>
-#include <other/core/python/wrap.h>
-#include <other/core/utility/format.h>
+#include <othercore/math/uint128.h>
+#include <othercore/python/stl.h>
+#include <othercore/python/wrap.h>
+#include <othercore/utility/format.h>
 #include <boost/static_assert.hpp>
 #include <iostream>
 namespace other{

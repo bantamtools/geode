@@ -1,8 +1,8 @@
 // Convenience functions for generating platonic solids
 #pragma once
 
-#include <other/core/mesh/TriangleMesh.h>
-#include <other/core/structure/Tuple.h>
+#include <othercore/mesh/TriangleMesh.h>
+#include <othercore/structure/Tuple.h>
 namespace other {
 
 OTHER_CORE_EXPORT Tuple<Ref<TriangleMesh>,Array<Vector<real,3>>> icosahedron_mesh();

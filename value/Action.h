@@ -3,8 +3,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/value/Value.h>
-#include <other/core/utility/move.h>
+#include <othercore/value/Value.h>
+#include <othercore/utility/move.h>
 #include <boost/type_traits/remove_reference.hpp>
 namespace other{
 

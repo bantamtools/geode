@@ -22,11 +22,11 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/utility/config.h>
-#include <other/core/array/Array.h>
-#include <other/core/force/Force.h>
-#include <other/core/vector/Vector.h>
-#include <other/core/mesh/forward.h>
+#include <othercore/utility/config.h>
+#include <othercore/array/Array.h>
+#include <othercore/force/Force.h>
+#include <othercore/vector/Vector.h>
+#include <othercore/mesh/forward.h>
 namespace other{
 
 class AirPressure : public Force<Vector<real,3>> {

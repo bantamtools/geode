@@ -3,10 +3,10 @@
 //#####################################################################
 // See Bratley and Fox. 1988. Algorithm 659: Implementing Sobol's quasirandom sequence generator. Acm Trans. Math. Softw. 14, 88-100.
 //#####################################################################
-#include <other/core/random/Sobol.h>
-#include <other/core/geometry/Box.h>
-#include <other/core/math/integer_log.h>
-#include <other/core/python/Class.h>
+#include <othercore/random/Sobol.h>
+#include <othercore/geometry/Box.h>
+#include <othercore/math/integer_log.h>
+#include <othercore/python/Class.h>
 namespace other {
 
 typedef real T;
