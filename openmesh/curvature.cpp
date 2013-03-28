@@ -1,12 +1,12 @@
 // Measure the mean and Gaussian curvatures of meshes
 #ifdef USE_OPENMESH
 
-#include <other/core/openmesh/curvature.h>
-#include <other/core/array/Field.h>
-#include <other/core/python/wrap.h>
-#include <other/core/utility/Log.h>
-#include <other/core/vector/normalize.h>
-#include <other/core/math/copysign.h>
+#include <othercore/openmesh/curvature.h>
+#include <othercore/array/Field.h>
+#include <othercore/python/wrap.h>
+#include <othercore/utility/Log.h>
+#include <othercore/vector/normalize.h>
+#include <othercore/math/copysign.h>
 namespace other {
 
 using Log::cout;

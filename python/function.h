@@ -3,12 +3,12 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/python/from_python.h>
-#include <other/core/python/to_python.h>
-#include <other/core/utility/config.h>
+#include <othercore/python/from_python.h>
+#include <othercore/python/to_python.h>
+#include <othercore/utility/config.h>
 #include <boost/function.hpp>
 #include <boost/type_traits/function_traits.hpp>
-#include <other/core/python/utility.h>
+#include <othercore/python/utility.h>
 namespace other {
 
 using std::string;

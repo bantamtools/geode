@@ -1,11 +1,11 @@
-#include <other/core/force/LinearBendingElements.h>
-#include <other/core/mesh/SegmentMesh.h>
-#include <other/core/mesh/TriangleMesh.h>
-#include <other/core/utility/Log.h>
-#include <other/core/vector/SparseMatrix.h>
-#include <other/core/vector/SolidMatrix.h>
-#include <other/core/vector/SymmetricMatrix.h>
-#include <other/core/python/Class.h>
+#include <othercore/force/LinearBendingElements.h>
+#include <othercore/mesh/SegmentMesh.h>
+#include <othercore/mesh/TriangleMesh.h>
+#include <othercore/utility/Log.h>
+#include <othercore/vector/SparseMatrix.h>
+#include <othercore/vector/SolidMatrix.h>
+#include <othercore/vector/SymmetricMatrix.h>
+#include <othercore/python/Class.h>
 namespace other{
 
 typedef real T;

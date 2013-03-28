@@ -1,8 +1,8 @@
 //#####################################################################
 // Module core
 //#####################################################################
-#include <other/core/python/module.h>
-#include <other/core/utility/interrupts.h>
+#include <othercore/python/module.h>
+#include <othercore/utility/interrupts.h>
 using namespace other;
 
 OTHER_PYTHON_MODULE(other_core) {

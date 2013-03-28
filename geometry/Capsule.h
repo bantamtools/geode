@@ -3,9 +3,9 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/geometry/Segment2d.h>
-#include <other/core/geometry/Segment3d.h>
-#include <other/core/vector/magnitude.h>
+#include <othercore/geometry/Segment2d.h>
+#include <othercore/geometry/Segment3d.h>
+#include <othercore/vector/magnitude.h>
 namespace other {
 
 template<class TV> class Capsule {

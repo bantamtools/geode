@@ -3,10 +3,10 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/forward.h>
-#include <other/core/vector/forward.h>
-#include <other/core/utility/HasCheapCopy.h>
-#include <other/core/utility/remove_const_reference.h>
+#include <othercore/array/forward.h>
+#include <othercore/vector/forward.h>
+#include <othercore/utility/HasCheapCopy.h>
+#include <othercore/utility/remove_const_reference.h>
 #include <boost/type_traits/is_empty.hpp>
 #include <boost/utility/declval.hpp>
 #include <boost/mpl/assert.hpp>
@@ -93,7 +93,7 @@ struct PointerProjector { // turns shared_ptr<T>, etc., into T*
 };
 
 }
-#include <other/core/array/ArrayBase.h>
+#include <othercore/array/ArrayBase.h>
 namespace other {
 
 template<class TArray> static inline ProjectedArray<const TArray,PointerProjector> raw_pointers(const TArray& array) {

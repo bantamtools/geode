@@ -5,8 +5,8 @@
 
 #include <cmath>
 #include <cfloat>
-#include <other/core/math/small_sort.h>
-#include <other/core/math/sqr.h>
+#include <othercore/math/small_sort.h>
+#include <othercore/math/sqr.h>
 namespace other {
 
 using ::std::abs;

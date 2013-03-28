@@ -1,7 +1,7 @@
 //#####################################################################
 // Module openmesh
 //#####################################################################
-#include <other/core/python/wrap.h>
+#include <othercore/python/wrap.h>
 using namespace other;
 
 static bool openmesh_enabled() {

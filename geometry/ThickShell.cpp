@@ -1,16 +1,16 @@
 // Thickened shells generalizing capsules
 
-#include <other/core/geometry/ThickShell.h>
-#include <other/core/array/view.h>
-#include <other/core/math/constants.h>
-#include <other/core/mesh/SegmentMesh.h>
-#include <other/core/mesh/TriangleMesh.h>
-#include <other/core/python/cast.h>
-#include <other/core/python/Class.h>
-#include <other/core/utility/Log.h>
-#include <other/core/utility/str.h>
-#include <other/core/vector/normalize.h>
-#include <other/core/vector/SymmetricMatrix2x2.h>
+#include <othercore/geometry/ThickShell.h>
+#include <othercore/array/view.h>
+#include <othercore/math/constants.h>
+#include <othercore/mesh/SegmentMesh.h>
+#include <othercore/mesh/TriangleMesh.h>
+#include <othercore/python/cast.h>
+#include <othercore/python/Class.h>
+#include <othercore/utility/Log.h>
+#include <othercore/utility/str.h>
+#include <othercore/vector/normalize.h>
+#include <othercore/vector/SymmetricMatrix2x2.h>
 namespace other {
 
 typedef double T;

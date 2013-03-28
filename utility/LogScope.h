@@ -3,8 +3,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/utility/LogEntry.h>
-#include <other/core/utility/tr1.h>
+#include <othercore/utility/LogEntry.h>
+#include <othercore/utility/tr1.h>
 #include <string>
 #include <vector>
 namespace other {

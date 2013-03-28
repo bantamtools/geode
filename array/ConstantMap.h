@@ -3,7 +3,7 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/ArrayBase.h>
+#include <othercore/array/ArrayBase.h>
 namespace other {
 
 template<class T> struct IsArray<ConstantMap<T> >:public mpl::true_{};

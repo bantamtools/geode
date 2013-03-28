@@ -4,10 +4,10 @@
 #pragma once
 #ifdef OTHER_PYTHON
 
-#include <other/core/python/config.h>
-#include <other/core/python/Object.h>
-#include <other/core/python/to_python.h>
-#include <other/core/python/from_python.h>
+#include <othercore/python/config.h>
+#include <othercore/python/Object.h>
+#include <othercore/python/to_python.h>
+#include <othercore/python/from_python.h>
 namespace other {
 
 template<class T> static inline Ref<> to_python_check(const T& o) {

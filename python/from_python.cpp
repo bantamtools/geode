@@ -1,8 +1,8 @@
 //#####################################################################
 // Function from_python
 //#####################################################################
-#include <other/core/python/from_python.h>
-#include <other/core/utility/format.h>
+#include <othercore/python/from_python.h>
+#include <othercore/utility/format.h>
 namespace other {
 
 #ifdef OTHER_PYTHON

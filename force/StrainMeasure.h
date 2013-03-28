@@ -3,9 +3,9 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/Array.h>
-#include <other/core/vector/Vector.h>
-#include <other/core/utility/debug.h>
+#include <othercore/array/Array.h>
+#include <othercore/vector/Vector.h>
+#include <othercore/utility/debug.h>
 namespace other{
 
 template<class TV,int d>

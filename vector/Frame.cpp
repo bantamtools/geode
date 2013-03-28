@@ -1,10 +1,10 @@
 //#####################################################################
 // Class Frame
 //#####################################################################
-#include <other/core/vector/Frame.h>
-#include <other/core/array/convert.h>
-#include <other/core/python/numpy.h>
-#include <other/core/python/wrap.h>
+#include <othercore/vector/Frame.h>
+#include <othercore/array/convert.h>
+#include <othercore/python/numpy.h>
+#include <othercore/python/wrap.h>
 namespace other {
 
 typedef real T;

@@ -1,6 +1,6 @@
 #ifdef OTHER_PYTHON
-#include <other/core/python/wrap_property.h>
-#include <other/core/utility/const_cast.h>
+#include <othercore/python/wrap_property.h>
+#include <othercore/utility/const_cast.h>
 namespace other {
 
 PyObject* wrap_property_helper(PyTypeObject* type,const char* name,getter get_wrapper,setter set_wrapper,void* getset) {

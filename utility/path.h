@@ -6,7 +6,7 @@
 // (also, boost::filesystem breaks with c++0x, as of 1.51,
 // and changes its API too frequently to be acceptable)
 
-#include <other/core/utility/config.h>
+#include <othercore/utility/config.h>
 #include <string>
 namespace other {
 namespace path {

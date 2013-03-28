@@ -2,7 +2,7 @@
 // Function wrap_field
 //#####################################################################
 #ifdef OTHER_PYTHON
-#include <other/core/python/wrap_field.h>
+#include <othercore/python/wrap_field.h>
 namespace other {
 
 PyObject* wrap_field_helper(PyTypeObject* type,const char* name,size_t offset,getter get,setter set) {

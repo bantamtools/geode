@@ -3,11 +3,11 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/vector/Matrix.h>
-#include <other/core/vector/Vector2d.h>
-#include <other/core/math/minabs.h>
-#include <other/core/math/sign.h>
-#include <other/core/math/robust.h>
+#include <othercore/vector/Matrix.h>
+#include <othercore/vector/Vector2d.h>
+#include <othercore/math/minabs.h>
+#include <othercore/math/sign.h>
+#include <othercore/math/robust.h>
 namespace other{
 
 using ::std::log;

@@ -9,8 +9,8 @@
 //
 // See http://stackoverflow.com/questions/2127693/sfinae-sizeof-detect-if-expression-compiles
 
-#include <other/core/utility/config.h>
-#include <other/core/utility/forward.h>
+#include <othercore/utility/config.h>
+#include <othercore/utility/forward.h>
 #include <boost/mpl/bool.hpp>
 
 #define OTHER_VALIDITY_CHECKER(name,T,expression) \

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <other/core/vector/Vector.h>
-#include <other/core/python/numpy.h>
-#include <other/core/utility/config.h>
+#include <othercore/vector/Vector.h>
+#include <othercore/python/numpy.h>
+#include <othercore/utility/config.h>
 #include <boost/mpl/assert.hpp>
 namespace other {
 

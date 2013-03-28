@@ -17,16 +17,16 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/ArrayBase.h>
-#include <other/core/array/RawArray.h>
-#include <other/core/python/Buffer.h>
-#include <other/core/python/exceptions.h>
-#include <other/core/python/forward.h>
-#include <other/core/utility/debug.h>
-#include <other/core/utility/format.h>
-#include <other/core/utility/config.h>
-#include <other/core/utility/range.h>
-#include <other/core/vector/Vector.h>
+#include <othercore/array/ArrayBase.h>
+#include <othercore/array/RawArray.h>
+#include <othercore/python/Buffer.h>
+#include <othercore/python/exceptions.h>
+#include <othercore/python/forward.h>
+#include <othercore/utility/debug.h>
+#include <othercore/utility/format.h>
+#include <othercore/utility/config.h>
+#include <othercore/utility/range.h>
+#include <othercore/vector/Vector.h>
 #include <boost/mpl/assert.hpp>
 #include <boost/type_traits/has_trivial_destructor.hpp>
 namespace other {

@@ -9,11 +9,11 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/Array.h>
-#include <other/core/mesh/forward.h>
-#include <other/core/python/Object.h>
-#include <other/core/python/Ptr.h>
-#include <other/core/python/Ref.h>
+#include <othercore/array/Array.h>
+#include <othercore/mesh/forward.h>
+#include <othercore/python/Object.h>
+#include <othercore/python/Ptr.h>
+#include <othercore/python/Ref.h>
 namespace other {
 
 class PolygonMesh : public Object {

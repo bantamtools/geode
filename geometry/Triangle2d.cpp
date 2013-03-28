@@ -1,8 +1,8 @@
 //#####################################################################
 // Class Triangle<Vector<T,2> >
 //##################################################################### 
-#include <other/core/geometry/Triangle2d.h>
-#include <other/core/geometry/Segment2d.h>
+#include <othercore/geometry/Triangle2d.h>
+#include <othercore/geometry/Segment2d.h>
 namespace other{
 
 template<class T> Vector<T,2> Triangle<Vector<T,2> >::

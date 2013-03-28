@@ -3,7 +3,7 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/ArrayExpression.h>
+#include <othercore/array/ArrayExpression.h>
 #include <cassert>
 namespace other {
 

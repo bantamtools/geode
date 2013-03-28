@@ -3,11 +3,11 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/force/Force.h>
-#include <other/core/python/Ptr.h>
-#include <other/core/vector/Matrix.h>
-#include <other/core/force/StrainMeasure.h>
-#include <other/core/force/ConstitutiveModel.h>
+#include <othercore/force/Force.h>
+#include <othercore/python/Ptr.h>
+#include <othercore/vector/Matrix.h>
+#include <othercore/force/StrainMeasure.h>
+#include <othercore/force/ConstitutiveModel.h>
 namespace other{
 
 template<class TV,int d_>

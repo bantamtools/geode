@@ -8,13 +8,13 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/forward.h>
-#include <other/core/array/ArrayBase.h>
-#include <other/core/vector/Vector.h>
-#include <other/core/python/from_python.h>
-#include <other/core/utility/HasCheapCopy.h>
-#include <other/core/utility/CopyConst.h>
-#include <other/core/utility/range.h>
+#include <othercore/array/forward.h>
+#include <othercore/array/ArrayBase.h>
+#include <othercore/vector/Vector.h>
+#include <othercore/python/from_python.h>
+#include <othercore/utility/HasCheapCopy.h>
+#include <othercore/utility/CopyConst.h>
+#include <othercore/utility/range.h>
 #include <boost/type_traits/remove_const.hpp>
 #include <iomanip>
 namespace other {

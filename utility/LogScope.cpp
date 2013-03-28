@@ -1,7 +1,7 @@
 //#####################################################################
 // Class LogScope
 //#####################################################################
-#include <other/core/utility/LogScope.h>
+#include <othercore/utility/LogScope.h>
 namespace other {
 
 LogScope::LogScope(LogEntry* parent, int depth, const string& scope_identifier, const string& name, int& verbosity_level)

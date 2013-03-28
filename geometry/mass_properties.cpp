@@ -1,13 +1,13 @@
 //#####################################################################
 // Mass properties of curves and surfaces
 //#####################################################################
-#include <other/core/geometry/mass_properties.h>
-#include <other/core/vector/Frame.h>
-#include <other/core/vector/Matrix.h>
-#include <other/core/vector/DiagonalMatrix.h>
-#include <other/core/vector/SymmetricMatrix.h>
-#include <other/core/force/StrainMeasure.h>
-#include <other/core/math/Factorial.h>
+#include <othercore/geometry/mass_properties.h>
+#include <othercore/vector/Frame.h>
+#include <othercore/vector/Matrix.h>
+#include <othercore/vector/DiagonalMatrix.h>
+#include <othercore/vector/SymmetricMatrix.h>
+#include <othercore/force/StrainMeasure.h>
+#include <othercore/math/Factorial.h>
 namespace other{
 
 namespace{

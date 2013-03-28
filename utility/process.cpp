@@ -1,10 +1,10 @@
 //#####################################################################
 // Namespace process
 //#####################################################################
-#include <other/core/utility/process.h>
-#include <other/core/utility/debug.h>
-#include <other/core/utility/Log.h>
-#include <other/core/math/min.h>
+#include <othercore/utility/process.h>
+#include <othercore/utility/debug.h>
+#include <othercore/utility/Log.h>
+#include <othercore/math/min.h>
 #include <assert.h>
 #include <iostream>
 #include <iomanip>

@@ -1,10 +1,10 @@
 // Conversion from PyObject* to Value<T>
 #pragma once
 
-#include <other/core/value/Compute.h>
-#include <other/core/python/from_python.h>
-#include <other/core/python/Ptr.h>
-#include <other/core/utility/format.h>
+#include <othercore/value/Compute.h>
+#include <othercore/python/from_python.h>
+#include <othercore/python/Ptr.h>
+#include <othercore/utility/format.h>
 #include <iostream>
 namespace other {
 

@@ -3,8 +3,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/utility/config.h>
-#include <other/core/utility/format.h>
+#include <othercore/utility/config.h>
+#include <othercore/utility/format.h>
 #include <boost/noncopyable.hpp>
 #include <ostream>
 #include <string>

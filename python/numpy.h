@@ -3,8 +3,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/python/config.h>
-#include <other/core/utility/config.h>
+#include <othercore/python/config.h>
+#include <othercore/utility/config.h>
 
 #ifdef OTHER_PYTHON
 #define PY_ARRAY_UNIQUE_SYMBOL _try_python_array_api
@@ -15,10 +15,10 @@
 #include <numpy/arrayobject.h>
 #endif
 
-#include <other/core/array/Array.h>
-#include <other/core/array/IndirectArray.h>
-#include <other/core/python/exceptions.h>
-#include <other/core/utility/const_cast.h>
+#include <othercore/array/Array.h>
+#include <othercore/array/IndirectArray.h>
+#include <othercore/python/exceptions.h>
+#include <othercore/utility/const_cast.h>
 namespace other {
 
 typedef Py_intptr_t npy_intp;

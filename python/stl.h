@@ -7,12 +7,12 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/python/config.h>
-#include <other/core/python/Ptr.h>
-#include <other/core/python/from_python.h>
-#include <other/core/python/to_python.h>
-#include <other/core/utility/config.h>
-#include <other/core/utility/tr1.h>
+#include <othercore/python/config.h>
+#include <othercore/python/Ptr.h>
+#include <othercore/python/from_python.h>
+#include <othercore/python/to_python.h>
+#include <othercore/utility/config.h>
+#include <othercore/utility/tr1.h>
 #include <boost/mpl/and.hpp>
 #include <vector>
 #include <set>

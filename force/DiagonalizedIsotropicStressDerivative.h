@@ -3,8 +3,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/force/forward.h>
-#include <other/core/vector/forward.h>
+#include <othercore/force/forward.h>
+#include <othercore/vector/forward.h>
 namespace other{
 
 template<class T>

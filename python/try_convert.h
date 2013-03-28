@@ -1,9 +1,9 @@
 // Convert to and from python if possible, otherwise throw an exception
 #pragma once
 
-#include <other/core/python/to_python.h>
-#include <other/core/python/from_python.h>
-#include <other/core/utility/forward.h>
+#include <othercore/python/to_python.h>
+#include <othercore/python/from_python.h>
+#include <othercore/utility/forward.h>
 #include <boost/utility/enable_if.hpp>
 namespace other {
 

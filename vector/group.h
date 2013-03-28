@@ -1,7 +1,7 @@
 // Various groups
 #pragma once
 
-#include <other/core/vector/Rotation.h>
+#include <othercore/vector/Rotation.h>
 namespace other {
 
 // Rotational symmetries of the cube

@@ -1,4 +1,4 @@
-#include <other/core/python/wrap.h>
+#include <othercore/python/wrap.h>
 
 void wrap_solver() {
   OTHER_WRAP(brent)

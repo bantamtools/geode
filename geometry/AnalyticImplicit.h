@@ -3,7 +3,7 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/geometry/Implicit.h>
+#include <othercore/geometry/Implicit.h>
 namespace other{
 
 template<class Shape>

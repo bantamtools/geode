@@ -8,9 +8,9 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/utility/config.h>
-#include <other/core/geometry/BoxScalar.h>
-#include <other/core/geometry/BoxVector.h>
+#include <othercore/utility/config.h>
+#include <othercore/geometry/BoxScalar.h>
+#include <othercore/geometry/BoxVector.h>
 namespace other {
 
 using std::numeric_limits;

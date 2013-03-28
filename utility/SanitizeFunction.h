@@ -2,8 +2,8 @@
 // Used by curry and compose.
 #pragma once
 
-#include <other/core/utility/forward.h>
-#include <other/core/utility/move.h>
+#include <othercore/utility/forward.h>
+#include <othercore/utility/move.h>
 #include <boost/type_traits/is_const.hpp>
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/mpl/if.hpp>

@@ -3,8 +3,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/force/Force.h>
-#include <other/core/force/StrainMeasure.h>
+#include <othercore/force/Force.h>
+#include <othercore/force/StrainMeasure.h>
 namespace other{
 
 template<class TV,int d_>

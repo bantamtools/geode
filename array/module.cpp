@@ -1,9 +1,9 @@
 //#####################################################################
 // Module Arrays
 //#####################################################################
-#include <other/core/array/Array2d.h>
-#include <other/core/python/numpy.h>
-#include <other/core/python/wrap.h>
+#include <othercore/array/Array2d.h>
+#include <othercore/python/numpy.h>
+#include <othercore/python/wrap.h>
 using namespace other;
 
 namespace {

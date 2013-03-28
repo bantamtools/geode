@@ -1,9 +1,9 @@
 // Thickened shells generalizing capsules
 #pragma once
 
-#include <other/core/geometry/Implicit.h>
-#include <other/core/array/Array.h>
-#include <other/core/mesh/forward.h>
+#include <othercore/geometry/Implicit.h>
+#include <othercore/array/Array.h>
+#include <othercore/mesh/forward.h>
 namespace other {
 
 class ThickShell : public Implicit<Vector<double,3>> {

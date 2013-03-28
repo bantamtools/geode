@@ -3,7 +3,7 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/Array.h>
+#include <othercore/array/Array.h>
 namespace other {
 
 template<class T>

@@ -1,7 +1,7 @@
-#include <other/core/python/config.h>
-#include <other/core/python/ExceptionValue.h>
-#include <other/core/python/exceptions.h>
-#include <other/core/utility/tr1.h>
+#include <othercore/python/config.h>
+#include <othercore/python/ExceptionValue.h>
+#include <othercore/python/exceptions.h>
+#include <othercore/utility/tr1.h>
 #include <iostream>
 namespace other{
 

@@ -1,11 +1,11 @@
 //#####################################################################
 // Class Random
 //#####################################################################
-#include <other/core/random/Random.h>
-#include <other/core/python/Class.h>
-#include <other/core/vector/Frame.h>
-#include <other/core/vector/Rotation.h>
-#include <other/core/python/stl.h>
+#include <othercore/random/Random.h>
+#include <othercore/python/Class.h>
+#include <othercore/vector/Frame.h>
+#include <othercore/vector/Rotation.h>
+#include <othercore/python/stl.h>
 namespace other {
 
 OTHER_DEFINE_TYPE(Random)

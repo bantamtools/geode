@@ -3,12 +3,12 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/value/Value.h>
-#include <other/core/value/Action.h>
-#include <other/core/structure/Tuple.h>
-#include <other/core/utility/curry.h>
-#include <other/core/utility/format.h>
-#include <other/core/utility/remove_const_reference.h>
+#include <othercore/value/Value.h>
+#include <othercore/value/Action.h>
+#include <othercore/structure/Tuple.h>
+#include <othercore/utility/curry.h>
+#include <othercore/utility/format.h>
+#include <othercore/utility/remove_const_reference.h>
 #include <boost/function.hpp>
 #include <stdio.h>
 namespace other {

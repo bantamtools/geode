@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <other/core/utility/format.h>
+#include <othercore/utility/format.h>
 #include <istream>
 namespace other {
 

@@ -3,21 +3,21 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/vector/Vector0d.h>
-#include <other/core/vector/Vector1d.h>
-#include <other/core/vector/Vector2d.h>
-#include <other/core/vector/Vector3d.h>
-#include <other/core/vector/Vector4d.h>
-#include <other/core/math/clamp.h>
-#include <other/core/math/inverse.h>
-#include <other/core/math/max.h>
-#include <other/core/math/min.h>
-#include <other/core/math/sqr.h>
-#include <other/core/python/forward.h>
-#include <other/core/python/repr.h>
-#include <other/core/python/to_python.h>
+#include <othercore/vector/Vector0d.h>
+#include <othercore/vector/Vector1d.h>
+#include <othercore/vector/Vector2d.h>
+#include <othercore/vector/Vector3d.h>
+#include <othercore/vector/Vector4d.h>
+#include <othercore/math/clamp.h>
+#include <othercore/math/inverse.h>
+#include <othercore/math/max.h>
+#include <othercore/math/min.h>
+#include <othercore/math/sqr.h>
+#include <othercore/python/forward.h>
+#include <othercore/python/repr.h>
+#include <othercore/python/to_python.h>
 #include <boost/type_traits/common_type.hpp>
-#include <other/core/python/config.h>
+#include <othercore/python/config.h>
 #include <cmath>
 namespace other {
 

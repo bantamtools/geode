@@ -3,11 +3,11 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/vector/Rotation.h>
-#include <other/core/vector/Vector.h>
-#include <other/core/vector/VectorPolicy.h>
-#include <other/core/utility/HasCheapCopy.h>
-#include <other/core/math/One.h>
+#include <othercore/vector/Rotation.h>
+#include <othercore/vector/Vector.h>
+#include <othercore/vector/VectorPolicy.h>
+#include <othercore/utility/HasCheapCopy.h>
+#include <othercore/math/One.h>
 namespace other {
 
 template<class TV> struct HasCheapCopy<Frame<TV> >:public mpl::true_{};

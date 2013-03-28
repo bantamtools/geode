@@ -8,10 +8,10 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/alloca.h>
-#include <other/core/array/RawStack.h>
-#include <other/core/array/view.h>
-#include <other/core/geometry/BoxTree.h>
+#include <othercore/array/alloca.h>
+#include <othercore/array/RawStack.h>
+#include <othercore/array/view.h>
+#include <othercore/geometry/BoxTree.h>
 namespace other {
 
 // Traverse one box tree.  There is no automatic culling: the visitor is responsible for everything.

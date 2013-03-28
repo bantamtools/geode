@@ -3,14 +3,14 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/vector/forward.h>
-#include <other/core/vector/Matrix0x0.h>
-#include <other/core/vector/Matrix1x1.h>
-#include <other/core/vector/Matrix2x2.h>
-#include <other/core/vector/Matrix3x2.h>
-#include <other/core/vector/Matrix3x3.h>
-#include <other/core/vector/Matrix4x4.h>
-#include <other/core/vector/Vector.h>
+#include <othercore/vector/forward.h>
+#include <othercore/vector/Matrix0x0.h>
+#include <othercore/vector/Matrix1x1.h>
+#include <othercore/vector/Matrix2x2.h>
+#include <othercore/vector/Matrix3x2.h>
+#include <othercore/vector/Matrix3x3.h>
+#include <othercore/vector/Matrix4x4.h>
+#include <othercore/vector/Vector.h>
 #include <iomanip>
 namespace other {
 

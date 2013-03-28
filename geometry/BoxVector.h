@@ -8,11 +8,11 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/forward.h>
-#include <other/core/geometry/forward.h>
-#include <other/core/math/clamp.h>
-#include <other/core/math/Zero.h>
-#include <other/core/vector/Vector.h>
+#include <othercore/array/forward.h>
+#include <othercore/geometry/forward.h>
+#include <othercore/math/clamp.h>
+#include <othercore/math/Zero.h>
+#include <othercore/vector/Vector.h>
 #include <limits>
 namespace other {
 

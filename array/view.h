@@ -7,8 +7,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/RawArray.h>
-#include <other/core/vector/ScalarPolicy.h>
+#include <othercore/array/RawArray.h>
+#include <othercore/vector/ScalarPolicy.h>
 namespace other {
 
 // check if it's safe to use vector space operations on the result of scalar_view<TV>

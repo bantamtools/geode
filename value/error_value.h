@@ -3,8 +3,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/value/Value.h>
-#include <other/core/python/ExceptionValue.h>
+#include <othercore/value/Value.h>
+#include <othercore/python/ExceptionValue.h>
 namespace other{
 
 template<class T> class ErrorValue : public Value<T> {

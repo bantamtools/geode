@@ -1,6 +1,6 @@
 #pragma once
 
-#include <other/core/python/exceptions.h>
+#include <othercore/python/exceptions.h>
 namespace other {
 
 #ifdef OTHER_PYTHON

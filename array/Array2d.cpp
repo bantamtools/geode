@@ -1,11 +1,11 @@
 //#####################################################################
 // Class Array<T,2>
 //#####################################################################
-#include <other/core/array/Array2d.h>
-#include <other/core/python/numpy.h>
-#include <other/core/vector/Vector.h>
+#include <othercore/array/Array2d.h>
+#include <othercore/python/numpy.h>
+#include <othercore/vector/Vector.h>
 #if defined(OTHER_BLAS) && defined(USE_MKL)
-#include <other/core/vector/blas.h>
+#include <othercore/vector/blas.h>
 #include <mkl_trans.h>
 #endif
 namespace other {

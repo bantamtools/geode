@@ -3,9 +3,9 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/ArrayExpression.h>
-#include <other/core/vector/ArithmeticPolicy.h>
-#include <other/core/utility/HasCheapCopy.h>
+#include <othercore/array/ArrayExpression.h>
+#include <othercore/vector/ArithmeticPolicy.h>
+#include <othercore/utility/HasCheapCopy.h>
 #include <boost/mpl/if.hpp>
 namespace other {
 

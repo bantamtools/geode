@@ -1,19 +1,19 @@
 #include "polygon.h"
 
-#include <other/core/vector/Matrix.h>
-#include <other/core/math/constants.h>
-#include <other/core/utility/Hasher.h>
-#include <other/core/utility/stl.h>
-#include <other/core/utility/str.h>
-#include <other/core/utility/tr1.h>
-#include <other/core/vector/Vector2d.h>
-#include <other/core/vector/normalize.h>
-#include <other/core/geometry/Box.h>
-#include <other/core/geometry/Segment2d.h>
-#include <other/core/mesh/SegmentMesh.h>
-#include <other/core/array/NestedArray.h>
-#include <other/core/array/Array.h>
-#include <other/core/array/RawArray.h>
+#include <othercore/vector/Matrix.h>
+#include <othercore/math/constants.h>
+#include <othercore/utility/Hasher.h>
+#include <othercore/utility/stl.h>
+#include <othercore/utility/str.h>
+#include <othercore/utility/tr1.h>
+#include <othercore/vector/Vector2d.h>
+#include <othercore/vector/normalize.h>
+#include <othercore/geometry/Box.h>
+#include <othercore/geometry/Segment2d.h>
+#include <othercore/mesh/SegmentMesh.h>
+#include <othercore/array/NestedArray.h>
+#include <othercore/array/Array.h>
+#include <othercore/array/RawArray.h>
 
 namespace other {
 
@@ -557,11 +557,11 @@ namespace other {
 
 using namespace other;
 
-#include <other/core/python/wrap.h>
-#include <other/core/python/function.h>
-#include <other/core/python/from_python.h>
-#include <other/core/vector/convert.h>
-#include <other/core/python/stl.h>
+#include <othercore/python/wrap.h>
+#include <othercore/python/function.h>
+#include <othercore/python/from_python.h>
+#include <othercore/vector/convert.h>
+#include <othercore/python/stl.h>
 
 void wrap_polygon() {
   // Typedefs needed for windows

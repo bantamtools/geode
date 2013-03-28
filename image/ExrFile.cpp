@@ -1,14 +1,14 @@
-#include <other/core/python/config.h> // Must be included first
+#include <othercore/python/config.h> // Must be included first
 #ifdef USE_OPENEXR
 #include <OpenEXR/ImfRgbaFile.h>
 #include <OpenEXR/ImfArray.h>
 #endif
 
-#include <other/core/image/ExrFile.h>
-#include <other/core/image/Image.h>
-#include <other/core/array/Array2d.h>
-#include <other/core/vector/Vector3d.h>
-#include <other/core/utility/Log.h>
+#include <othercore/image/ExrFile.h>
+#include <othercore/image/Image.h>
+#include <othercore/array/Array2d.h>
+#include <othercore/vector/Vector3d.h>
+#include <othercore/utility/Log.h>
 
 namespace other {
 #ifndef USE_OPENEXR

@@ -1,7 +1,7 @@
 // Macro to stack allocate a RawArray
 #pragma once
 
-#include <other/core/array/RawArray.h>
+#include <othercore/array/RawArray.h>
 #ifdef _WIN32
 #include <malloc.h>
 #define OTHER_ALLOCA _alloca

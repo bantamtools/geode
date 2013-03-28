@@ -9,13 +9,13 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/Array.h>
-#include <other/core/array/NestedArray.h>
-#include <other/core/mesh/forward.h>
-#include <other/core/python/Object.h>
-#include <other/core/python/Ptr.h>
-#include <other/core/python/Ref.h>
-#include <other/core/vector/Vector.h>
+#include <othercore/array/Array.h>
+#include <othercore/array/NestedArray.h>
+#include <othercore/mesh/forward.h>
+#include <othercore/python/Object.h>
+#include <othercore/python/Ptr.h>
+#include <othercore/python/Ref.h>
+#include <othercore/vector/Vector.h>
 namespace other {
 
 class TriangleMesh : public Object {

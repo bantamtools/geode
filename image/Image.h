@@ -3,8 +3,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/Array2d.h>
-#include <other/core/vector/Vector3d.h>
+#include <othercore/array/Array2d.h>
+#include <othercore/vector/Vector3d.h>
 #include <vector>
 namespace other{
 

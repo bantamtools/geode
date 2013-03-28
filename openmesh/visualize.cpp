@@ -1,7 +1,7 @@
 // Set colors on a TriMesh
 #ifdef USE_OPENMESH
 
-#include <other/core/openmesh/visualize.h>
+#include <othercore/openmesh/visualize.h>
 namespace other {
 
 template<> OTHER_CORE_EXPORT void visualize(TriMesh& mesh, const function<TriMesh::Color(VertexHandle)>& color) {

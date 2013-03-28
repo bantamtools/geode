@@ -8,7 +8,7 @@
 #pragma once
 
 #include <cmath>
-#include <other/core/math/max.h>
+#include <othercore/math/max.h>
 namespace other {
 
 using std::abs;

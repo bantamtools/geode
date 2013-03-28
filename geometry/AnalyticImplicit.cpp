@@ -1,13 +1,13 @@
 //#####################################################################
 // Class AnalyticImplicit
 //#####################################################################
-#include <other/core/geometry/AnalyticImplicit.h>
-#include <other/core/geometry/Box.h>
-#include <other/core/geometry/Sphere.h>
-#include <other/core/geometry/Capsule.h>
-#include <other/core/geometry/Cylinder.h>
-#include <other/core/geometry/Plane.h>
-#include <other/core/python/Class.h>
+#include <othercore/geometry/AnalyticImplicit.h>
+#include <othercore/geometry/Box.h>
+#include <othercore/geometry/Sphere.h>
+#include <othercore/geometry/Capsule.h>
+#include <othercore/geometry/Cylinder.h>
+#include <othercore/geometry/Plane.h>
+#include <othercore/python/Class.h>
 namespace other{
 
 typedef real T;

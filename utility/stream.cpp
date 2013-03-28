@@ -1,7 +1,7 @@
 // Stream I/O related utilities 
 
-#include <other/core/utility/stream.h>
-#include <other/core/python/exceptions.h>
+#include <othercore/utility/stream.h>
+#include <othercore/python/exceptions.h>
 namespace other {
 
 void throw_unexpected_error(expect expected,char got) {

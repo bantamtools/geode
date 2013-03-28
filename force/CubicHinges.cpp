@@ -1,14 +1,14 @@
 // Cubic hinges based on Garg et al. 2007
 
-#include <other/core/force/CubicHinges.h>
-#include <other/core/array/view.h>
-#include <other/core/math/copysign.h>
-#include <other/core/geometry/Triangle3d.h>
-#include <other/core/python/Class.h>
-#include <other/core/utility/Log.h>
-#include <other/core/vector/normalize.h>
-#include <other/core/vector/SolidMatrix.h>
-#include <other/core/vector/SymmetricMatrix.h>
+#include <othercore/force/CubicHinges.h>
+#include <othercore/array/view.h>
+#include <othercore/math/copysign.h>
+#include <othercore/geometry/Triangle3d.h>
+#include <othercore/python/Class.h>
+#include <othercore/utility/Log.h>
+#include <othercore/vector/normalize.h>
+#include <othercore/vector/SolidMatrix.h>
+#include <othercore/vector/SymmetricMatrix.h>
 namespace other {
 
 using Log::cout;

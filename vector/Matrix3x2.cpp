@@ -1,9 +1,9 @@
 //#####################################################################
 // Class Matrix3x2
 //#####################################################################
-#include <other/core/vector/Matrix.h>
-#include <other/core/vector/DiagonalMatrix2x2.h>
-#include <other/core/vector/SymmetricMatrix2x2.h>
+#include <othercore/vector/Matrix.h>
+#include <othercore/vector/DiagonalMatrix2x2.h>
+#include <othercore/vector/SymmetricMatrix2x2.h>
 using namespace other;
 //#####################################################################
 // Function Fast_Singular_Value_Decomposition

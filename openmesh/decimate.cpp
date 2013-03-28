@@ -1,11 +1,11 @@
 #ifdef USE_OPENMESH
-#include <other/core/openmesh/decimate.h>
+#include <othercore/openmesh/decimate.h>
 #include <OpenMesh/Tools/Decimater/DecimaterT.hh>
 #include <OpenMesh/Tools/Decimater/ModQuadricT.hh>
 #include <OpenMesh/Tools/Decimater/ModNormalFlippingT.hh>
 #include <OpenMesh/Tools/Decimater/ModBaseT.hh>
-#include <other/core/geometry/Triangle3d.h>
-#include <other/core/python/wrap.h>
+#include <othercore/geometry/Triangle3d.h>
+#include <othercore/python/wrap.h>
 namespace other {
 
 typedef real T;

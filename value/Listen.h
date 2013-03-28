@@ -3,8 +3,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/value/Value.h>
-#include <other/core/value/Action.h>
+#include <othercore/value/Value.h>
+#include <othercore/value/Action.h>
 #include <boost/function.hpp>
 namespace other {
 

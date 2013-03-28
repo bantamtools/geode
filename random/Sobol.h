@@ -1,10 +1,10 @@
 // Class Sobol: Low discrepancy quasirandom numbers
 #pragma once
 
-#include <other/core/random/forward.h>
-#include <other/core/array/Array.h>
-#include <other/core/python/Object.h>
-#include <other/core/vector/Vector.h>
+#include <othercore/random/forward.h>
+#include <othercore/array/Array.h>
+#include <othercore/python/Object.h>
+#include <othercore/vector/Vector.h>
 #include <boost/noncopyable.hpp>
 #include <boost/mpl/if.hpp>
 #include <limits>

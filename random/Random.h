@@ -3,10 +3,10 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/random/counter.h>
-#include <other/core/array/view.h>
-#include <other/core/python/Object.h>
-#include <other/core/vector/Vector.h>
+#include <othercore/random/counter.h>
+#include <othercore/array/view.h>
+#include <othercore/python/Object.h>
+#include <othercore/vector/Vector.h>
 #include <boost/cstdint.hpp>
 #include <boost/noncopyable.hpp>
 #include <cmath>

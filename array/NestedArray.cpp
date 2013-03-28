@@ -1,8 +1,8 @@
 //#####################################################################
 // Class NestedArray
 //#####################################################################
-#include <other/core/array/NestedArray.h>
-#include <other/core/python/Class.h>
+#include <othercore/array/NestedArray.h>
+#include <othercore/python/Class.h>
 namespace other {
 
 Array<int> nested_array_offsets(RawArray<const int> lengths) {

@@ -1,12 +1,12 @@
 //#####################################################################
 // Class PolygonMesh
 //#####################################################################
-#include <other/core/mesh/PolygonMesh.h>
-#include <other/core/mesh/SegmentMesh.h>
-#include <other/core/mesh/TriangleMesh.h>
-#include <other/core/structure/Hashtable.h>
-#include <other/core/utility/const_cast.h>
-#include <other/core/python/Class.h>
+#include <othercore/mesh/PolygonMesh.h>
+#include <othercore/mesh/SegmentMesh.h>
+#include <othercore/mesh/TriangleMesh.h>
+#include <othercore/structure/Hashtable.h>
+#include <othercore/utility/const_cast.h>
+#include <othercore/python/Class.h>
 namespace other {
 
 OTHER_DEFINE_TYPE(PolygonMesh)

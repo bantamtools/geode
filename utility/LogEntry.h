@@ -3,9 +3,9 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/utility/Log.h>
-#include <other/core/utility/time.h>
-#include <other/core/utility/config.h>
+#include <othercore/utility/Log.h>
+#include <othercore/utility/time.h>
+#include <othercore/utility/config.h>
 #include <boost/noncopyable.hpp>
 #include <string>
 #include <cstdio>

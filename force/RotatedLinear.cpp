@@ -1,11 +1,11 @@
 //#####################################################################
 // Class RotatedLinear
 //#####################################################################
-#include <other/core/force/IsotropicConstitutiveModel.h>
-#include <other/core/python/Class.h>
-#include <other/core/vector/DiagonalMatrix.h>
-#include <other/core/vector/Matrix.h>
-#include <other/core/vector/SymmetricMatrix.h>
+#include <othercore/force/IsotropicConstitutiveModel.h>
+#include <othercore/python/Class.h>
+#include <othercore/vector/DiagonalMatrix.h>
+#include <othercore/vector/Matrix.h>
+#include <othercore/vector/SymmetricMatrix.h>
 namespace other{
 
 template<class T,int d>

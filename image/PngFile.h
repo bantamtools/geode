@@ -5,8 +5,8 @@
 
 #include <string>
 #include <vector>
-#include <other/core/array/forward.h>
-#include <other/core/vector/forward.h>
+#include <othercore/array/forward.h>
+#include <othercore/vector/forward.h>
 namespace other {
 
 template<class T> class PngFile {

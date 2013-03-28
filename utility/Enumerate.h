@@ -2,8 +2,8 @@
 // Enumerate<T0,T1,...> inherits from Types<ITP<0,T0>,ITP<1,T1>,...>
 #pragma once
 
-#include <other/core/utility/forward.h>
-#include <other/core/structure/forward.h>
+#include <othercore/utility/forward.h>
+#include <othercore/structure/forward.h>
 namespace other {
 
 // An (index,type) pair

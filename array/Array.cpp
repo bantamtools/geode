@@ -1,8 +1,8 @@
 //#####################################################################
 // Class Array
 //#####################################################################
-#include <other/core/array/convert.h>
-#include <other/core/vector/Vector.h>
+#include <othercore/array/convert.h>
+#include <othercore/vector/Vector.h>
 namespace other{
 
 ARRAY_CONVERSIONS(1,bool)

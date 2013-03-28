@@ -1,13 +1,13 @@
 //#####################################################################
 // Class Log
 //#####################################################################
-#include <other/core/utility/Log.h>
-#include <other/core/utility/debug.h>
-#include <other/core/utility/format.h>
-#include <other/core/utility/LogEntry.h>
-#include <other/core/utility/LogScope.h>
-#include <other/core/utility/str.h>
-#include <other/core/utility/time.h>
+#include <othercore/utility/Log.h>
+#include <othercore/utility/debug.h>
+#include <othercore/utility/format.h>
+#include <othercore/utility/LogEntry.h>
+#include <othercore/utility/LogScope.h>
+#include <othercore/utility/str.h>
+#include <othercore/utility/time.h>
 #include <boost/scoped_ptr.hpp>
 #include <sstream>
 #include <iostream>

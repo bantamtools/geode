@@ -1,12 +1,12 @@
 //#####################################################################
 // Class Triangle<Vector<T,3> >
 //##################################################################### 
-#include <other/core/geometry/Triangle3d.h>
-#include <other/core/array/Array.h>
-#include <other/core/math/constants.h>
-#include <other/core/geometry/Ray.h>
-#include <other/core/geometry/Segment3d.h>
-#include <other/core/math/lerp.h>
+#include <othercore/geometry/Triangle3d.h>
+#include <othercore/array/Array.h>
+#include <othercore/math/constants.h>
+#include <othercore/geometry/Ray.h>
+#include <othercore/geometry/Segment3d.h>
+#include <othercore/math/lerp.h>
 namespace other{
 
 typedef real T;

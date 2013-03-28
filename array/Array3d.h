@@ -7,11 +7,11 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/ArrayNdBase.h>
-#include <other/core/array/Subarray.h>
-#include <other/core/geometry/Box.h>
-#include <other/core/python/exceptions.h>
-#include <other/core/vector/Vector.h>
+#include <othercore/array/ArrayNdBase.h>
+#include <othercore/array/Subarray.h>
+#include <othercore/geometry/Box.h>
+#include <othercore/python/exceptions.h>
+#include <othercore/vector/Vector.h>
 namespace other {
 
 template<class T_>

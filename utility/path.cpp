@@ -1,8 +1,8 @@
 // Path convenience functions
 
-#include <other/core/utility/path.h>
-#include <other/core/utility/format.h>
-#include <other/core/python/exceptions.h>
+#include <othercore/utility/path.h>
+#include <othercore/utility/format.h>
+#include <othercore/python/exceptions.h>
 
 #ifdef _WIN32
 #define WINDOWS_LEAN_AND_MEAN

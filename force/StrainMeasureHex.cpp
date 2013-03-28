@@ -1,11 +1,11 @@
 //#####################################################################
 // Class StrainMeasureHex
 //#####################################################################
-#include <other/core/force/StrainMeasureHex.h>
-#include <other/core/array/view.h>
-#include <other/core/python/Class.h>
-#include <other/core/utility/Log.h>
-#include <other/core/vector/Matrix.h>
+#include <othercore/force/StrainMeasureHex.h>
+#include <othercore/array/view.h>
+#include <othercore/python/Class.h>
+#include <othercore/utility/Log.h>
+#include <othercore/vector/Matrix.h>
 namespace other{
 
 using Log::cout;

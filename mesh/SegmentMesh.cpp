@@ -1,15 +1,15 @@
 //#####################################################################
 // Class SegmentMesh
 //#####################################################################
-#include <other/core/mesh/SegmentMesh.h>
-#include <other/core/array/NestedArray.h>
-#include <other/core/array/sort.h>
-#include <other/core/array/view.h>
-#include <other/core/python/Class.h>
-#include <other/core/utility/const_cast.h>
-#include <other/core/utility/stl.h>
-#include <other/core/vector/convert.h>
-#include <other/core/vector/normalize.h>
+#include <othercore/mesh/SegmentMesh.h>
+#include <othercore/array/NestedArray.h>
+#include <othercore/array/sort.h>
+#include <othercore/array/view.h>
+#include <othercore/python/Class.h>
+#include <othercore/utility/const_cast.h>
+#include <othercore/utility/stl.h>
+#include <othercore/vector/convert.h>
+#include <othercore/vector/normalize.h>
 #include <vector>
 namespace other {
 

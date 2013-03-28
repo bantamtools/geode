@@ -1,11 +1,11 @@
 //#####################################################################
 // Namespace debug
 //#####################################################################
-#include <other/core/python/exceptions.h>
-#include <other/core/utility/debug.h>
-#include <other/core/utility/format.h>
-#include <other/core/utility/process.h>
-#include <other/core/utility/Log.h>
+#include <othercore/python/exceptions.h>
+#include <othercore/utility/debug.h>
+#include <othercore/utility/format.h>
+#include <othercore/utility/process.h>
+#include <othercore/utility/Log.h>
 #include <cassert>
 #include <stdexcept>
 #if defined(__linux__) || defined(__CYGWIN__) || defined(__APPLE__)

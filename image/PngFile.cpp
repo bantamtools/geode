@@ -6,16 +6,16 @@
 #define LEAVE_WINDOWS_DEFINES_ALONE
 #endif
 
-#include <other/core/python/config.h> // Must be included first
+#include <othercore/python/config.h> // Must be included first
 #ifdef USE_LIBPNG
 #define PNG_SKIP_SETJMP_CHECK // Both png and python want to be included first
 #include <png.h>
 #endif
-#include <other/core/image/PngFile.h>
-#include <other/core/image/Image.h>
-#include <other/core/array/Array2d.h>
-#include <other/core/vector/Vector3d.h>
-#include <other/core/utility/Log.h>
+#include <othercore/image/PngFile.h>
+#include <othercore/image/Image.h>
+#include <othercore/array/Array2d.h>
+#include <othercore/vector/Vector3d.h>
+#include <othercore/utility/Log.h>
 namespace other{
 //#####################################################################
 // Read/Write stubs for case of no libpng

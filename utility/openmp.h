@@ -1,9 +1,9 @@
 // OpenMP helper routines
 #pragma once
 
-#include <other/core/math/min.h>
-#include <other/core/utility/debug.h>
-#include <other/core/utility/range.h>
+#include <othercore/math/min.h>
+#include <othercore/utility/debug.h>
+#include <othercore/utility/range.h>
 #ifdef _OPENMP
 #include <omp.h>
 #endif

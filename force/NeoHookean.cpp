@@ -1,15 +1,15 @@
 //#####################################################################
 // Class NeoHookean
 //#####################################################################
-#include <other/core/force/IsotropicConstitutiveModel.h>
-#include <other/core/force/DiagonalizedIsotropicStressDerivative.h>
-#include <other/core/math/cube.h>
-#include <other/core/math/pow.h>
-#include <other/core/python/Class.h>
-#include <other/core/utility/Log.h>
-#include <other/core/vector/Matrix.h>
-#include <other/core/vector/DiagonalMatrix.h>
-#include <other/core/vector/SymmetricMatrix.h>
+#include <othercore/force/IsotropicConstitutiveModel.h>
+#include <othercore/force/DiagonalizedIsotropicStressDerivative.h>
+#include <othercore/math/cube.h>
+#include <othercore/math/pow.h>
+#include <othercore/python/Class.h>
+#include <othercore/utility/Log.h>
+#include <othercore/vector/Matrix.h>
+#include <othercore/vector/DiagonalMatrix.h>
+#include <othercore/vector/SymmetricMatrix.h>
 namespace other{
 
 using ::std::log;

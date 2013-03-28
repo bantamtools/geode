@@ -1,7 +1,7 @@
 //#####################################################################
 // Numpy interface functions
 //#####################################################################
-#include <other/core/python/numpy.h>
+#include <othercore/python/numpy.h>
 #include <boost/detail/endian.hpp>
 #include <boost/cstdint.hpp>
 #include <stdio.h>

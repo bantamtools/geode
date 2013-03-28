@@ -3,9 +3,9 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/ArrayExpression.h>
-#include <other/core/vector/ArithmeticPolicy.h>
-#include <other/core/vector/ScalarPolicy.h>
+#include <othercore/array/ArrayExpression.h>
+#include <othercore/vector/ArithmeticPolicy.h>
+#include <othercore/vector/ScalarPolicy.h>
 #include <boost/type_traits/is_same.hpp>
 namespace other {
 

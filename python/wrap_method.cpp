@@ -2,7 +2,7 @@
 // Function wrap_method
 //#####################################################################
 #ifdef OTHER_PYTHON
-#include <other/core/python/wrap_method.h>
+#include <othercore/python/wrap_method.h>
 namespace other {
 
 PyObject* wrap_method_helper(PyTypeObject* type,const char* name,wrapperfunc wrapper,void* method) {

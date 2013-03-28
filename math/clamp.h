@@ -3,8 +3,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/math/min.h>
-#include <other/core/math/max.h>
+#include <othercore/math/min.h>
+#include <othercore/math/max.h>
 namespace other {
 
 template<class T> static inline T clamp(const T x, const T xmin, const T xmax) {

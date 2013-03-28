@@ -3,16 +3,16 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/vector/complex.h>
-#include <other/core/vector/Quaternion.h>
+#include <othercore/vector/complex.h>
+#include <othercore/vector/Quaternion.h>
 #include <boost/utility/enable_if.hpp>
-#include <other/core/array/forward.h>
-#include <other/core/math/clamp.h>
-#include <other/core/math/constants.h>
-#include <other/core/math/robust.h>
-#include <other/core/python/to_python.h>
-#include <other/core/utility/debug.h>
-#include <other/core/vector/Matrix.h>
+#include <othercore/array/forward.h>
+#include <othercore/math/clamp.h>
+#include <othercore/math/constants.h>
+#include <othercore/math/robust.h>
+#include <othercore/python/to_python.h>
+#include <othercore/utility/debug.h>
+#include <othercore/vector/Matrix.h>
 namespace other {
 
 using ::std::sin;

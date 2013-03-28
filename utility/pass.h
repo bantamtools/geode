@@ -11,7 +11,7 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/utility/config.h>
+#include <othercore/utility/config.h>
 namespace other{
 
 #define OTHER_PASS(expression) {const int _pass_helper[] OTHER_UNUSED = {((expression),1)...};}

@@ -1,9 +1,9 @@
-#include <other/core/geometry/Cylinder.h>
-#include <other/core/vector/magnitude.h>
-#include <other/core/vector/normalize.h>
-#include <other/core/geometry/AnalyticImplicit.h>
-#include <other/core/python/from_python.h>
-#include <other/core/python/to_python.h>
+#include <othercore/geometry/Cylinder.h>
+#include <othercore/vector/magnitude.h>
+#include <othercore/vector/normalize.h>
+#include <othercore/geometry/AnalyticImplicit.h>
+#include <othercore/python/from_python.h>
+#include <othercore/python/to_python.h>
 namespace other {
 
 typedef real T;

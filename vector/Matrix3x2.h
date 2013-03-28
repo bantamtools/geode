@@ -3,10 +3,10 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/vector/Vector.h>
-#include <other/core/math/sqr.h>
-#include <other/core/math/max.h>
-#include <other/core/vector/SymmetricMatrix2x2.h>
+#include <othercore/vector/Vector.h>
+#include <othercore/math/sqr.h>
+#include <othercore/math/max.h>
+#include <othercore/vector/SymmetricMatrix2x2.h>
 namespace other {
 
 template<class T>

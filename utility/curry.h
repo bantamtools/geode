@@ -2,10 +2,10 @@
 // This is essentially a simpler version of boost::bind.
 #pragma once
 
-#include <other/core/utility/SanitizeFunction.h>
-#include <other/core/utility/Enumerate.h>
-#include <other/core/utility/move.h>
-#include <other/core/structure/Tuple.h>
+#include <othercore/utility/SanitizeFunction.h>
+#include <othercore/utility/Enumerate.h>
+#include <othercore/utility/move.h>
+#include <othercore/structure/Tuple.h>
 #include <boost/utility/declval.hpp>
 #include <boost/utility/result_of.hpp>
 #include <boost/type_traits/add_const.hpp>

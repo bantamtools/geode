@@ -19,11 +19,11 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/python/Class.h>
-#include <other/core/utility/config.h>
-#include <other/core/utility/format.h>
-#include <other/core/utility/tr1.h>
-#include <other/core/python/to_python.h>
+#include <othercore/python/Class.h>
+#include <othercore/utility/config.h>
+#include <othercore/utility/format.h>
+#include <othercore/utility/tr1.h>
+#include <othercore/python/to_python.h>
 #include <boost/mpl/void.hpp>
 #include <boost/utility/enable_if.hpp>
 namespace other {

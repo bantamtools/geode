@@ -1,14 +1,14 @@
 //#####################################################################
 // Class DiagonalizedIsotropicStressDerivative
 //#####################################################################
-#include <other/core/force/DiagonalizedIsotropicStressDerivative.h>
-#include <other/core/vector/DiagonalMatrix2x2.h>
-#include <other/core/vector/DiagonalMatrix3x3.h>
-#include <other/core/vector/Matrix2x2.h>
-#include <other/core/vector/Matrix3x3.h>
-#include <other/core/vector/SymmetricMatrix2x2.h>
-#include <other/core/vector/SymmetricMatrix3x3.h>
-#include <other/core/vector/Vector.h>
+#include <othercore/force/DiagonalizedIsotropicStressDerivative.h>
+#include <othercore/vector/DiagonalMatrix2x2.h>
+#include <othercore/vector/DiagonalMatrix3x3.h>
+#include <othercore/vector/Matrix2x2.h>
+#include <othercore/vector/Matrix3x3.h>
+#include <othercore/vector/SymmetricMatrix2x2.h>
+#include <othercore/vector/SymmetricMatrix3x3.h>
+#include <othercore/vector/Vector.h>
 namespace other{
 
 template<class T> void DiagonalizedIsotropicStressDerivative<T,2>::

@@ -1,6 +1,6 @@
-#include <other/core/value/PropManager.h>
-#include <other/core/python/Class.h>
-#include <other/core/python/stl.h>
+#include <othercore/value/PropManager.h>
+#include <othercore/python/Class.h>
+#include <othercore/python/stl.h>
 namespace other {
 
 using std::pair;

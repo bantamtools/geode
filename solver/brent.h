@@ -9,8 +9,8 @@
 // guarantee implied provided you keep this notice in all copies.
 // *****END NOTICE************
 
-#include <other/core/array/RawArray.h>
-#include <other/core/structure/Tuple.h>
+#include <othercore/array/RawArray.h>
+#include <othercore/structure/Tuple.h>
 #include <boost/function.hpp>
 namespace other {
 

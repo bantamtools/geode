@@ -9,9 +9,9 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/utility/debug.h>
-#include <other/core/array/forward.h>
-#include <other/core/vector/forward.h>
+#include <othercore/utility/debug.h>
+#include <othercore/array/forward.h>
+#include <othercore/vector/forward.h>
 #include <string>
 namespace other {
 

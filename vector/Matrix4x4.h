@@ -3,9 +3,9 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/vector/Vector.h>
-#include <other/core/vector/Matrix3x3.h>
-#include <other/core/math/sqr.h>
+#include <othercore/vector/Vector.h>
+#include <othercore/vector/Matrix3x3.h>
+#include <othercore/math/sqr.h>
 namespace other {
 
 template<class T>

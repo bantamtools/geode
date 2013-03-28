@@ -1,7 +1,7 @@
 //#####################################################################
 // Class Sphere
 //##################################################################### 
-#include <other/core/geometry/Sphere.h>
+#include <othercore/geometry/Sphere.h>
 namespace other{
 
 // From Jack ritter: ftp://ftp-graphics.stanford.edu/pub/Graphics/RTNews/html/rtnews7b.html#art4

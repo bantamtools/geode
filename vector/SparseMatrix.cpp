@@ -1,15 +1,15 @@
 //#####################################################################
 // Class SparseMatrix
 //#####################################################################
-#include <other/core/vector/SparseMatrix.h>
-#include <other/core/array/NdArray.h>
-#include <other/core/array/ProjectedArray.h>
-#include <other/core/array/view.h>
-#include <other/core/vector/Vector.h>
-#include <other/core/python/Class.h>
-#include <other/core/structure/Hashtable.h>
-#include <other/core/utility/Log.h>
-#include <other/core/utility/const_cast.h>
+#include <othercore/vector/SparseMatrix.h>
+#include <othercore/array/NdArray.h>
+#include <othercore/array/ProjectedArray.h>
+#include <othercore/array/view.h>
+#include <othercore/vector/Vector.h>
+#include <othercore/python/Class.h>
+#include <othercore/structure/Hashtable.h>
+#include <othercore/utility/Log.h>
+#include <othercore/utility/const_cast.h>
 namespace other{
 
 typedef real T;

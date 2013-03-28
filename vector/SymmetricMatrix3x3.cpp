@@ -1,12 +1,12 @@
 //#####################################################################
 // Class SymmetricMatrix3x3
 //#####################################################################
-#include <other/core/vector/DiagonalMatrix.h>
-#include <other/core/vector/Matrix.h>
-#include <other/core/vector/SymmetricMatrix.h>
-#include <other/core/vector/UpperTriangularMatrix3x3.h>
-#include <other/core/math/maxabs.h>
-#include <other/core/utility/debug.h>
+#include <othercore/vector/DiagonalMatrix.h>
+#include <othercore/vector/Matrix.h>
+#include <othercore/vector/SymmetricMatrix.h>
+#include <othercore/vector/UpperTriangularMatrix3x3.h>
+#include <othercore/math/maxabs.h>
+#include <othercore/utility/debug.h>
 #include <limits>
 namespace other {
 //#####################################################################

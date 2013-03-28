@@ -3,8 +3,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/forward.h>
-#include <other/core/utility/remove_const_reference.h>
+#include <othercore/array/forward.h>
+#include <othercore/utility/remove_const_reference.h>
 #include <boost/type_traits/remove_reference.hpp>
 #include <boost/utility/declval.hpp>
 #include <iterator>

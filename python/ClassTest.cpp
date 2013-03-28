@@ -5,11 +5,11 @@
 // Tests various python wrapping features.
 //
 //#####################################################################
-#include <other/core/python/Class.h>
-#include <other/core/python/forward.h>
-#include <other/core/python/Object.h>
-#include <other/core/python/Ptr.h>
-#include <other/core/python/Ref.h>
+#include <othercore/python/Class.h>
+#include <othercore/python/forward.h>
+#include <othercore/python/Object.h>
+#include <othercore/python/Ptr.h>
+#include <othercore/python/Ref.h>
 namespace other {
 namespace {
 

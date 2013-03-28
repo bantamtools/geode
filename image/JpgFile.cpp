@@ -6,9 +6,9 @@
 #define LEAVE_WINDOWS_DEFINES_ALONE
 #endif
 
-#include <other/core/image/JpgFile.h>
-#include <other/core/array/Array2d.h>
-#include <other/core/vector/Vector3d.h>
+#include <othercore/image/JpgFile.h>
+#include <othercore/array/Array2d.h>
+#include <othercore/vector/Vector3d.h>
 
 #ifdef USE_LIBJPEG
 
@@ -21,8 +21,8 @@ extern "C"{
 }
 #undef HAVE_PROTOTYPES
 #undef HAVE_STDLIB_H
-#include <other/core/image/Image.h>
-#include <other/core/utility/Log.h>
+#include <othercore/image/Image.h>
+#include <othercore/utility/Log.h>
 //#####################################################################
 // Function Read
 //#####################################################################

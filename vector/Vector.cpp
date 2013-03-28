@@ -1,7 +1,7 @@
 //#####################################################################
 // Class Vector
 //#####################################################################
-#include <other/core/vector/convert.h>
+#include <othercore/vector/convert.h>
 
 namespace other {
 

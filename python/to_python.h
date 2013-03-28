@@ -14,10 +14,10 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/python/forward.h>
-#include <other/core/utility/debug.h>
-#include <other/core/utility/forward.h>
-#include <other/core/utility/validity.h>
+#include <othercore/python/forward.h>
+#include <othercore/utility/debug.h>
+#include <othercore/utility/forward.h>
+#include <othercore/utility/validity.h>
 #include <boost/utility/declval.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_enum.hpp>

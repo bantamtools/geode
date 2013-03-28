@@ -3,9 +3,9 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/vector/Vector3d.h>
-#include <other/core/math/robust.h>
-#include <other/core/utility/HasCheapCopy.h>
+#include <othercore/vector/Vector3d.h>
+#include <othercore/math/robust.h>
+#include <othercore/utility/HasCheapCopy.h>
 namespace other {
 
 template<class T> struct HasCheapCopy<SymmetricMatrix<T,3> >:public mpl::true_{};

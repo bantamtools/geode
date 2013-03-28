@@ -3,10 +3,10 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/value/Compute.h>
-#include <other/core/structure/Tuple.h>
-#include <other/core/utility/curry.h>
-#include <other/core/utility/remove_const_reference.h>
+#include <othercore/value/Compute.h>
+#include <othercore/structure/Tuple.h>
+#include <othercore/utility/curry.h>
+#include <othercore/utility/remove_const_reference.h>
 namespace other{
 
 template<int n,class Tuple> static inline auto extract_helper(const ValueRef<Tuple>& value)

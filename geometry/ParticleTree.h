@@ -3,9 +3,9 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/geometry/forward.h>
-#include <other/core/geometry/BoxTree.h>
-#include <other/core/math/constants.h>
+#include <othercore/geometry/forward.h>
+#include <othercore/geometry/BoxTree.h>
+#include <othercore/math/constants.h>
 
 namespace other{
 

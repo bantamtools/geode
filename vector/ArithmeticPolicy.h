@@ -3,7 +3,7 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/vector/forward.h>
+#include <othercore/vector/forward.h>
 #include <boost/utility/declval.hpp>
 namespace other{
 

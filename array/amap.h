@@ -1,7 +1,7 @@
 #pragma once
 
-#include <other/core/array/ArrayExpression.h>
-#include <other/core/utility/remove_const_reference.h>
+#include <othercore/array/ArrayExpression.h>
+#include <othercore/utility/remove_const_reference.h>
 #include <boost/utility/declval.hpp>
 namespace other {
 

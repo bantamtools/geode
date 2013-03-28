@@ -1,7 +1,7 @@
 // Convert to and from python if possible, otherwise throw an exception
 
-#include <other/core/python/try_convert.h>
-#include <other/core/utility/format.h>
+#include <othercore/python/try_convert.h>
+#include <othercore/utility/format.h>
 namespace other {
 
 #ifdef OTHER_PYTHON

@@ -1,15 +1,15 @@
 //#####################################################################
 // Class SolidMatrix
 //#####################################################################
-#include <other/core/vector/SolidMatrix.h>
-#include <other/core/array/sort.h>
-#include <other/core/array/view.h>
-#include <other/core/structure/Tuple.h>
-#include <other/core/python/Class.h>
-#include <other/core/vector/DiagonalMatrix.h>
-#include <other/core/vector/SymmetricMatrix.h>
-#include <other/core/geometry/Box.h>
-#include <other/core/utility/const_cast.h>
+#include <othercore/vector/SolidMatrix.h>
+#include <othercore/array/sort.h>
+#include <othercore/array/view.h>
+#include <othercore/structure/Tuple.h>
+#include <othercore/python/Class.h>
+#include <othercore/vector/DiagonalMatrix.h>
+#include <othercore/vector/SymmetricMatrix.h>
+#include <othercore/geometry/Box.h>
+#include <othercore/utility/const_cast.h>
 namespace other{
 
 typedef real T;

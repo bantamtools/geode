@@ -1,9 +1,9 @@
 // Locate extra resource files (textures, etc.) at runtime
 
-#include <other/core/utility/resource.h>
-#include <other/core/array/Array.h>
-#include <other/core/python/wrap.h>
-#include <other/core/python/utility.h>
+#include <othercore/utility/resource.h>
+#include <othercore/array/Array.h>
+#include <othercore/python/wrap.h>
+#include <othercore/python/utility.h>
 #if defined(_WIN32)
 #define WINDOWS_MEAN_AND_LEAN
 #include <windows.h>

@@ -3,7 +3,7 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/vector/ScalarPolicy.h>
+#include <othercore/vector/ScalarPolicy.h>
 namespace other {
 
 template<class TV> inline const TV& mean(const TV& x) {

@@ -3,7 +3,7 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/utility/config.h>
+#include <othercore/utility/config.h>
 #include <string>
 namespace other {
 

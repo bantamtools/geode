@@ -1,12 +1,12 @@
 //#####################################################################
 // Class ParticleTree
 //#####################################################################
-#include <other/core/geometry/ParticleTree.h>
-#include <other/core/geometry/Sphere.h>
-#include <other/core/geometry/traverse.h>
-#include <other/core/array/IndirectArray.h>
-#include <other/core/python/Class.h>
-#include <other/core/structure/UnionFind.h>
+#include <othercore/geometry/ParticleTree.h>
+#include <othercore/geometry/Sphere.h>
+#include <othercore/geometry/traverse.h>
+#include <othercore/array/IndirectArray.h>
+#include <othercore/python/Class.h>
+#include <othercore/structure/UnionFind.h>
 namespace other{
 using std::cout;
 using std::endl;

@@ -1,7 +1,7 @@
 // Compose two functions into a single function object
 #pragma once
 
-#include <other/core/utility/SanitizeFunction.h>
+#include <othercore/utility/SanitizeFunction.h>
 namespace other {
 
 using namespace other;

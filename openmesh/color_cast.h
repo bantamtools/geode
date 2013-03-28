@@ -1,7 +1,7 @@
 // Work around a bug in OpenMesh color casting
 #pragma once
 
-#include <other/core/openmesh/TriMesh.h>
+#include <othercore/openmesh/TriMesh.h>
 
 #ifdef USE_OPENMESH
 namespace OpenMesh {

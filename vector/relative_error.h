@@ -1,8 +1,8 @@
 // relative_error function
 #pragma once
 
-#include <other/core/math/max.h>
-#include <other/core/vector/ScalarPolicy.h>
+#include <othercore/math/max.h>
+#include <othercore/vector/ScalarPolicy.h>
 namespace other {
 
 template<class T> typename boost::enable_if<IsScalar<T>,T>::type relative_error(const T& a, const T& b, const T& absolute=1e-30) {

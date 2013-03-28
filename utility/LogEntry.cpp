@@ -1,4 +1,4 @@
-#include <other/core/utility/LogEntry.h>
+#include <othercore/utility/LogEntry.h>
 namespace other {
 
 bool LogEntry::start_on_separate_line=false;

@@ -1,7 +1,7 @@
 #include "Listen.h"
-#include <other/core/python/Class.h>
-#include <other/core/python/function.h>
-#include <other/core/python/wrap.h>
+#include <othercore/python/Class.h>
+#include <othercore/python/function.h>
+#include <othercore/python/wrap.h>
 namespace other {
 
 OTHER_DEFINE_TYPE(Listen)

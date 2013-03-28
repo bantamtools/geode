@@ -1,9 +1,9 @@
 // Random access pseudorandom permutations
 
-#include <other/core/random/permute.h>
-#include <other/core/random/counter.h>
-#include <other/core/math/integer_log.h>
-#include <other/core/python/wrap.h>
+#include <othercore/random/permute.h>
+#include <othercore/random/counter.h>
+#include <othercore/math/integer_log.h>
+#include <othercore/python/wrap.h>
 namespace other {
 
 // For details, see

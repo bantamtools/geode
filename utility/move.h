@@ -1,7 +1,7 @@
 // Clang doesn't have the C++11 headers by default, so declare move and forward ourselves
 #pragma once
 
-#include <other/core/utility/config.h>
+#include <othercore/utility/config.h>
 #include <boost/type_traits/remove_reference.hpp>
 namespace other {
 

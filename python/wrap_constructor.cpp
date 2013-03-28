@@ -2,7 +2,7 @@
 // Function Wrap_Constructor
 //#####################################################################
 #ifdef OTHER_PYTHON
-#include <other/core/python/wrap_constructor.h>
+#include <othercore/python/wrap_constructor.h>
 namespace other{
 
 void set_argument_count_error(int desired,PyObject* args,PyObject* kwds) {

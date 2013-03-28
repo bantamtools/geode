@@ -1,8 +1,8 @@
-#include <other/core/value/Compute.h>
-#include <other/core/python/from_python.h>
-#include <other/core/python/Ptr.h>
-#include <other/core/python/Class.h>
-#include <other/core/utility/format.h>
+#include <othercore/value/Compute.h>
+#include <othercore/python/from_python.h>
+#include <othercore/python/Ptr.h>
+#include <othercore/python/Class.h>
+#include <othercore/utility/format.h>
 namespace other {
 #ifdef OTHER_PYTHON
 

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <other/core/structure/Tuple.h>
-#include <other/core/geometry/Segment2d.h>
-#include <other/core/array/Array.h>
+#include <othercore/structure/Tuple.h>
+#include <othercore/geometry/Segment2d.h>
+#include <othercore/array/Array.h>
 #include <vector>
 
 namespace other {

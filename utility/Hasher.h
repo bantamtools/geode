@@ -1,7 +1,7 @@
 // Hash class for STL containers
 #pragma once
 
-#include <other/core/math/hash.h>
+#include <othercore/math/hash.h>
 namespace other {
 
 struct Hasher {

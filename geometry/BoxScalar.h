@@ -9,15 +9,15 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/geometry/forward.h>
-#include <other/core/vector/ScalarPolicy.h>
-#include <other/core/math/clamp.h>
-#include <other/core/math/max.h>
-#include <other/core/math/min.h>
-#include <other/core/math/maxabs.h>
-#include <other/core/math/Zero.h>
-#include <other/core/python/forward.h>
-#include <other/core/utility/STATIC_ASSERT_SAME.h>
+#include <othercore/geometry/forward.h>
+#include <othercore/vector/ScalarPolicy.h>
+#include <othercore/math/clamp.h>
+#include <othercore/math/max.h>
+#include <othercore/math/min.h>
+#include <othercore/math/maxabs.h>
+#include <othercore/math/Zero.h>
+#include <othercore/python/forward.h>
+#include <othercore/utility/STATIC_ASSERT_SAME.h>
 #include <boost/mpl/assert.hpp>
 #include <cassert>
 #include <limits>

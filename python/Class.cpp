@@ -1,7 +1,7 @@
 //#####################################################################
 // Class Class
 //#####################################################################
-#include <other/core/python/Class.h>
+#include <othercore/python/Class.h>
 #include <iostream>
 namespace other{
 

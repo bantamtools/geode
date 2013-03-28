@@ -3,20 +3,20 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/value/forward.h>
-#include <other/core/value/Value.h>
-#include <other/core/math/clamp.h>
-#include <other/core/python/Ref.h>
-#include <other/core/python/Ptr.h>
-#include <other/core/python/try_convert.h>
-#include <other/core/python/stl.h>
-#include <other/core/structure/forward.h>
-#include <other/core/utility/CopyConst.h>
-#include <other/core/utility/format.h>
-#include <other/core/utility/const_cast.h>
-#include <other/core/utility/stl.h>
-#include <other/core/utility/str.h>
-#include <other/core/vector/Vector.h>
+#include <othercore/value/forward.h>
+#include <othercore/value/Value.h>
+#include <othercore/math/clamp.h>
+#include <othercore/python/Ref.h>
+#include <othercore/python/Ptr.h>
+#include <othercore/python/try_convert.h>
+#include <othercore/python/stl.h>
+#include <othercore/structure/forward.h>
+#include <othercore/utility/CopyConst.h>
+#include <othercore/utility/format.h>
+#include <othercore/utility/const_cast.h>
+#include <othercore/utility/stl.h>
+#include <othercore/utility/str.h>
+#include <othercore/vector/Vector.h>
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/scoped_ptr.hpp>
 namespace other {

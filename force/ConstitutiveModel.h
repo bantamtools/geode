@@ -3,11 +3,11 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/NdArray.h>
-#include <other/core/force/forward.h>
-#include <other/core/force/DiagonalizedIsotropicStressDerivative.h>
-#include <other/core/python/Object.h>
-#include <other/core/utility/debug.h>
+#include <othercore/array/NdArray.h>
+#include <othercore/force/forward.h>
+#include <othercore/force/DiagonalizedIsotropicStressDerivative.h>
+#include <othercore/python/Object.h>
+#include <othercore/utility/debug.h>
 namespace other{
 
 template<class T,int d>

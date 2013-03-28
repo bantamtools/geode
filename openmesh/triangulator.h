@@ -1,7 +1,7 @@
 #pragma once
 
-#include <other/core/openmesh/TriMesh.h>
-#include <other/core/utility/tr1.h>
+#include <othercore/openmesh/TriMesh.h>
+#include <othercore/utility/tr1.h>
 #ifdef USE_OPENMESH
 namespace other {
 

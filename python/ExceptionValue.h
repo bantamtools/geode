@@ -10,8 +10,8 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/utility/config.h>
-#include <other/core/utility/safe_bool.h>
+#include <othercore/utility/config.h>
+#include <othercore/utility/safe_bool.h>
 #include <boost/shared_ptr.hpp>
 namespace other {
 

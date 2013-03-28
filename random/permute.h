@@ -1,8 +1,8 @@
 // Random access pseudorandom permutations
 #pragma once
 
-#include <other/core/math/uint128.h>
-#include <other/core/vector/Vector.h>
+#include <othercore/math/uint128.h>
+#include <othercore/vector/Vector.h>
 namespace other {
 
 // Apply a pseudorandom permutation to the range [0,n-1]

@@ -10,3 +10,7 @@
 *.vcxproj.user
 Debug*/
 Release*/
+*.xcuserdata
+*.xcuserstate
+*.xcbkptlist
+xcuserdata
