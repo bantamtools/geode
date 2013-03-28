@@ -1,4 +1,6 @@
-Import('env library external')
+Import('env library external toplevel')
+
+toplevel('othercore','.')
 
 external('openmesh',libpath=['/usr/local/lib/OpenMesh'],flags=['USE_OPENMESH'],libs=['OpenMeshCore','OpenMeshTools'],requires=['boost_link'])
 
