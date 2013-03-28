@@ -2,8 +2,8 @@
 // See other/core/exact/config.h for discussion.
 #pragma once
 
-#include <other/core/exact/config.h>
-#include <other/core/geometry/Box.h>
+#include <othercore/exact/config.h>
+#include <othercore/geometry/Box.h>
 #include <limits>
 namespace other {
 

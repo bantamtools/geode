@@ -15,7 +15,7 @@
  * Actually, Delaunay runs 20% faster without the interval steps, so we'll go pure integer for now.
  */
 
-#include <other/core/utility/config.h>
+#include <othercore/utility/config.h>
 #include <stdint.h>
 namespace other {
 namespace exact {

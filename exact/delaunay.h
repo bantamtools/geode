@@ -1,9 +1,9 @@
 // Randomized incremental Delaunay using simulation of simplicity
 #pragma once
 
-#include <other/core/exact/config.h>
-#include <other/core/mesh/CornerMesh.h>
-#include <other/core/mesh/HalfedgeMesh.h>
+#include <othercore/exact/config.h>
+#include <othercore/mesh/CornerMesh.h>
+#include <othercore/mesh/HalfedgeMesh.h>
 namespace other {
 
 // Compute an approximate Delaunay triangulation of a point set, by first quantizing and performing exact Delaunay.

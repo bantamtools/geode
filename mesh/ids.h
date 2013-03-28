@@ -1,9 +1,9 @@
 // Strongly typed ids for use in meshes
 #pragma once
 
-#include <other/core/python/from_python.h>
-#include <other/core/python/to_python.h>
-#include <other/core/vector/Vector.h>
+#include <othercore/python/from_python.h>
+#include <othercore/python/to_python.h>
+#include <othercore/vector/Vector.h>
 namespace other {
 
 using std::ostream;

@@ -1,13 +1,13 @@
 // A halfedge data structure representing oriented triangle meshes.
 
-#include <other/core/mesh/HalfedgeMesh.h>
-#include <other/core/array/convert.h>
-#include <other/core/array/NestedArray.h>
-#include <other/core/python/Class.h>
-#include <other/core/random/Random.h>
-#include <other/core/structure/Hashtable.h>
-#include <other/core/utility/Log.h>
-#include <other/core/vector/convert.h>
+#include <othercore/mesh/HalfedgeMesh.h>
+#include <othercore/array/convert.h>
+#include <othercore/array/NestedArray.h>
+#include <othercore/python/Class.h>
+#include <othercore/random/Random.h>
+#include <othercore/structure/Hashtable.h>
+#include <othercore/utility/Log.h>
+#include <othercore/vector/convert.h>
 #include <boost/dynamic_bitset.hpp>
 namespace other {
 

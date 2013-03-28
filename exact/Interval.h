@@ -3,8 +3,8 @@
 
 // Modified from code by Tyson Brochu, 2011
 
-#include <other/core/utility/config.h>
-#include <other/core/python/repr.h>
+#include <othercore/utility/config.h>
+#include <othercore/python/repr.h>
 #include <fenv.h>
 namespace other {
 

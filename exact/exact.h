@@ -1,8 +1,8 @@
 // Multiprecision integer arithmetic for exact geometric predicates
 #pragma once 
 
-#include <other/core/exact/config.h>
-#include <other/core/math/uint128.h>
+#include <othercore/exact/config.h>
+#include <othercore/math/uint128.h>
 namespace other {
 namespace exact {
 

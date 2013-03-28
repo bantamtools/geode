@@ -1,14 +1,14 @@
 // Unit tests for exact geometric predicates
 
-#include <other/core/exact/config.h>
-#include <other/core/exact/predicates.h>
-#include <other/core/exact/scope.h>
-#include <other/core/array/sort.h>
-#include <other/core/math/choice.h>
-#include <other/core/python/wrap.h>
-#include <other/core/random/Random.h>
-#include <other/core/utility/interrupts.h>
-#include <other/core/utility/Log.h>
+#include <othercore/exact/config.h>
+#include <othercore/exact/predicates.h>
+#include <othercore/exact/scope.h>
+#include <othercore/array/sort.h>
+#include <othercore/math/choice.h>
+#include <othercore/python/wrap.h>
+#include <othercore/random/Random.h>
+#include <othercore/utility/interrupts.h>
+#include <othercore/utility/Log.h>
 #include <tr1/unordered_map>
 #include <vector>
 namespace other {

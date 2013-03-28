@@ -2,8 +2,8 @@
 // This class represents topology only, not geometry.
 #pragma once
 
-#include <other/core/mesh/ids.h>
-#include <other/core/array/Field.h>
+#include <othercore/mesh/ids.h>
+#include <othercore/array/Field.h>
 namespace other {
 
 struct OutgoingCirculator;

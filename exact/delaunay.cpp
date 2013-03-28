@@ -1,19 +1,19 @@
 // Randomized incremental Delaunay using simulation of simplicity
 
-#include <other/core/exact/delaunay.h>
-#include <other/core/exact/predicates.h>
-#include <other/core/exact/quantize.h>
-#include <other/core/exact/scope.h>
-#include <other/core/array/amap.h>
-#include <other/core/array/RawField.h>
-#include <other/core/math/integer_log.h>
-#include <other/core/python/wrap.h>
-#include <other/core/random/permute.h>
-#include <other/core/random/Random.h>
-#include <other/core/structure/Tuple.h>
-#include <other/core/utility/curry.h>
-#include <other/core/utility/interrupts.h>
-#include <other/core/utility/Log.h>
+#include <othercore/exact/delaunay.h>
+#include <othercore/exact/predicates.h>
+#include <othercore/exact/quantize.h>
+#include <othercore/exact/scope.h>
+#include <othercore/array/amap.h>
+#include <othercore/array/RawField.h>
+#include <othercore/math/integer_log.h>
+#include <othercore/python/wrap.h>
+#include <othercore/random/permute.h>
+#include <othercore/random/Random.h>
+#include <othercore/structure/Tuple.h>
+#include <othercore/utility/curry.h>
+#include <othercore/utility/interrupts.h>
+#include <othercore/utility/Log.h>
 namespace other {
 
 using Log::cout;
