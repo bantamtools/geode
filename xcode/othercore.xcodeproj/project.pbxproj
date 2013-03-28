@@ -27,12 +27,14 @@
 		205636C71703AC0C000A42F9 /* utility */ = {isa = PBXFileReference; lastKnownFileType = folder; name = utility; path = ../utility; sourceTree = "<group>"; };
 		205636C81703AC0C000A42F9 /* value */ = {isa = PBXFileReference; lastKnownFileType = folder; name = value; path = ../value; sourceTree = "<group>"; };
 		205636C91703AC0C000A42F9 /* vector */ = {isa = PBXFileReference; lastKnownFileType = folder; name = vector; path = ../vector; sourceTree = "<group>"; };
+		20E826641703D5E7001322E2 /* exact */ = {isa = PBXFileReference; lastKnownFileType = folder; name = exact; path = ../exact; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		205636A51703AB60000A42F9 = {
 			isa = PBXGroup;
 			children = (
+				20E826641703D5E7001322E2 /* exact */,
 				205636B61703AC0C000A42F9 /* __init__.py */,
 				205636B71703AC0C000A42F9 /* array */,
 				205636B81703AC0C000A42F9 /* bin */,
@@ -61,7 +63,7 @@
 /* Begin PBXLegacyTarget section */
 		205636AC1703AB60000A42F9 /* othercore */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "has_libpng=0 has_libjpeg=0 has_openexr=0 has_openmesh=0 has_python=0";
+			buildArgumentsString = "has_libpng=0 has_libjpeg=0 has_openexr=0 has_openmesh=0 has_python=1";
 			buildConfigurationList = 205636AF1703AB60000A42F9 /* Build configuration list for PBXLegacyTarget "othercore" */;
 			buildPhases = (
 			);
@@ -70,7 +72,7 @@
 			dependencies = (
 			);
 			name = othercore;
-			passBuildSettingsInEnvironment = 1;
+			passBuildSettingsInEnvironment = 0;
 			productName = othercore;
 		};
 /* End PBXLegacyTarget section */

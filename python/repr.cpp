@@ -14,9 +14,15 @@ string repr(PyObject& x) {
   return format("<object of type %s>",x.ob_type->tp_name);
 #endif
 }
-
+    
 string repr(PyObject* x) {
   return x ? repr(*x) : "None";
+}
+
+string repr(const int x) {
+    static char buffer[40];
+    sprintf(buffer,"%d",x);
+    return buffer;
 }
 
 string repr(const float x) {

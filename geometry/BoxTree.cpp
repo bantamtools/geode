@@ -14,6 +14,7 @@ namespace other{
 using std::cout;
 using std::endl;
 
+template<> OTHER_DEFINE_TYPE(BoxTree<Vector<int,2> >)
 template<> OTHER_DEFINE_TYPE(BoxTree<Vector<real,2> >)
 template<> OTHER_DEFINE_TYPE(BoxTree<Vector<real,3> >)
 #ifndef OTHER_FLOAT
@@ -195,6 +196,7 @@ any_box_intersection(const Shape& shape) const {
   template class BoxTree<Vector<T,d> >; \
   template OTHER_CORE_EXPORT bool BoxTree<Vector<T,d>>::any_box_intersection(const Box<Vector<T,d>>&) const; \
   template OTHER_CORE_EXPORT bool BoxTree<Vector<T,d>>::any_box_intersection(const Sphere<Vector<T,d>>&) const;
+INSTANTIATE(int,2)
 INSTANTIATE(real,2)
 INSTANTIATE(real,3)
 #ifndef OTHER_FLOAT
