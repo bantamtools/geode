@@ -168,7 +168,7 @@ def external(name,default=0,dir=0,flags='',cxxflags='',linkflags='',cpppath=(),l
   if env[name+'_callback']!=0: lib['callback'] = env[name+'_callback']
 
 # Predefined external libraries
-external('python',default=1,frameworks=['Python'],flags=['OTHER_PYTHON'])
+external('python',has=0,default=1,frameworks=['Python'],flags=['OTHER_PYTHON'])
 external('boost',default=1,hide=1)
 external('boost_link',requires=['boost'],libs=['boost_iostreams$boost_lib_suffix','boost_filesystem$boost_lib_suffix','boost_system$boost_lib_suffix','z','bz2'],hide=1)
 external('mpi',flags=['USE_MPI'])
