@@ -1,17 +1,17 @@
 // Nearly exact geometric constructions
 
-#include <other/core/exact/constructions.h>
-#include <other/core/exact/predicates.h>
-#include <other/core/exact/perturb.h>
-#include <other/core/exact/Exact.h>
-#include <other/core/exact/Interval.h>
-#include <other/core/exact/math.h>
-#include <other/core/exact/scope.h>
-#include <other/core/array/RawArray.h>
-#include <other/core/geometry/Segment2d.h>
-#include <other/core/python/wrap.h>
-#include <other/core/random/Random.h>
-#include <other/core/utility/Log.h>
+#include <othercore/exact/constructions.h>
+#include <othercore/exact/predicates.h>
+#include <othercore/exact/perturb.h>
+#include <othercore/exact/Exact.h>
+#include <othercore/exact/Interval.h>
+#include <othercore/exact/math.h>
+#include <othercore/exact/scope.h>
+#include <othercore/array/RawArray.h>
+#include <othercore/geometry/Segment2d.h>
+#include <othercore/python/wrap.h>
+#include <othercore/random/Random.h>
+#include <othercore/utility/Log.h>
 namespace other {
 
 using Log::cout;

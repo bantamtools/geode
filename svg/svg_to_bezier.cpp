@@ -1,7 +1,7 @@
-#include <other/core/svg/svg_to_bezier.h>
-#include <other/core/python/wrap.h>
-#include <other/core/python/Class.h>
-#include <other/core/python/stl.h>
+#include <othercore/svg/svg_to_bezier.h>
+#include <othercore/python/wrap.h>
+#include <othercore/python/Class.h>
+#include <othercore/python/stl.h>
 
 namespace other {
 

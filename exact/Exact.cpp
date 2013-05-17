@@ -1,6 +1,6 @@
 // Multiprecision integer arithmetic for exact geometric predicates
 
-#include <other/core/exact/Exact.h>
+#include <othercore/exact/Exact.h>
 #include <vector>
 namespace other {
 

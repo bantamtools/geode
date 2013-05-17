@@ -1,10 +1,10 @@
 #include "Bezier.h"
-#include <other/core/vector/Matrix4x4.h>
-#include <other/core/vector/Matrix.h>
-#include <other/core/utility/stl.h>
-#include <other/core/python/Class.h>
-#include <other/core/python/stl.h>
-#include <other/core/geometry/polygon.h>
+#include <othercore/vector/Matrix4x4.h>
+#include <othercore/vector/Matrix.h>
+#include <othercore/utility/stl.h>
+#include <othercore/python/Class.h>
+#include <othercore/python/stl.h>
+#include <othercore/geometry/polygon.h>
 #include <iostream>
 
 namespace other{
@@ -307,6 +307,7 @@ template struct PointSolve<3>;
 template struct Span<2>;
 template struct Span<3>;
 
+#ifdef OTHER_PYTHON
 
 PyObject* to_python(const InvertableBox& self) {
   return to_python(tuple(self.begin,self.end));
@@ -316,6 +317,8 @@ InvertableBox FromPython<InvertableBox>::convert(PyObject* object) {
   const auto extents = from_python<Tuple<real,real>>(object);
   return InvertableBox(extents.x,extents.y);
 }
+
+#endif
 
 std::ostream& operator<<(std::ostream& os, const InvertableBox& ib) {
   os << "[" << ib.begin << ", " << ib.end << "]";

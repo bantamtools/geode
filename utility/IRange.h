@@ -1,7 +1,7 @@
 // Compile time range of integers
 #pragma once
 
-#include <other/core/utility/config.h>
+#include <othercore/utility/config.h>
 namespace other {
 
 template<int n,class... R> struct IRange : public IRange<n-1,R...,mpl::int_<sizeof...(R)>> {};

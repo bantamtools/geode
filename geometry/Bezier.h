@@ -1,11 +1,11 @@
 #pragma once
 
-#include <other/core/vector/Vector.h>
-#include <other/core/structure/Tuple.h>
-#include <other/core/geometry/Box.h>
-#include <other/core/python/Object.h>
-#include <other/core/python/Ref.h>
-#include <other/core/math/constants.h>
+#include <othercore/vector/Vector.h>
+#include <othercore/structure/Tuple.h>
+#include <othercore/geometry/Box.h>
+#include <othercore/python/Object.h>
+#include <othercore/python/Ref.h>
+#include <othercore/math/constants.h>
 #include <tr1/unordered_map>
 #include <map>
 
@@ -26,8 +26,11 @@ class InvertableBox {
   real begin;
   real end;
 };
+
+#ifdef OTHER_PYTHON
 OTHER_CORE_EXPORT PyObject* to_python(const InvertableBox& self);
 template<> struct FromPython<InvertableBox>{OTHER_CORE_EXPORT static InvertableBox convert(PyObject* object);};
+#endif
 
 std::ostream& operator<<(std::ostream& os, const InvertableBox& ib);
 

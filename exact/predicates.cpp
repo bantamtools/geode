@@ -1,12 +1,12 @@
 // Exact geometric predicates
 
-#include <other/core/exact/predicates.h>
-#include <other/core/exact/Exact.h>
-#include <other/core/exact/math.h>
-#include <other/core/exact/perturb.h>
-#include <other/core/array/RawArray.h>
-#include <other/core/python/wrap.h>
-#include <other/core/random/Random.h>
+#include <othercore/exact/predicates.h>
+#include <othercore/exact/Exact.h>
+#include <othercore/exact/math.h>
+#include <othercore/exact/perturb.h>
+#include <othercore/array/RawArray.h>
+#include <othercore/python/wrap.h>
+#include <othercore/random/Random.h>
 namespace other {
 
 using std::cout;

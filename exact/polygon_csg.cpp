@@ -1,19 +1,19 @@
 // Robust constructive solid geometry for polygons in the plane
 
-#include <other/core/exact/polygon_csg.h>
-#include <other/core/exact/constructions.h>
-#include <other/core/exact/predicates.h>
-#include <other/core/exact/perturb.h>
-#include <other/core/exact/quantize.h>
-#include <other/core/exact/scope.h>
-#include <other/core/array/amap.h>
-#include <other/core/array/sort.h>
-#include <other/core/geometry/BoxTree.h>
-#include <other/core/geometry/traverse.h>
-#include <other/core/python/wrap.h>
-#include <other/core/structure/Hashtable.h>
-#include <other/core/utility/Log.h>
-#include <other/core/utility/str.h>
+#include <othercore/exact/polygon_csg.h>
+#include <othercore/exact/constructions.h>
+#include <othercore/exact/predicates.h>
+#include <othercore/exact/perturb.h>
+#include <othercore/exact/quantize.h>
+#include <othercore/exact/scope.h>
+#include <othercore/array/amap.h>
+#include <othercore/array/sort.h>
+#include <othercore/geometry/BoxTree.h>
+#include <othercore/geometry/traverse.h>
+#include <othercore/python/wrap.h>
+#include <othercore/structure/Hashtable.h>
+#include <othercore/utility/Log.h>
+#include <othercore/utility/str.h>
 namespace other {
 
 typedef exact::Vec2 EV;

@@ -2,7 +2,7 @@
 // These are more general than their equivalents in core/vector: they can operate on tuples with varying precision.
 #pragma once
 
-#include <other/core/utility/config.h>
+#include <othercore/utility/config.h>
 #include <boost/utility/enable_if.hpp>
 namespace other {
 

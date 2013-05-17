@@ -1,11 +1,11 @@
 // General purpose black box simulation of simplicity
 #pragma once
 
-#include <other/core/exact/config.h>
-#include <other/core/exact/exact.h>
-#include <other/core/structure/Tuple.h>
-#include <other/core/utility/IRange.h>
-#include <other/core/vector/Vector.h>
+#include <othercore/exact/config.h>
+#include <othercore/exact/exact.h>
+#include <othercore/structure/Tuple.h>
+#include <othercore/utility/IRange.h>
+#include <othercore/vector/Vector.h>
 #include <gmp.h>
 namespace other {
 

@@ -9,8 +9,8 @@
 // Warning: The worst case complexity of these algorithms is quadratic, since O(n) arbitrary line segments may
 // have up to O(n^2) intersections, and contour depth is computed in a worst case O(n^2) fashion.
 
-#include <other/core/exact/config.h>
-#include <other/core/array/Nested.h>
+#include <othercore/exact/config.h>
+#include <othercore/array/Nested.h>
 namespace other {
 
 // Resolve all intersections between polygons, and extract the contour with given *external* depth.

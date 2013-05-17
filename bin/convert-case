@@ -85,7 +85,7 @@ include_pattern = re.compile(r'#include <(Try|Pneumo)/(\w+)/(\w+).h>')
 def convert_include(m):
   if m.group(1)=='Pneumo':
     return '#include <other/sim/%s.h>'%convert(m.group(3))
-  return '#include <other/core/%s/%s.h>'%(dir_map[m.group(2)],convert(m.group(3)))
+  return '#include <othercore/%s/%s.h>'%(dir_map[m.group(2)],convert(m.group(3)))
 
 module_pattern = re.compile(r'\bTry((?:\.[A-Z][a-z_]{2,})?)\b')
 def convert_module(m):

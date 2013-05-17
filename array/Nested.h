@@ -9,7 +9,7 @@
 //#####################################################################
 #pragma once
 
-#include <other/core/array/Array.h>
+#include <othercore/array/Array.h>
 namespace other {
 
 using std::ostream;

@@ -540,10 +540,10 @@ Nested<Vec2> canonicalize_polygons(Nested<const Vec2> polys) {
 }
 using namespace other;
 
-#include <other/core/python/wrap.h>
-#include <other/core/python/function.h>
-#include <other/core/python/from_python.h>
-#include <other/core/vector/convert.h>
+#include <othercore/python/wrap.h>
+#include <othercore/python/function.h>
+#include <othercore/python/from_python.h>
+#include <othercore/vector/convert.h>
 
 void wrap_polygon() {
   OTHER_FUNCTION_2(polygon_area,polygon_area_py)

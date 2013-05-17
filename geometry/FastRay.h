@@ -1,8 +1,8 @@
 // Fast ray-box intersection tests
 #pragma once
 
-#include <other/core/geometry/Box.h>
-#include <other/core/geometry/Ray.h>
+#include <othercore/geometry/Box.h>
+#include <othercore/geometry/Ray.h>
 namespace other {
 namespace {
 

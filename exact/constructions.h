@@ -1,8 +1,8 @@
 // Nearly exact geometric constructions
 #pragma once
 
-#include <other/core/exact/config.h>
-#include <other/core/vector/Vector.h>
+#include <othercore/exact/config.h>
+#include <othercore/vector/Vector.h>
 namespace other {
 
 // Construct the intersection of two segments, assuming they actually do intersect

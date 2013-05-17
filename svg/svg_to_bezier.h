@@ -1,9 +1,9 @@
 #pragma once
 
-#include <other/core/svg/nanosvg/nanosvg.h>
-#include <other/core/geometry/Bezier.h>
-#include <other/core/array/Array.h>
-#include <other/core/python/Ref.h>
+#include <othercore/svg/nanosvg/nanosvg.h>
+#include <othercore/geometry/Bezier.h>
+#include <othercore/array/Array.h>
+#include <othercore/python/Ref.h>
 #include <vector>
 namespace other {
 

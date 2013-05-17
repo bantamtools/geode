@@ -1,8 +1,8 @@
 #ifdef USE_OPENMESH
-#include <other/core/openmesh/smooth.h>
+#include <othercore/openmesh/smooth.h>
 #include <gmm/gmm.h>
-#include <other/core/python/wrap.h>
-#include <other/core/utility/stream.h>
+#include <othercore/python/wrap.h>
+#include <othercore/utility/stream.h>
 
 namespace other {
 

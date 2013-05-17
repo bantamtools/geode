@@ -1,6 +1,6 @@
 // Class Box
 
-#include <other/core/geometry/Box.h>
+#include <othercore/geometry/Box.h>
 namespace other {
 
 template Box<real> bounding_box(const RawArray<const real>&);

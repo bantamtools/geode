@@ -23,7 +23,7 @@
 #ifndef NANOSVG_H
 #define NANOSVG_H
 
-#include <other/core/utility/config.h> // for OTHER_EXPORT
+#include <othercore/utility/config.h> // for OTHER_EXPORT
 
 #ifdef __cplusplus
 extern "C" {
