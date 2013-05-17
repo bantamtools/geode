@@ -8,6 +8,7 @@
 #include <othercore/math/copysign.h>
 #include <othercore/structure/UnionFind.h>
 #include <othercore/geometry/SimplexTree.h>
+#include <othercore/geometry/ParticleTree.h>
 #include <othercore/geometry/Ray.h>
 #include <boost/algorithm/string.hpp>
 #include <othercore/utility/path.h>
@@ -16,6 +17,9 @@
 #include <othercore/openmesh/triangulator.h>
 #include <othercore/vector/Frame.h>
 #include <othercore/vector/convert.h>
+#include <othercore/array/NdArray.h>
+
+
 #include <queue>
 #include <iostream>
 namespace other {
@@ -259,6 +263,30 @@ Segment<Vector<real, 3> > TriMesh::segment(HalfedgeHandle heh) const {
   return Segment<Vector<real, 3> >(point(from_vertex_handle(heh)), point(to_vertex_handle(heh)));
 }
 
+real TriMesh::cotan_weight(EdgeHandle eh) const {
+
+  auto he0 = halfedge_handle(eh, 0);
+  auto he1 = halfedge_handle(eh, 1);
+  auto v0 = to_vertex_handle(he0);
+  auto v1 = to_vertex_handle(he1);
+  auto p0 = point(v0);
+  auto p1 = point(v1);
+
+  real weight = 0.;
+
+  auto p2 = point(opposite_vh(he0));
+  auto d0 = (p0 - p2).normalized();
+  auto d1 = (p1 - p2).normalized();
+  weight += 1.0 / tan(acos(std::max(-1., std::min(1., dot(d0,d1)))));
+
+  p2 = point(opposite_vh(he1));
+  d0 = (p0 - p2).normalized();
+  d1 = (p1 - p2).normalized();
+  weight += 1.0 / tan(acos(std::max(-1., std::min(1., dot(d0,d1)))));
+
+  return weight;
+}
+
 Vector<VertexHandle, 2> TriMesh::vertex_handles(HalfedgeHandle heh) const {
   return Vector<VertexHandle,2>(from_vertex_handle(heh),to_vertex_handle(heh));
 }
@@ -428,6 +456,27 @@ TriMesh::Normal TriMesh::smooth_normal(FaceHandle fh,
   return n;
 }
 
+unordered_map<VertexHandle, VertexHandle, Hasher> TriMesh::garbage_collection_with_map() {
+  OpenMesh::VPropHandleT<VertexHandle> oldid;
+  add_property(oldid);
+
+  for (auto vh : vertex_handles()) {
+    property(oldid, vh) = vh;
+  }
+
+  garbage_collection();
+
+  unordered_map<VertexHandle, VertexHandle, Hasher> old_to_new;
+
+  for (auto vh : vertex_handles()) {
+    old_to_new[property(oldid,vh)] = vh;
+  }
+
+  remove_property(oldid);
+
+  return old_to_new;
+}
+
 int TriMesh::remove_infinite_vertices() {
   int removed = 0;
   for (auto v : vertex_handles()) {
@@ -521,7 +570,7 @@ Ref<TriMesh> TriMesh::inverse_extract_faces(vector<FaceHandle> const &faces) con
   return inverse_extract_faces(faces, id2id);
 }
 
-vector<vector<Vector<real,2>>> TriMesh::silhouette(const Rotation<TV>& rotation) const {
+Nested<TV2> TriMesh::silhouette(const Rotation<TV>& rotation) const {
   OTHER_ASSERT(has_face_normals());
   OTHER_ASSERT(!has_boundary());
   const TV up = rotation.z_axis();
@@ -542,13 +591,14 @@ vector<vector<Vector<real,2>>> TriMesh::silhouette(const Rotation<TV>& rotation)
   }
 
   // Walk loops until we have no edges left
-  vector<vector<TV2>> loops;
+  Array<int> offsets;
+  offsets.append(0);
+  Array<TV2> flat;
   while (unused.size()) {
     // Grab one and walk as far as possible
     const auto start = unused.pop();
     if (!unused_set.erase(start))
       continue;
-    vector<TV2> loop;
     auto edge = start;
     for (;;) {
       auto next = next_halfedge_handle(edge);
@@ -556,14 +606,14 @@ vector<vector<Vector<real,2>>> TriMesh::silhouette(const Rotation<TV>& rotation)
         next = next_halfedge_handle(opposite_halfedge_handle(next));
         assert(edge_handle(next)!=edge_handle(edge)); // Implies something nonmanifold is happening
       }
-      loop.push_back(rotation.inverse_times(point(from_vertex_handle(next))).xy());
+      flat.append(rotation.inverse_times(point(from_vertex_handle(next))).xy());
       if (next==start)
         break;
       edge = next;
     }
-    loops.push_back(loop);
+    offsets.append(flat.size());
   }
-  return loops;
+  return Nested<TV2>(offsets,flat);
 }
 
 unordered_set<HalfedgeHandle, Hasher> TriMesh::boundary_of(vector<FaceHandle> const &faces) const {
@@ -808,17 +858,23 @@ vector<VertexHandle> TriMesh::split_nonmanifold_vertex(VertexHandle vh, unordere
   auto components = surface_components(vh, exclude_edges);
 
   vector<VertexHandle> verts(1,vh);
+  TV dupe = point(vh);
   for (int i = 1; i < (int) components.size(); ++i) {
-    VertexHandle v = add_vertex(point(vh));
+    VertexHandle v = add_vertex(dupe);
 
     for (auto f : components[i]) {
       auto vhs = vertex_handles(f);
-      delete_face(f);
+      delete_face(f,false);
       // replace vh with v in vhs
       if (vhs.x == vh) vhs.x = v;
       if (vhs.y == vh) vhs.y = v;
       if (vhs.z == vh) vhs.z = v;
+
       add_face(vhs.x, vhs.y, vhs.z);
+
+      OTHER_ASSERT(!status(vhs.x).deleted() && vhs.x.is_valid() && isfinite(point(vhs.x)) );
+      OTHER_ASSERT(!status(vhs.y).deleted() && vhs.y.is_valid()  && isfinite(point(vhs.y)) );
+      OTHER_ASSERT(!status(vhs.z).deleted() && vhs.z.is_valid()  && isfinite(point(vhs.z)) );
     }
 
     verts.push_back(v);
@@ -836,7 +892,6 @@ vector<EdgeHandle> TriMesh::separate_edge(EdgeHandle eh) {
   if (is_boundary(eh)) {
     return make_vector(EdgeHandle());
   }
-
   // we split the edge by splitting each end vertex
   auto vhs = vertex_handles(eh);
   unordered_set<EdgeHandle, Hasher> edgeset;
@@ -856,6 +911,28 @@ vector<EdgeHandle> TriMesh::separate_edge(EdgeHandle eh) {
 
   return result;
 }
+
+// split the mesh along a string of edges. If the edges form loops, this
+// results in two holes per loop. All non-loop connected components create
+// a single hole. Returns all vertices that were split, and all vertices they
+// were split into.
+OTHER_CORE_EXPORT vector<VertexHandle> TriMesh::separate_edges(vector<EdgeHandle> ehs) {
+  unordered_set<EdgeHandle, Hasher> edgeset(ehs.begin(), ehs.end());
+
+  unordered_set<VertexHandle, Hasher> edgeverts;
+  for (auto e : ehs) {
+    auto vhs = vertex_handles(e);
+    edgeverts.insert(vhs.x);
+    edgeverts.insert(vhs.y);
+  }
+
+  vector<VertexHandle> allverts;
+  for (auto v : edgeverts) {
+    extend(allverts, split_nonmanifold_vertex(v, edgeset));
+  }
+  return allverts;
+}
+
 
 void TriMesh::cut_and_mirror(Plane<real> const &plane, bool mirror, double epsilon, double area_hack) {
   OpenMesh::VPropHandleT<int> vtype;
@@ -1052,10 +1129,9 @@ bool TriMesh::has_boundary() const {
 // find boundary loops
 vector<vector<TriMesh::HalfedgeHandle> > TriMesh::boundary_loops() const {
   unordered_set<HalfedgeHandle, Hasher> done;
-
   vector<vector<HalfedgeHandle> >  loops;
-
-  for (ConstHalfedgeIter it = halfedges_sbegin(); it != halfedges_end(); ++it) {
+  for (ConstHalfedgeIter it = halfedges_begin(); it != halfedges_end(); ++it) {
+    if(status(edge_handle(it)).deleted() || status(it).deleted()) continue;
     if (is_boundary(it) && !done.count(it.handle())) {
       loops.push_back(boundary_loop(it.handle()));
       done.insert(loops.back().begin(), loops.back().end());
@@ -1138,6 +1214,16 @@ Array<Vector<int,3> > TriMesh::elements() const {
     tris.append(vec(v.x.idx(),v.y.idx(),v.z.idx()));
   }
   return tris;
+}
+
+Array<Vector<int,2> > TriMesh::segments() const {
+  Array<Vector<int,2> > segs;
+  segs.preallocate(n_edges());
+  for (auto eh : edge_handles()) {
+    Vector<VertexHandle, 2> vh = vertex_handles(eh);
+    segs.append(Vector<int,2>(vh[0].idx(),vh[1].idx()));
+  }
+  return segs;
 }
 
 RawArray<const Vector<real,3> > TriMesh::X() const {
@@ -1314,6 +1400,12 @@ void TriMesh::transform(Frame<Vector<real, 3> > const &F) {
   }
 }
 
+void TriMesh::transform(Matrix<real, 4> const &M) {
+  for (TriMesh::VertexIter v = vertices_begin(); v != vertices_end(); ++v) {
+    set_point(v, M.homogeneous_times(point(v)));
+  }
+}
+
 void TriMesh::invert_component(std::vector<FaceHandle> component) {
   // this will fail horribly if the given faces are not a complete component
   // (ie if they have neighbors that are not in the vector)
@@ -1380,7 +1472,7 @@ real TriMesh::volume() const {
 
   real sum=0;
 
-  for (TriMesh::ConstFaceIter f = faces_begin(); f != faces_end(); ++f) {
+  for (TriMesh::ConstFaceIter f = faces_sbegin(); f != faces_end(); ++f) {
     Triangle<Vector<real, 3> > t = triangle(f);
     sum+=det(t.x0,t.x1,t.x2);
   }
@@ -1584,6 +1676,18 @@ vector<Ref<TriMesh> > TriMesh::nested_components() const{
   return output;
 }
 
+Ref<SimplexTree<Vector<real,3>,2>> TriMesh::face_tree() const {
+  return new_<SimplexTree<TV,2>>(*new_<TriangleMesh>(elements()),X().copy(),4);
+}
+
+Ref<SimplexTree<Vector<real,3>,1>> TriMesh::edge_tree() const {
+  return new_<SimplexTree<TV,1>>(*new_<SegmentMesh>(segments()),X().copy(),4);
+}
+
+Ref<ParticleTree<Vector<real,3>>> TriMesh::point_tree() const {
+  return new_<ParticleTree<Vector<real,3>>>(X().copy(),4);
+}
+
 OMSilencer::OMSilencer(bool log, bool err, bool out)
   : log_enabled(::omlog().is_enabled())
   , err_enabled(::omerr().is_enabled())
@@ -1696,9 +1800,12 @@ void wrap_trimesh() {
     .OTHER_OVERLOADED_METHOD(real(Self::*)()const,area)
     .OTHER_OVERLOADED_METHOD_2(v_Method_r_vec3, "scale", scale)
     .OTHER_OVERLOADED_METHOD_2(v_Method_vec3_vec3, "scale_anisotropic", scale)
-    .OTHER_METHOD(transform)
+    .OTHER_OVERLOADED_METHOD(void(Self::*)(Matrix<real,4>const&),transform)
     .OTHER_METHOD(translate)
     .OTHER_METHOD(boundary_loops)
+    .OTHER_METHOD(face_tree)
+    .OTHER_METHOD(edge_tree)
+    .OTHER_METHOD(point_tree)
     .OTHER_OVERLOADED_METHOD(OTriMesh::Point const &(Self::*)(VertexHandle)const, point)
     .OTHER_OVERLOADED_METHOD(Self::Normal (Self::*)(FaceHandle)const, normal)
     .OTHER_OVERLOADED_METHOD(Self::TV(Self::*)()const, centroid)

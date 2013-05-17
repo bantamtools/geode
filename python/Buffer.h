@@ -34,11 +34,16 @@ public:
   template<class T> static Buffer*
   new_(const int m) {
 #ifndef _WIN32
-    BOOST_MPL_ASSERT((boost::has_trivial_destructor<T>));
+    BOOST_MPL_ASSERT((boost::has_trivial_destructor<T>)); // Array<T> never calls destructors, so T cannot have any
     Buffer* self = (Buffer*)malloc(16+m*sizeof(T));
 #else
     // Windows doesn't guarantee 16 byte alignment, so use _aligned_malloc
     Buffer* self = (Buffer*)_aligned_malloc(16+m*sizeof(T),16);
+    //if (m > 100000) {
+    //    char str[2000];
+    //    sprintf(str, "Buffer of length %d and size %d\n", m, sizeof(T));
+    //    OutputDebugStringA(str);
+    //}
 #endif
     return OTHER_PY_OBJECT_INIT(self,&pytype);
   }

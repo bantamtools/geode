@@ -2,6 +2,9 @@
 using namespace other;
 
 void wrap_exact() {
-  OTHER_WRAP(exact_tests)
+  OTHER_WRAP(perturb)
+  OTHER_WRAP(predicates)
+  OTHER_WRAP(constructions)
   OTHER_WRAP(delaunay)
+  OTHER_WRAP(polygon_csg)
 }

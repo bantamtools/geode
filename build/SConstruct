@@ -178,6 +178,7 @@ external('libpng',flags=['USE_LIBPNG'],libs=['png'],pattern=r'PngFile',cpppath=[
 external('openexr',flags=['USE_OPENEXR'],libs=['IlmImf','Half','Imath'],cpppath=['$BASE/include/OpenEXR'],pattern=r'ExrFile|tim[/\\]fab',cxxflags=' /wd4290' if windows else '')
 external('atlas',flags=['OTHER_BLAS'],libs=['cblas','lapack','atlas'])
 external('openblas',flags=['OTHER_BLAS'],libs=['lapack','blas'])
+external('gmp',flags=['OTHER_GMP'],libs=['gmp','gmpxx'])
 if darwin:
   external('accelerate',default=1,flags=['OTHER_BLAS'],frameworks=['Accelerate'])
 if windows:
@@ -300,7 +301,7 @@ else: # assume g++...
   elif env['arch']=='opteron': machine_flags = ' -march=opteron '+ifsse('-msse3')
   elif env['arch']=='powerpc': machine_flags = ''
   elif env['arch']=='native':  machine_flags = ' -march=native -mtune=native '+ifsse('')
-  else: machine_flags=''
+  else: machine_flags = ''
   env.Append(CXXFLAGS=machine_flags)
   # type specific flags
   if env['type']=='optdebug': env.Append(CXXFLAGS=' -g3')

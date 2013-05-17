@@ -196,7 +196,6 @@ static inline PyObject* to_python(BaseHandle h) {
   return ::other::to_python(h.idx());
 }
 #endif
-
 }
 
 namespace other {
@@ -224,6 +223,30 @@ template<> struct FromPython<EdgeHandle> {
 template<> struct FromPython<HalfedgeHandle> {
   static HalfedgeHandle convert(PyObject* object) {
     return HalfedgeHandle((unsigned int)from_python<int>(object));
+  }
+};
+
+template<class T> struct FromPython<OpenMesh::VPropHandleT<T>> {
+  static OpenMesh::VPropHandleT<T> convert(PyObject* object) {
+    return OpenMesh::VPropHandleT<T>((unsigned int)from_python<int>(object));
+  }
+};
+
+template<class T> struct FromPython<OpenMesh::HPropHandleT<T>> {
+  static OpenMesh::HPropHandleT<T> convert(PyObject* object) {
+    return OpenMesh::HPropHandleT<T>((unsigned int)from_python<int>(object));
+  }
+};
+
+template<class T> struct FromPython<OpenMesh::FPropHandleT<T>> {
+  static OpenMesh::FPropHandleT<T> convert(PyObject* object) {
+    return OpenMesh::FPropHandleT<T>((unsigned int)from_python<int>(object));
+  }
+};
+
+template<class T> struct FromPython<OpenMesh::EPropHandleT<T>> {
+  static OpenMesh::EPropHandleT<T> convert(PyObject* object) {
+    return OpenMesh::EPropHandleT<T>((unsigned int)from_python<int>(object));
   }
 };
 
@@ -317,6 +340,9 @@ public:
   OTHER_CORE_EXPORT Segment<Vector<real, 3> > segment(EdgeHandle eh) const;
   OTHER_CORE_EXPORT Segment<Vector<real, 3> > segment(HalfedgeHandle heh) const;
 
+  // compute the cotan weight for an edge
+  OTHER_CORE_EXPORT real cotan_weight(EdgeHandle eh) const;
+
   // get the vertex handles incident to the given halfedge
   OTHER_CORE_EXPORT Vector<VertexHandle,2> vertex_handles(HalfedgeHandle heh) const;
 
@@ -395,6 +421,10 @@ public:
   // get an interpolated normal at any point on the mesh
   OTHER_CORE_EXPORT Normal smooth_normal(FaceHandle fh, Vector<real,3> const &bary) const;
 
+  // garbage collection, but also returns a map of old to new vertex handles
+  // the map does not contains old vertex handles that have been deleted.
+  OTHER_CORE_EXPORT unordered_map<VertexHandle, VertexHandle, Hasher> garbage_collection_with_map();
+
   // get rid of all infinite or nan vertices (they are simply deleted, along with incident faces)
   OTHER_CORE_EXPORT int remove_infinite_vertices();
 
@@ -428,7 +458,7 @@ public:
   OTHER_CORE_EXPORT Ref<TriMesh> inverse_extract_faces(vector<FaceHandle> const &faces) const;
 
   // compute the 2D silhouettes of the mesh as seem from the given rotation (with rotation*(0,0,1) as the normal)
-  OTHER_CORE_EXPORT vector<vector<Vector<real,2>>> silhouette(const Rotation<TV>& rotation) const;
+  OTHER_CORE_EXPORT Nested<Vector<real,2>> silhouette(const Rotation<TV>& rotation) const;
 
   // get the halfedges bounding the given set of faces (for all halfedges, face_handle(he) is in faces)
   OTHER_CORE_EXPORT unordered_set<HalfedgeHandle, Hasher> boundary_of(vector<FaceHandle> const &faces) const;
@@ -467,6 +497,12 @@ public:
   // have to be boundary vertices for this to happen.
   OTHER_CORE_EXPORT vector<EdgeHandle> separate_edge(EdgeHandle eh);
 
+  // split the mesh along a string of edges. If the edges form loops, this
+  // results in two holes per loop. All non-loop connected components create
+  // a single hole. Returns all vertices that were split, and all vertices they
+  // were split into.
+  OTHER_CORE_EXPORT vector<VertexHandle> separate_edges(vector<EdgeHandle> ehs);
+
   // cut the mesh with a plane (negative side will be removed)
   OTHER_CORE_EXPORT void cut(Plane<real> const &p, double epsilon = 1e-4, double area_hack = 0);
 
@@ -498,6 +534,7 @@ public:
   OTHER_CORE_EXPORT void translate(const TV& c);
   OTHER_CORE_EXPORT void rotate(const Rotation<TV>& R, const TV& center=TV());
   OTHER_CORE_EXPORT void transform(const Frame<TV>& F);
+  OTHER_CORE_EXPORT void transform(const Matrix<double,4>&M);
 
   // flip all faces inside out
   OTHER_CORE_EXPORT void invert();
@@ -513,6 +550,7 @@ public:
 
   // Warning: these construct new arrays or copy memory
   OTHER_CORE_EXPORT Array<Vector<int,3> > elements() const;
+  OTHER_CORE_EXPORT Array<Vector<int,2> > segments() const;
   OTHER_CORE_EXPORT Array<Vector<real,3> > X_python() const;
   OTHER_CORE_EXPORT void set_X_python(RawArray<const Vector<real,3>> new_X);
   OTHER_CORE_EXPORT void set_vertex_normals(RawArray<const Vector<real,3>> normals);
@@ -521,6 +559,10 @@ public:
   // Warning: reference goes invalid if the mesh is changed
   OTHER_CORE_EXPORT RawArray<Vector<real,3> > X();
   OTHER_CORE_EXPORT RawArray<const Vector<real,3> > X() const;
+
+  OTHER_CORE_EXPORT Ref<SimplexTree<Vector<real,3>,2>> face_tree() const;
+  OTHER_CORE_EXPORT Ref<SimplexTree<Vector<real,3>,1>> edge_tree() const;
+  OTHER_CORE_EXPORT Ref<ParticleTree<Vector<real,3>>> point_tree() const;
 
   // Warning: reference goes invalid if the mesh is changed
   template<class PropHandle> RawField<typename PropHandle::Value,typename prop_handle_type<PropHandle>::type> prop(PropHandle p) {

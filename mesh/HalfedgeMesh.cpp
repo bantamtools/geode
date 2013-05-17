@@ -2,7 +2,7 @@
 
 #include <othercore/mesh/HalfedgeMesh.h>
 #include <othercore/array/convert.h>
-#include <othercore/array/NestedArray.h>
+#include <othercore/array/Nested.h>
 #include <othercore/python/Class.h>
 #include <othercore/random/Random.h>
 #include <othercore/structure/Hashtable.h>
@@ -391,8 +391,8 @@ int HalfedgeMesh::degree(VertexId v) const {
   return degree;
 }
 
-NestedArray<HalfedgeId> HalfedgeMesh::boundary_loops() const {
-  NestedArray<HalfedgeId> loops;
+Nested<HalfedgeId> HalfedgeMesh::boundary_loops() const {
+  Nested<HalfedgeId> loops;
   boost::dynamic_bitset<> seen(n_halfedges()); 
   for (const auto start : halfedges())
     if (is_boundary(start) && !seen[start.idx()]) {
