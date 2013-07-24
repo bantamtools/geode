@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from other.core.value import *
+from othercore.value import *
 
 def test_prop():
   i = Prop('i',3)

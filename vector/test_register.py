@@ -1,4 +1,4 @@
-from other.core.vector import *
+from othercore.vector import *
 from numpy import *
 
 def test_register():

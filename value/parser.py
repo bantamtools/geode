@@ -3,9 +3,9 @@ import sys
 import ast
 import argparse
 from numpy import *
-from other.core import *
-from other.core.utility import Log
-from other.core.vector import *
+from othercore import *
+from othercore.utility import Log
+from othercore.vector import *
 
 def fix_name(name):
   return name.replace('_','-')

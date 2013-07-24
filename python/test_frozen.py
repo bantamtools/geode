@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import with_statement
-from other.core.python.Frozen import Frozen,Immutable
+from othercore.python.Frozen import Frozen,Immutable
 
 def test_frozen():
   a = Frozen()

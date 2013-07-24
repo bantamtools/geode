@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from numpy import *
-from other.core.vector import *
+from othercore.vector import *
 
 def test_frame_2d():
   random.seed(18312)

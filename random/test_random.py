@@ -2,8 +2,8 @@
 
 from __future__ import division
 from numpy import *
-from other.core.random import *
-from other.core import *
+from othercore.random import *
+from othercore import *
 import hashlib
 import numpy
 

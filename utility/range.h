@@ -11,6 +11,11 @@ template<class Iter> struct Range {
 
   const Iter& begin() const { return lo; }
   const Iter& end() const { return hi; }
+
+  Iter operator[](const int i) const { assert(0<=i && i<hi-lo); return lo+i; }
+  
+  decltype(*lo) front() const { assert(lo!=hi); return *lo; }
+  decltype(*lo) back() const { assert(lo!=hi); return *(hi-1); }
 };
 
 template<> struct Range<int> {
@@ -39,6 +44,8 @@ template<> struct Range<int> {
   Iter end() const { return Iter(hi); }
 
   int operator[](const int i) const { assert(0<=i && i<hi-lo); return lo+i; }
+
+  int front() const { assert(lo<hi); return lo; }
   int back() const { assert(lo<hi); return hi-1; }
 
   bool contains(int i) const { return lo <= i && i < hi; }

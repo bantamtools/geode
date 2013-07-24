@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from other.core import *
+from othercore import *
 from . import parser
 
 def Prop(name,default,shape=None):

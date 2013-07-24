@@ -8,7 +8,7 @@
 #include <othercore/exact/math.h>
 #include <othercore/exact/scope.h>
 #include <othercore/array/RawArray.h>
-#include <othercore/geometry/Segment2d.h>
+#include <othercore/geometry/Segment.h>
 #include <othercore/python/wrap.h>
 #include <othercore/random/Random.h>
 #include <othercore/utility/Log.h>
@@ -16,29 +16,8 @@ namespace other {
 
 using Log::cout;
 using std::endl;
-using exact::Exact;
 using exact::Point2;
-typedef Vector<exact::Int,2> IV2;
-typedef Vector<Exact<1>,2> LV2;
-
-// If interval computations aren't this close, we fall back to exact computation.
-static const double threshold = 1;
-
-// Are all intervals in a vector small?
-template<int m> static inline bool small(const Vector<Interval,m>& xs) {
-  for (auto& x : xs)
-    if (x.nlo+x.hi >= threshold)
-      return false;
-  return true;
-}
-
-// Compute our best integer guess for the value of an interval vector
-template<int m> static inline Vector<exact::Int,m> snap(const Vector<Interval,m>& xs) {
-  Vector<exact::Int,m> r;
-  for (int i=0;i<m;i++)
-    r[i] = int(round(xs[i].center()));
-  return r;
-}
+typedef Vector<Quantized,2> EV2;
 
 exact::Vec2 segment_segment_intersection(const Point2 a0, const Point2 a1, const Point2 b0, const Point2 b1) {
   // Evaluate conservatively using intervals
@@ -49,24 +28,30 @@ exact::Vec2 segment_segment_intersection(const Point2 a0, const Point2 a1, const
     const auto den = edet(da,db);
     if (!den.contains_zero()) {
       const auto r = a0i+edet(b0i-a0i,db)*da*inverse(den);
-      if (small(r))
+      if (small(r,segment_segment_intersection_threshold))
         return snap(r);
     }
   }
 
   // If intervals fail, evaluate and round exactly using symbolic perturbation
-  struct F { static inline Vector<Exact<>,3> eval(RawArray<const IV2> X) {
-    const LV2 a0(X[0]), a1(X[1]), b0(X[2]), b1(X[3]);
+  struct F { static void eval(RawArray<mp_limb_t,2> result, RawArray<const Vector<Exact<1>,2>> X) {
+    const auto a0(X[0]), a1(X[1]), b0(X[2]), b1(X[3]);
     const auto da = a1-a0,
                db = b1-b0;
     const auto den = edet(da,db);
-    return Vector<Exact<>,3>(Vector<Exact<>,2>(emul(den,a0)+emul(edet(b0-a0,db),da)),Exact<>(den));
+    const auto num = emul(den,a0)+emul(edet(b0-a0,db),da);
+    assert(result.m==3);
+    mpz_set(result[0],num.x);
+    mpz_set(result[1],num.y);
+    mpz_set(result[2],den);
   }};
   const Point2 X[4] = {a0,a1,b0,b1};
-  return perturbed_ratio<2>(&F::eval,3,RawArray<const Point2>(4,X));
+  exact::Vec2 result;
+  perturbed_ratio(asarray(result),&F::eval,3,asarray(X));
+  return result;
 }
 
-static bool check_intersection(const IV2 a0, const IV2 a1, const IV2 b0, const IV2 b1, Random& random) {
+static bool check_intersection(const EV2 a0, const EV2 a1, const EV2 b0, const EV2 b1, Random& random) {
   typedef Vector<double,2> DV;
   const int i = random.bits<uint32_t>();
   const Point2 a0p(i,a0), a1p(i+1,a1), b0p(i+2,b0), b1p(i+3,b1);
@@ -83,27 +68,56 @@ static void construction_tests() {
   Log::Scope log("construction tests");
   IntervalScope scope;
 
+  {
+    const Point2 a0(0,EV2(-100.1,   0)),
+                 a1(1,EV2( 100.1,   0)),
+                 b0(2,EV2(   0,-100.1)),
+                 b1(3,EV2(   0, 100.1)),
+
+                 c0(4,EV2( 100.2, 200.1)),
+                 c1(5,EV2( 300.2, 200.1)),
+                 d0(6,EV2( 200.2, 100.1)),
+                 d1(7,EV2( 200.2, 300.1));
+
+    const Point2 e0(8,EV2(-100,  50)),
+                 e1(9,EV2( 100,  50));
+
+    // Check very simple cases where two segments intersect
+    OTHER_ASSERT(segments_intersect(a0,a1,b1,b0));
+    OTHER_ASSERT(segments_intersect(c0,c1,d0,d1));
+    OTHER_ASSERT(segments_intersect(a0,a1,b0,b1));
+
+    // Check very simple case where two segments don't intersect
+    OTHER_ASSERT(!segments_intersect(a0,b0,a1,b1));
+    OTHER_ASSERT(!segments_intersect(a0,a1,e0,e1));
+  }
+
   // Check a bunch of large random segments
   const auto random = new_<Random>(623189131);
   {
-    const int total = 1024;
+    const int total = 4096;
     int count = 0;
     for (int k=0;k<total;k++)
-      count += check_intersection(perturbation<2>(4,k),perturbation<2>(5,k),perturbation<2>(6,k),perturbation<2>(7,k),random);
+      count += check_intersection(EV2(perturbation<2>(4,k)),
+                                  EV2(perturbation<2>(5,k)),
+                                  EV2(perturbation<2>(6,k)),
+                                  EV2(perturbation<2>(7,k)),random);
     // See https://groups.google.com/forum/?fromgroups=#!topic/sci.math.research/kRvImz5RslU
     const double prob = 25./108;
     cout << "random: expected "<<round(prob*total)<<"+-"<<round(sqrt(total*prob*(1-prob)))<<", got "<<count<<endl;
-    OTHER_ASSERT(sqr(count-prob*total)<total*prob*(1-prob)); // Require that we're within one standard deviation, because this is a unit test.
+    OTHER_ASSERT(sqr(count-prob*total)<sqr(3)*total*prob*(1-prob)); // Require that we're within 3 standard deviations.
   }
 
   // Check nearly colinear segments
   for (int k=0;k<32;k++) {
-    const int x1 = random->uniform<int>(-1<<20,1<<20),
-              x0 = random->uniform<int>(-1<<23,x1),
-              x2 = random->uniform<int>(x1,1<<23),
-              dx = random->uniform<int>(-1<<23,1<<23),
-              y  = random->uniform<int>(-1<<20,1<<20);
-    IV2 a0(x0,y),
+    const auto med = exact::bound/16,
+               big = exact::bound/2;
+    const Quantized x1 = random->uniform<ExactInt>(-med,med),
+                    x0 = random->uniform<ExactInt>(-big,x1),
+                    x2 = random->uniform<ExactInt>(x1,big),
+                    dx = random->uniform<ExactInt>(-big,big),
+                    y  = random->uniform<ExactInt>(-med,med);
+    EV2 a0(x0,y),
         a1(x2,y),
         b0(x1-dx,y-1),
         b1(x1+dx,y+1);
@@ -117,12 +131,12 @@ static void construction_tests() {
 
   // Check exactly colinear segments
   {
-    const int total = 421;
+    const int total = 450;
     int count = 0;
     for (int k=0;k<total;k++) {
       // Pick a random line with simple rational slope, then choose four random points exactly on this line.
-      const auto base = random->uniform<IV2>(-1000,1000),
-                 slope = random->uniform<IV2>(-15,16);
+      const EV2 base (random->uniform<Vector<ExactInt,2>>(-1000,1000)),
+                slope(random->uniform<Vector<ExactInt,2>>(-15,16));
       const auto ts = random->uniform<Vector<int,4>>(-1000,1000);
       count += check_intersection(base+ts.x*slope,
                                   base+ts.y*slope,
@@ -138,7 +152,7 @@ static void construction_tests() {
     const int total = 48;
     int count = 0;
     for (int k=0;k<total;k++) {
-      const auto p = perturbation<2>(16,k);
+      const auto p = EV2(perturbation<2>(16,k));
       const Point2 a0(k,p), a1(k+1,p), b0(k+2,p), b1(k+3,p);
       if (segments_intersect(a0,a1,b0,b1)) {
         OTHER_ASSERT(segment_segment_intersection(a0,a1,b0,b1)==p);
@@ -146,7 +160,7 @@ static void construction_tests() {
       }
     }
     cout << "coincident: count = "<<count<<endl;
-    OTHER_ASSERT(count==8);
+    OTHER_ASSERT(count==13);
   }
 }
 

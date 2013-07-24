@@ -2,7 +2,7 @@
 
 from __future__ import (division,absolute_import)
 
-from other.core import *
+from othercore import *
 from numpy import asarray
 
 BoxTrees = {2:BoxTree2d,3:BoxTree3d}

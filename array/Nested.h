@@ -128,6 +128,10 @@ public:
     return flat.slice(offsets[i],offsets[i+1]);
   }
 
+  bool operator==(const Nested& v) const {
+    return (offsets == v.offsets) && (flat == v.flat);
+  }
+
   Nested<Element> copy() const {
     Nested<Element> copy;
     copy.offsets = offsets;
@@ -160,7 +164,7 @@ public:
   }
 };
 
-template<class T> inline ostream& operator<<(ostream& output, const Nested<T>& a) {
+template<class T,bool f> inline ostream& operator<<(ostream& output, const Nested<T,f>& a) {
   output << '[';
   for (int i=0;i<a.size();i++) {
     if (i)
@@ -183,15 +187,28 @@ template<class TA> Nested<typename TA::value_type> make_nested(const TA& a0, con
   return nested;
 }
 
-template<class TA> Nested<typename TA::value_type::value_type,false> asnested(const TA& a) {
-  return Nested<typename TA::value_type::value_type,false>::copy(a);
+template<class T> std::vector<std::vector<typename boost::remove_const<T>::type>> as_vectors(Nested<T> const &a) {
+  std::vector<std::vector<typename boost::remove_const<T>::type>> r;
+  for (auto ar : a) {
+    r.push_back(std::vector<T>(ar.begin(), ar.end()));
+  }
+  return r;
+}
+
+// we have to put "parentheses" around TA::value_type to prevent MSVC from thinking TA::value_type::value_type is a constructor.
+template<class TA> Nested<typename First<typename TA::value_type,void>::type::value_type,false> asnested(const TA& a) {
+  return Nested<typename First<typename TA::value_type,void>::type::value_type,false>::copy(a);
 }
 
 template<class T,bool frozen> const Nested<T,frozen>& asnested(const Nested<T,frozen>& a) {
   return a;
 }
 
-template<class T,bool f0,bool f1> OTHER_CORE_EXPORT Nested<typename boost::remove_const<T>::type,false> concatenate(const Nested<T,f0>& a0, const Nested<T,f1>& a1) {
+template<class T,bool f0> OTHER_CORE_EXPORT Nested<typename boost::remove_const<T>::type,false> concatenate(const Nested<T,f0>& a0) {
+  return Nested<typename boost::remove_const<T>::type,false>(a0);
+}
+
+template<class T,bool f0,bool f1> Nested<typename boost::remove_const<T>::type,false> concatenate(const Nested<T,f0>& a0, const Nested<T,f1>& a1) {
   return Nested<typename boost::remove_const<T>::type,false>(concatenate(a0.offsets,a0.offsets.back()+a1.offsets.slice(1,a1.offsets.size())),
                                                              concatenate(a0.flat,a1.flat));
 }
@@ -220,4 +237,4 @@ template<class T> Nested<T> FromPython<Nested<T>>::convert(PyObject* object) {
 }
 #endif
 
-}
+} // namespace other

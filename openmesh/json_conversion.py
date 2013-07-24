@@ -1,5 +1,5 @@
-from other.core.utility.json_conversion import register
-from other.core.openmesh import *
+from othercore.utility.json_conversion import register
+from othercore.openmesh import *
 
 to_fn = lambda v: {
   't': 'TriMesh',

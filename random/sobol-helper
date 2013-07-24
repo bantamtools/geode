@@ -4,7 +4,7 @@
 # For details, see Bratley and Fox. 1988. Algorithm 659: Implementing Sobol's quasirandom sequence generator. Acm Trans. Math. Softw. 14, 88-100.
 
 from __future__ import division
-from other.core import *
+from othercore import *
 
 # Polynomials over Z_2 represented in binary.  Up to 40 dimensions supported
 polys = [1,3,7,11,13,19,25,37,59,47,61,55,41,67,97,91,109,103,115,131,193,137,145,143,241,157,185,167,229,171,213,191,253,203,211,239,247,285,369,299]

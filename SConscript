@@ -1,4 +1,4 @@
-Import('env library external toplevel')
+Import('env library external windows clang toplevel')
 
 toplevel('othercore','.')
 

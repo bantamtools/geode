@@ -3,9 +3,9 @@
 from __future__ import division
 
 from numpy import *
-from other.core import Nested, PolygonMesh, SegmentMesh, TriangleMesh
-from other.core.geometry.platonic import icosahedron_mesh, sphere_mesh
-from other.core.vector import relative_error
+from othercore import Nested, PolygonMesh, SegmentMesh, TriangleMesh
+from othercore.geometry.platonic import icosahedron_mesh, sphere_mesh
+from othercore.vector import relative_error
 
 def test_misc():
   counts = array([3,4],dtype=int32)

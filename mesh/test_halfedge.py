@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 from __future__ import division
-from other.core import *
-from other.core.geometry.platonic import *
+from othercore import *
+from othercore.geometry.platonic import *
 
 def construction_test(Mesh,random_edge_flips=random_edge_flips,random_face_splits=random_face_splits,mesh_destruction_test=mesh_destruction_test):
   random.seed(813177)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from other.core import Object,ClassTest
+from othercore import Object,ClassTest
 
 def test_extra():
   # Extra arguments should throw exceptions

@@ -2,7 +2,7 @@
    See also platonic.h'''
 
 from __future__ import (division,absolute_import)
-from other.core import *
+from othercore import *
 
 def sphere_mesh(refinements,center=0,radius=1):
   return sphere_mesh_py(refinements,center,radius)

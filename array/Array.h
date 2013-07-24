@@ -29,6 +29,9 @@
 #include <othercore/vector/Vector.h>
 #include <boost/mpl/assert.hpp>
 #include <boost/type_traits/has_trivial_destructor.hpp>
+#include <othercore/utility/const_cast.h>
+#include <vector>
+
 namespace other {
 
 using std::swap;
@@ -268,7 +271,7 @@ private:
     int m_ = this->m_; // teach compiler that m_ is constant
     if (copy_existing_elements)
       for (int i=0;i<m_;i++)
-        ((T*)new_owner->data)[i] = data_[i];
+        ((typename boost::remove_const<T>::type*)new_owner->data)[i] = data_[i];
     OTHER_XDECREF(owner_);
     max_size_ = max_size_new;
     data_ = (T*)new_owner->data;
@@ -371,13 +374,13 @@ public:
   }
 
   template<class TArray> void extend(const TArray& append_array) {
-    STATIC_ASSERT_SAME(T,typename TArray::value_type);
+    STATIC_ASSERT_SAME(typename boost::remove_const<T>::type,typename boost::remove_const<typename TArray::value_type>::type);
     int append_m = append_array.size(),
         m_new = m_+append_m;
     if (max_size_<m_new)
       grow_buffer(m_new);
     for (int i=0;i<append_m;i++)
-      data_[m_+i] = append_array[i];
+      other::const_cast_(data_[m_+i]) = append_array[i];
     m_ = m_new;
   }
 
@@ -471,6 +474,7 @@ public:
   }
 };
 
+template<class T,int d>   static inline const RawArray<T>       asarray(T (&v)[d])                 { return RawArray<T>(d,v); }
 template<class T,int d>   static inline const RawArray<T>       asarray(Vector<T,d>& v)            { return RawArray<T>(d,v.begin()); }
 template<class T,int d>   static inline const RawArray<const T> asarray(const Vector<T,d>& v)      { return RawArray<const T>(d,v.begin()); }
 template<class T>         static inline const RawArray<T>&      asarray(const RawArray<T>& v)      { return v; }
@@ -479,16 +483,17 @@ template<class T,class A> static inline const RawArray<T>       asarray(std::vec
 template<class T,class A> static inline const RawArray<const T> asarray(const std::vector<T,A>& v) { return RawArray<const T>(v.size(),&v[0]); }
 template<class T,class A> static inline const A&                asarray(const ArrayBase<T,A>& v)   { return v.derived(); }
 
+template<class T,int d>   static inline const RawArray<const T> asconstarray(T (&v)[d])                 { return RawArray<const T>(d,v); }
 template<class T,int d>   static inline const RawArray<const T> asconstarray(const Vector<T,d>& v)      { return RawArray<const T>(d,v.begin()); }
 template<class T>         static inline const RawArray<const T> asconstarray(const RawArray<T>& v)      { return v; }
 template<class T>         static inline const RawArray<const T> asconstarray(const Array<T>& v)         { return v; }
 template<class T,class A> static inline const RawArray<const T> asconstarray(const std::vector<T,A>& v) { return RawArray<const T>(v.size(),&v[0]); }
 template<class T,class A> static inline const A&                asconstarray(const ArrayBase<T,A>& v)   { return v.derived(); }
 
-template<class T,int d> static inline       Array<T,d>& flat(      Array<T,d>& A) { return A.flat; }
-template<class T>       static inline       Array<T,1>& flat(      Array<T,1>& A) { return A; }
-template<class T,int d> static inline const Array<T,d>& flat(const Array<T,d>& A) { return A.flat; }
-template<class T>       static inline const Array<T,1>& flat(const Array<T,1>& A) { return A; }
+template<class T,int d> static inline       Array<T>& flat(      Array<T,d>& A) { return A.flat; }
+template<class T>       static inline       Array<T>& flat(      Array<T,1>& A) { return A; }
+template<class T,int d> static inline const Array<T>& flat(const Array<T,d>& A) { return A.flat; }
+template<class T>       static inline const Array<T>& flat(const Array<T,1>& A) { return A; }
 
 }
 namespace std{

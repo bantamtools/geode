@@ -1,7 +1,7 @@
 import json
 
 from numpy import *
-from other.core import *
+from othercore import *
 
 
 def from_ndarray(v, typ = float):

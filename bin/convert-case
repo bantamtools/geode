@@ -90,7 +90,7 @@ def convert_include(m):
 module_pattern = re.compile(r'\bTry((?:\.[A-Z][a-z_]{2,})?)\b')
 def convert_module(m):
   s = m.group(1)
-  return 'other.core'+('.'+dir_map[s[1:]] if s else '')
+  return 'othercore'+('.'+dir_map[s[1:]] if s else '')
 
 module_name_pattern = re.compile(r'\bTry('+'|'.join(dir_map.keys())+r')\b')
 def convert_module_name(m):

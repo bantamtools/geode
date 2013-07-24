@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from other.core.utility import tryfile
+from othercore.utility import tryfile
 from numpy import *
 import py.test
 

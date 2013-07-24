@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 from __future__ import division
-from other.core.geometry.platonic import *
-from other.core.vector import *
+from othercore.geometry.platonic import *
+from othercore.vector import *
 
 def test_icosahedron():
   mesh,X = icosahedron_mesh()

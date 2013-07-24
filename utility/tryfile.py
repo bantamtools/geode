@@ -1,4 +1,4 @@
-"""other.core binary file format (.try)
+"""othercore binary file format (.try)
 
 A .try file holds packed, hierarchical binary data.  It consists of a
 header, a tree of atoms, and a data section.  Each atom has a name, a

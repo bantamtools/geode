@@ -30,14 +30,14 @@ extern "C" {
 #endif
 
 /* Example Usage:
-	// Load
-	struct SVGPath* plist;
-	plist = svgParseFromFile("test.svg");
-	// Use...
-	for (SVGPath* it = plist; it; it = it->next)
-		...
-	// Delete
-	svgDelete(plist);
+  // Load
+  struct SVGPath* plist;
+  plist = svgParseFromFile("test.svg");
+  // Use...
+  for (SVGPath* it = plist; it; it = it->next)
+    ...
+  // Delete
+  svgDelete(plist);
 */
 
 struct SVGInfo
@@ -54,32 +54,32 @@ struct SVGInfo
 struct SVGPath
 {
   // polyline
-	float* pts;
-	int npts;
+  float* pts;
+  int npts;
   
   // added: bezier segments
   float* bezpts;
   int nbezpts;
   
-	unsigned int elementIndex; //can be used to differentiate multiple subpaths from same path. Will monotonicaly decrease while traversing next
-	unsigned int fillColor;
-	unsigned int strokeColor;
-	float strokeWidth;
-	char hasFill;
-	char fillRule; // 1 for nonzero (default), 2 for evenodd
-	char hasStroke;
-	char closed;
-	struct SVGPath* next;
+  unsigned int elementIndex; //can be used to differentiate multiple subpaths from same path. Will monotonicaly decrease while traversing next
+  unsigned int fillColor;
+  unsigned int strokeColor;
+  float strokeWidth;
+  char hasFill;
+  char fillRule; // 1 for nonzero (default), 2 for evenodd
+  char hasStroke;
+  char closed;
+  struct SVGPath* next;
 };
 
 // Parses SVG file from a file, returns linked list of paths.
-struct SVGPath* svgParseFromFile(const char* filename, struct SVGInfo *) OTHER_EXPORT;
+OTHER_CORE_EXPORT struct SVGPath* svgParseFromFile(const char* filename, struct SVGInfo *);
 
 // Parses SVG file from a null terminated string, returns linked list of paths.
-struct SVGPath* svgParse(char* input, struct SVGInfo *) OTHER_EXPORT;
+OTHER_CORE_EXPORT struct SVGPath* svgParse(char* input, struct SVGInfo *);
 
 // Deletes list of paths.
-void svgDelete(struct SVGPath* plist) OTHER_EXPORT;
+OTHER_CORE_EXPORT void svgDelete(struct SVGPath* plist);
 
 #ifdef __cplusplus
 };

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 from __future__ import with_statement
-from other.core import PropManager,cache
-from other.core.value import Worker
+from othercore import PropManager,cache
+from othercore.value import Worker
 import sys
 
 def worker_test_factory(props):

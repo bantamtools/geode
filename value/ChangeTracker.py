@@ -1,4 +1,4 @@
-from other.core import listen
+from othercore import listen
 
 class KeysTracker:
   def __init__(self, keys_value, lookup_value_function):
@@ -220,7 +220,7 @@ class SyncedKeysDict(Synced):
 """
 
 if __name__ == "__main__":
-  from other.core import *
+  from othercore import *
 
   props = PropManager()
   var_a = props.add("a", 3)

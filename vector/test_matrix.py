@@ -2,10 +2,10 @@
 
 from __future__ import absolute_import
 
-import other.core
+import othercore
 from numpy import *
-from other.core.array import *
-from other.core.vector import *
+from othercore.array import *
+from othercore.vector import *
 
 def close(a,b):
     assert all(abs(a-b)[:-1]<1e-6)
@@ -40,21 +40,21 @@ def test_matrix():
     check(A.inverse(),Matrix(linalg.inv(A)))
 
 def test_conversions():
-    A=Matrix([eye(4)]*2,dtype=other.core.real)
+    A=Matrix([eye(4)]*2,dtype=othercore.real)
     A[0,1,2] = 3
     B=matrix_test(A)
     check(A,B)
 
 def test_sparse():
     J=Nested([[1,0],[1,0,2],[1,2]],dtype=int32)
-    A=array([-1,2,2,-1,-1,-1,2],dtype=other.core.real)
+    A=array([-1,2,2,-1,-1,-1,2],dtype=othercore.real)
     M=SparseMatrix(J,A)
     assert M.rows()==M.columns()==3
     assert all(M.J.offsets==J.offsets)
     assert all(M.J.flat==[0,1,0,1,2,1,2])
     assert all(M.A.flat==A)
     print M.J,M.A
-    b=array([pi,3,e],dtype=other.core.real)
+    b=array([pi,3,e],dtype=othercore.real)
     C=M.incomplete_cholesky_factorization(0,0)
     t=empty_like(b)
     C.solve_forward_substitution(b,t)

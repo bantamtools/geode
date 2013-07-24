@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import division
-from other.core import *
+from othercore import *
 from numpy import *
 
 def test_brent():

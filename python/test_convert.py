@@ -1,4 +1,4 @@
-from other.core import *
+from othercore import *
 
 def test_list():
   x = [1,2,3]

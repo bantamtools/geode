@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 from __future__ import division
-from other.core.vector import *
-from other.core.openmesh import *
-from other.core.geometry.platonic import *
+from othercore.vector import *
+from othercore.openmesh import *
+from othercore.geometry.platonic import *
 
 if openmesh_enabled():
   def test_trimesh():

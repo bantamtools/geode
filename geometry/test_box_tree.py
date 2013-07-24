@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 from __future__ import division
-from other.core import *
-from other.core.geometry.platonic import *
+from othercore import *
+from othercore.geometry.platonic import *
 
 def test_box_tree():
   random.seed(10098331)
