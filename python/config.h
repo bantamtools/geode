@@ -1,6 +1,8 @@
 // Include Python.h in the appropriate platform specific manner
 #pragma once
 
+#include <othercore/build_flags.h>
+
 #ifdef OTHER_PYTHON
 #ifdef __APPLE__
 #include <Python/Python.h>
