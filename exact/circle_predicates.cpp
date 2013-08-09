@@ -9,6 +9,8 @@
 namespace other {
 typedef exact::Vec2 EV2;
 typedef Vector<Exact<1>,3> LV3;
+using std::cout;
+using std::endl;
 
 
 // If true, always run both fast and slow tests and compare results
@@ -40,14 +42,6 @@ static bool filter_helper(const Interval fast, const bool slow, const int line) 
 #define FILTER(fast,...) filter_helper(fast,__VA_ARGS__,__LINE__)
 #endif
 
-
-bool arcs_from_same_circle(const RawArray<const ExactCircleArc>& arcs, int i0, int i1) {
-  if(i0 == i1) return true;
-  const auto& a0 = arcs[i0], a1 = arcs[i1];
-  if(a0.index != a1.index) return false;
-  assert(a0.center == a1.center && a0.radius == a1.radius && a0.positive == a1.positive);
-  return true;
-}
 
 // Do two circles intersect (degree 2)?
 namespace {
@@ -82,7 +76,7 @@ template<int i,int j> struct Beta { template<class... Args> static PredicateType
 // Which quadrant is in the intersection of two circles in relative to the center of the first?
 // The quadrants are 0 to 3 counterclockwise from positive/positive.
 // This function should be used only from circle_circle_intersections, where it is precomputed as Vertex::q0.
-// As written this is degree 4, but it can be reduced to degree 2 if necessary.
+// As written this is degree 6, but it can be reduced to degree 2 if necessary.
 namespace {
 template<int axis> struct QuadrantA { template<class TV> static PredicateType<3,TV> eval(const TV S0, const TV S1) {
   return Alpha::eval(S0,S1)*(axis==0?S1.y-S0.y:S0.x-S1.x);
@@ -213,7 +207,7 @@ quadrants:
   return v;
 }
 
-Box<exact::Vec2> arc_box(RawArray<const ExactCircleArc> arcs, const Vertex& v01, const Vertex& v12) {
+Box<exact::Vec2> arc_box(Arcs arcs, const Vertex& v01, const Vertex& v12) {
   const int i1 = v01.i1;
   assert(v01.i1 == v12.i0);
 
@@ -239,41 +233,179 @@ Box<exact::Vec2> arc_box(RawArray<const ExactCircleArc> arcs, const Vertex& v01,
   return box;
 }
 
-
-// Is intersection (a0,a1).y < (b0,b1).y?  This is degree 20 as written, but can be reduced to 6.
-// If add = true, assume a0=b0 and check whether ((0,a1)+(0,b1)).y > 0.
 namespace {
-template<bool add> struct UpwardsA { template<class TV> static PredicateType<5,TV> eval(const TV S0, const TV S1, const TV S2, const TV S3) {
-  const auto c0 = S0.xy(), c1 = S1.xy(), c2 = S2.xy(), c3 = S3.xy();
-  const auto r0 = S0.z,    r1 = S1.z,    r2 = S2.z,    r3 = S3.z;
-  const auto c01 = c1-c0, c23 = c3-c2;
-  const auto sqr_c01 = esqr_magnitude(c01),
-             sqr_c23 = esqr_magnitude(c23);
-  const auto alpha01 = sqr_c01+(r0+r1)*(r0-r1),
-             alpha23 = sqr_c23+(r2+r3)*(r2-r3);
-  return !add ? ((c2.y-c0.y)<<1)*sqr_c01*sqr_c23+alpha23*(c23.y*sqr_c01)-alpha01*(c01.y*sqr_c23)
-              : alpha23*(c23.y*sqr_c01)+alpha01*(c01.y*sqr_c23);
+#define UPWARDS_PRELUDE() \
+  const auto c0 = S0.xy(), c1 = S1.xy(), c2 = S2.xy(); \
+  const auto r0 = S0.z,    r1 = S1.z,    r2 = S2.z; \
+  const auto c01 = c1-c0, c02 = c2-c0; \
+  const auto sqr_c01 = esqr_magnitude(c01), \
+             sqr_c02 = esqr_magnitude(c02); \
+  const auto alpha01 = sqr_c01+(r0+r1)*(r0-r1), \
+             alpha02 = sqr_c02+(r0+r2)*(r0-r2);
+template<bool add> struct UpwardsA { template<class TV> static PredicateType<5,TV> eval(const TV S0, const TV S1, const TV S2) {
+  UPWARDS_PRELUDE()
+  const auto first  = alpha02*(c02.y*sqr_c01),
+             second = alpha01*(c01.y*sqr_c02);
+  return add ? first+second : first-second;
 }};
-template<int i> struct UpwardsB { template<class TV> static PredicateType<3,TV> eval(const TV S0, const TV S1, const TV S2, const TV S3) {
-  BOOST_STATIC_ASSERT(i==0 || i==2);
+template<int i> struct UpwardsB { template<class TV> static PredicateType<3,TV> eval(const TV S0, const TV S1, const TV S2) {
+  BOOST_STATIC_ASSERT(i==1 || i==2);
   const auto c01 = S1.xy()-S0.xy(),
-             c23 = S3.xy()-S2.xy();
-  return i==0 ? c01.x*esqr_magnitude(c23) // Negated below
-              : c23.x*esqr_magnitude(c01);
+             c02 = S2.xy()-S0.xy();
+  return i==1 ? c01.x*esqr_magnitude(c02) // Negated below
+              : c02.x*esqr_magnitude(c01);
+}};
+template<bool add,int i> struct UpwardsDE { template<class TV> static PredicateType<6,TV> eval(const TV S0, const TV S1, const TV S2) {
+  UPWARDS_PRELUDE()
+  // Happily, D/positive and the two factors of E/positive all have quite similar form, so we encode them into the same template here.  From below, the three expressions are
+  //   D/positive =    c02^2 alpha01^2 + c01^2 alpha02^2 +- 2 alpha01 alpha02  c1y c2y            - 4 r0^2 ((c1y c2x)^2 + (c1x c2y)^2 + 2 (c1x c2x)^2)
+  //   E/positive =   (c02^2 alpha01^2 + c01^2 alpha02^2 +- 2 alpha01 alpha02 (c1y c2y - c1x c2x) - 4 r0^2 (c1x c2y + c1y c2x)^2)
+  //                * (c02^2 alpha01^2 + c01^2 alpha02^2 +- 2 alpha01 alpha02 (c1y c2y + c1x c2x) - 4 r0^2 (c1x c2y - c1y c2x)^2)
+  // All three have the form
+  //   second = alpha01*alpha02*2*F
+  //   factor = first +- second - 4*sqr(r0)*G
+  // Mapping D to i = 0 and E to i = 1,2, we get
+  const auto c1x2x = c01.x*c02.x,
+             c1y2y = c01.y*c02.y,
+             c1x2y = c01.x*c02.y,
+             c1y2x = c01.y*c02.x;
+  const auto F = i==0 ? c1y2y
+               : i==1 ? c1y2y-c1x2x
+               :        c1y2y+c1x2x;
+  const auto G = i==0 ? sqr(c1y2x)+sqr(c1x2y)+(sqr(c1x2x)<<1)
+                      : sqr(i==1 ? c1x2y+c1y2x
+                                 : c1x2y-c1y2x);
+  const auto first = sqr_c02*sqr(alpha01)+sqr_c01*sqr(alpha02),
+             second = alpha01*alpha02*(F<<1);
+  return (add?first+second:first-second)-sqr(r0<<1)*G;
+}};
+template<bool add> struct UpwardsF { template<class TV> static PredicateType<8,TV> eval(const TV S0, const TV S1, const TV S2) {
+  UPWARDS_PRELUDE()
+  // F/positive = c01^2 (alpha02 (alpha02 c01^2 +- 2 alpha01 c1y c2y) + (2r0)^2 ((c1x c2y)^2 - (c1y c2x)^2)) - alpha01^2 (c1x^2 - c1y^2) c02^2
+  const auto first  = alpha02*sqr_c01,
+             second = (c01.y<<1)*c02.y*alpha01;
+  return sqr_c01*(alpha02*(add?first+second:first-second)+sqr(r0<<1)*(sqr(c01.x*c02.y)-sqr(c01.y*c02.x)))-sqr(alpha01)*((sqr(c01.x)-sqr(c01.y))*sqr_c02);
 }};}
-template<bool add=false> bool circle_intersections_upwards_helper(Arcs arcs, const Vertex a, const Vertex b) {
-  assert(a!=b && a!=b.reverse() && (!add || a.i0==b.i0));
-  return FILTER(add ? a.p().y+b.p().y-(arcs[a.i0].center.y*2) : b.p().y-a.p().y,
-               (    (arcs_from_same_circle(arcs, a.i0, b.i0) && arcs_from_same_circle(arcs, a.i1, b.i1))
-                 || (arcs_from_same_circle(arcs, a.i0, b.i1) && arcs_from_same_circle(arcs, a.i1, b.i0)))
+template<bool add,class P3> OTHER_ALWAYS_INLINE static inline bool perturbed_upwards(const int sign1, const int sign2, const P3 S0, const P3 S1, const P3 S2) {
+  // This routine is an optimized version of perturbed_predicate_two_sqrts specialized to this particular predicate, taking advantage of polynomial factorization
+  // to reduce the degree from 20 to 8.  This improves on the degree 12 result of Devillers et al., Algebraic methods and arithmetic filtering for exact predicates on circle arcs,
+  // which is possible since our predicate operates on three unique arcs instead of four.
+
+  // Our predicate is a function of three arcs (c0,r0),(c1,r1),(c2,r2).  Let j = 3-i.  Defining
+  //   si = signi
+  //   c01 = c1-c0
+  //   c02 = c2-c0
+  //   alpha0i = c01^2+(r0+ri)(r0-ri) = c0i^2+r0^2-ri^2
+  //   A = alpha02 (c02.y c01^2) +- alpha01 (c01.y c02^2)
+  //   Bi = c0iy c0j^2
+  //   Ci = 4r0^2 c0i^2 - alpha0i^2
+  // our predicate is
+  //   A + s1 B1 sqrt(C1) + s2 B2 sqrt(C2) > 0
+  // Below, we will include si in Bi to get
+  //   A + B1 sqrt(C1) + B2 sqrt(C2) > 0
+  typedef UpwardsA<add> A; // Degree 5
+  typedef UpwardsB<1> B1;  // Degree 3
+  typedef UpwardsB<2> B2;
+  typedef Beta<0,1> C1;    // Degree 4
+  typedef Beta<0,2> C2;
+
+  // First, some consistency checks
+  assert(abs(sign1)==1 && abs(sign2)==1);
+  assert(perturbed_predicate<C1>(S0,S1,S2));
+  assert(perturbed_predicate<C2>(S0,S1,S2));
+
+  // As in the general case, we next check if all three terms have the same sign.  This is degree 5 due to A.
+  const int sA  =        perturbed_predicate<A> (S0,S1,S2) ? 1 : -1,
+            sB1 = sign1*(perturbed_predicate<B1>(S0,S1,S2) ? 1 : -1),
+            sB2 = sign2*(perturbed_predicate<B2>(S0,S1,S2) ? 1 : -1);
+  if (sA==sB1 && sA==sB2)
+    return sA > 0;
+
+  // We now have a choice of what to move to the RHS: B1 sqrt(C1), B2 sqrt(C2), or both.  In order to maximize
+  // speed, we make this choice differently depending on the signs of A, B1, B2.  If B1 and B2 have the same
+  // sign, moving both to the RHS turns out to require only degree 6 predicates, so we do that.  However, if
+  // B1 and B2 have different signs, determining the sign of the RHS after moving both over requires a degree
+  // 10 predicate.  Therefore, we instead move exactly the term which differs from A in sign, which requires
+  // at most degree 8 predicates.
+
+  // If B1 and B2 have the same sign, go the degree 6 route:
+  int sign_flips;
+  if (sB1 == sB2) {
+
+    // Move *both* sqrt terms to the RHS and square once.  Moving both terms is different from perturbed_predicate_two_sqrts, but lets us reach 6 if sB1==sB2.
+    // We use the notation s> to mean > if s>0 and < if s<0.
+    //   A + B1 sqrt(C1) + B2 sqrt(C2) > 0
+    //   A > -B1 sqrt(C1) - B2 sqrt(C2)
+    //   A^2 sA> B1^2 C1 + B2^2 C2 + 2 B1 B2 sqrt(C1 C2)
+    //   A^2 - B1^2 C1 - B2^2 C2 - 2 B1 B2 sqrt(C1 C2) sA> 0
+    //   D - 2 B1 B2 sqrt(C1 C2) sA> 0
+    // where
+    //   D = A^2 - B1^2 C1 - B2^2 C2
+    // D is degree 10 but is a multiple of c01^2 c02^2 as shown in Mathematica.  Removing these unconditionally positive factors and simplifying produces
+    //   D/positive = c02^2 alpha01^2 + c01^2 alpha02^2 +- 2 alpha01 alpha02 c1y c2y - 4 r0^2 ((c1y c2x)^2 + (c1x c2y)^2 + 2 (c1x c2x)^2)
+    typedef UpwardsDE<add,0> D;
+    const int sD = perturbed_predicate<D>(S0,S1,S2) ? 1 : -1;
+    if (sD==-sB1*sB2)
+      return sD*sA > 0;
+
+    // Now we square once more to get our final polynomial:
+    //   D - 2 B1 B2 sqrt(C1 C2) sA> 0
+    //   D sA> 2 B1 B2 sqrt(C1 C2)
+    //   D^2 sAsD> 4 B1^2 B2^2 C1 C2
+    //   D^2 - 4 B1^2 B2^2 C1 C2 sAsD> 0
+    //   E sAsD> 0
+    // where
+    //   E = D^2 - 4 B1^2 B2^2 C1 C2
+    // is degree 20.  E factors into c01^2 c02^2 and two degree 6 factors:
+    //   E/positive =   (c02^2 alpha01^2 + c01^2 alpha02^2 +- 2 alpha01 alpha02 (c1y c2y - c1x c2x) - 4 r0^2 (c1x c2y + c1y c2x)^2)
+    //                * (c02^2 alpha01^2 + c01^2 alpha02^2 +- 2 alpha01 alpha02 (c1y c2y + c1x c2x) - 4 r0^2 (c1x c2y - c1y c2x)^2)
+    sign_flips = sA*sD;
+
+  } else { // sB1 != sB2
+
+    // Define i,j by sA == sBi, sA != sBj.  We have
+    //   A + Bi sqrt(Ci) + Bj sqrt(Cj) > 0
+    //   A + Bi sqrt(Ci) > -Bj sqrt(Cj)
+    //   A^2 + Bi^2 Ci + 2 A Bi sqrt(Ci) sA> Bj^2 Cj
+    //   A^2 + Bi^2 Ci - Bj^2 Cj sA> -2 A Bi sqrt(Ci)
+    //   F sA> -2 A Bi sqrt(Ci)
+    // where
+    //   F = A^2 + Bi^2 Ci - Bj^2 Cj
+    // F has degree 10, but is a multiple of c0j^2, so reduces to degree 8.  If i=1,j=2, we have
+    //   F/positive = c01^2 (alpha02 (alpha02 c01^2 +- 2 alpha01 c1y c2y) + (2r0)^2 ((c1x c2y)^2 - (c1y c2x)^2)) - alpha01^2 (c1x^2 - c1y^2) c02^2
+    typedef UpwardsF<add> F;
+    const int i = sA==sB1 ? 1 : 2;
+    const int sF = perturbed_predicate<F>(S0,i==1?S1:S2,i==1?S2:S1) ? 1 : -1;
+    if (sF == 1)
+      return sF*sA > 0;
+
+    // As before, we square once more to get our final polynomial
+    //   F sA> -2 A Bi sqrt(Ci)
+    //   F^2 sAsF> 4 A^2 Bi^2 Ci
+    //   F^2 - 4 A^2 Bi^2 Ci sAsF> 0
+    //   E sAsF> 0 
+    // since we have
+    //   E = F^2 - 4 A^2 Bi^2 Ci = D^2 - 4 B1^2 B2^2 C1 C2 // The formula for E from above 
+    sign_flips = sA*sF;
+  }
+
+  // The sB1 == sB2 and sB1 != sB2 join up here, since they both use the same E predicate.
+  typedef UpwardsDE<add,1> Ea;
+  typedef UpwardsDE<add,2> Eb;
+  const int sE =    perturbed_predicate<Ea>(S0,S1,S2)
+                 == perturbed_predicate<Eb>(S0,S1,S2) ? 1 : -1;
+  return sE*sign_flips > 0;
+}
+
+template<bool add> bool circle_intersections_upwards(Arcs arcs, const Vertex a, const Vertex b) {
+  assert(a!=b && a.i0==b.i0);
+  return FILTER(add ? a.p().y+b.p().y-2*arcs[a.i0].center.y : b.p().y-a.p().y,
+               (   arcs_from_same_circle(arcs,a.i1,b.i1)
+                || (arcs_from_same_circle(arcs,a.i0,b.i1) && arcs_from_same_circle(arcs,a.i1,a.i0)))
                   ? add ?    upwards(aspoint_center(arcs,a.i0),aspoint_center(arcs,a.i1)) == perturbed_predicate<Alpha>(aspoint(arcs,a.i0),aspoint(arcs,a.i1))
                         : rightwards(aspoint_center(arcs,a.i0),aspoint_center(arcs,a.i1)) ^ a.left
-                  : perturbed_predicate_two_sqrts<UpwardsA<add>,UpwardsB<0>,UpwardsB<2>,Beta<0,1>,Beta<2,3>>(a.left^add?-1:1,b.left?1:-1,aspoint(arcs,a.i0),aspoint(arcs,a.i1),aspoint(arcs,b.i0),aspoint(arcs,b.i1)));
+                  : perturbed_upwards<add>(a.left^add?-1:1,b.left?1:-1,aspoint(arcs,a.i0),aspoint(arcs,a.i1),aspoint(arcs,b.i1)));
 }
-bool circle_intersections_upwards(Arcs arcs, const Vertex a, const Vertex b) {
-  return circle_intersections_upwards_helper(arcs, a, b);
-}
-
 
 // // Are the intersections of two circles with a third counterclockwise?  In other words, is the triangle c0,x01,x02 positively oriented?
 // // The two intersections are assumed to exist.
@@ -286,10 +418,9 @@ bool circle_intersections_upwards(Arcs arcs, const Vertex a, const Vertex b) {
 //        * choice<a1>(Alpha::eval(S0,S2),One())
 //        * small_mul(a0 && !a1 ? -1 : 1, choice<a0!=a1>(edet(dc1,dc2),edot(dc1,dc2)));
 // }};
-//
-//
 // }
 // static bool circle_intersections_ordered_helper(Arcs arcs, const Vertex v0, const Vertex v1) {
+//   assert(v0.i0==v1.i0);
 //   // Perform case analysis based on the two quadrants
 //   const int q0 = v0.q0,
 //             q1 = v1.q0;
@@ -334,8 +465,8 @@ bool circle_arc_intersects_circle(Arcs arcs, const Vertex a01, const Vertex a12,
 
 // Does the piece of a1 between a0 and a1 intersect the piece of b1 between b0 and b2?  a1 and b1 are assumed to intersect.
 bool circle_arcs_intersect(Arcs arcs, const Vertex a01, const Vertex a12,
-                                             const Vertex b01, const Vertex b12,
-                                             const Vertex ab) {
+                                      const Vertex b01, const Vertex b12,
+                                      const Vertex ab) {
   return circle_arc_intersects_circle(arcs,a01,a12,ab)
       && circle_arc_intersects_circle(arcs,b01,b12,ab.reverse());
 }
@@ -386,7 +517,7 @@ bool circle_intersection_right_of_center(Arcs arcs, const Vertex a, const int b)
                 perturbed_predicate_sqrt<CircleIntersectionRightOfCenter_A,CircleIntersectionRightOfCenter_B,Beta<0,1>>(a.left?-1:1,aspoint(arcs,a.i0),aspoint(arcs,a.i1),aspoint(arcs,b)));
 }
 
-Array<Vertex> compute_verticies(RawArray<const ExactCircleArc> arcs, RawArray<const int> next) {
+Array<Vertex> compute_vertices(Arcs arcs, RawArray<const int> next) {
   IntervalScope scope;
   Array<Vertex> vertices(arcs.size(),false); // vertices[i] is the start of arcs[i]
   for (int i0=0;i0<arcs.size();i0++) {
@@ -396,88 +527,100 @@ Array<Vertex> compute_verticies(RawArray<const ExactCircleArc> arcs, RawArray<co
   return vertices;
 }
 
-// Compute winding(local_outside) - winding(rightwards), where local_outside is immediately outside of a12 and rightwards
-// is far to the right of a12, taking into account only arcs a1 and a2.  Thus, ignoring secondary intersections with arcs a1 and a2,
-// the result will be either 0 or -1, since locally winding(local_outside) = 0 and winding(rightwards) = 0 or 1.
-int local_x_axis_depth(Arcs arcs, const Vertex a01, const Vertex a12, const Vertex a23) {
-  assert(a01.i1==a12.i0 && a12.i1==a23.i0);
-  // Compute quadrants of both centers and the differentials going in and out of the intersection.
-  const bool a1_positive = arcs[a12.i0].positive,
-             a2_positive = arcs[a23.i0].positive;
-  const int q1 = a12.q0,
-            q2 = a12.q1,
-            q_in  = (q1+3+2*a1_positive)&3, // The quadrant of the a1 arc differential pointing towards x12
-            q_out = (q2+3+2*a2_positive)&3;
-  // Compute the depth contribution due to the neighborhood of (a1,a2).  If we come in below horizontal and leave above the
-  // result is 0, and it is -1 for the above to below case since then rightwards is slightly inside the arc.  Otherwise, we
-  // come in and head out on the same side of the horizontal line, and the result depends on the orientation of the inwards
-  // and outwards tangents: it is -1 if we make a right turn at a12 (since then rightwards is inside), 0 if we make a left
-  // turn (since then rightwards is outside).  Since we make a right turn iff !a12.left, the result is
-  const int local = -(q_in/2==q_out/2 ? q_out/2!=0
-                                      : !a12.left ^ a1_positive ^ a2_positive);
-
-  // Unlike in the straight line polygon case, arcs a1,a2 can make additional depth contributions through their other intersections.
-  // The existence of such contributions depends on (1) whether the arc goes up or down, (2) whether the center is to the left or right of x01
-  // and (3) whether the other intersection is above or below the horizontal line.
-  const int near01 = ((q1==1 || q1==2) && (q_in>=2)!=circle_intersections_upwards(arcs,a12,a01)) * (q_in <2 ? -1 : 1),
-            near23 = ((q2==1 || q2==2) && (q_out<2)!=circle_intersections_upwards(arcs,a12,a23)) * (q_out<2 ? -1 : 1);
-  return local+near01+near23;
+template<int d=3> static inline typename exact::Point<d>::type aspoint_horizontal(const Quantized y) {
+  const int index = numeric_limits<int>::max();
+  return tuple(index,Vector<Quantized,d>(vec(0,y)));
 }
 
-// Count the depth change along the horizontal ray from (a0,a1) to (a0,a1+(inf,0) due to the arc from (b0,b1) to (b1,b2).
-// The change is -1 if we go out of an arc, +1 if we go into an arc.  Degree 8 as written, but can be eliminated entirely.
 namespace {
-template<int rsign> struct HorizontalDepthChange_A { template<class TV> static PredicateType<3,TV> eval(const TV S0, const TV S1, const TV S2) {
-  const auto c0 = S0.xy(), c1 = S1.xy(), c2 = S2.xy();
-  const auto r0 = S0.z,    r1 = S1.z,    r2 = S2.z;
-  const auto c01 = c1-c0;
-  const auto sqr_c01 = esqr_magnitude(c01);
-  return (sqr_c01+(r0+r1)*(r0-r1))*c01.y-((c2.y-c0.y+(rsign>0?r2:-r2))<<1)*sqr_c01;
-}};
-struct HorizontalDepthChange_B { template<class TV> static PredicateType<1,TV> eval(const TV S0, const TV S1, const TV S2) {
-  return S1.x-S0.x;
-}};
+template<int sign> struct CircleIntersectsHorizontal { template<class TV> static PredicateType<1,TV> eval(const TV S0, const TV S1) {
+  const auto cy = S0.y,
+             r = S0.z,
+             y = S1.y;
+  return sign>0 ? (cy+r)-y
+                : y-(cy-r);
+}};}
+bool circle_intersects_horizontal(Arcs arcs, const int arc, const Quantized y) {
+  const auto& a = arcs[arc];
+  return FILTER((Interval(a.center.y)+a.radius)-y,
+                perturbed_predicate<CircleIntersectsHorizontal<+1>>(aspoint(arcs,arc),aspoint_horizontal(y)))
+      && FILTER(y-(Interval(a.center.y)-a.radius),
+                perturbed_predicate<CircleIntersectsHorizontal<-1>>(aspoint(arcs,arc),aspoint_horizontal(y)));
 }
-int horizontal_depth_change(Arcs arcs, const Vertex a, const Vertex b01, const Vertex b12) {
-  assert(b01.i1==b12.i0);
-  const int b1 = b12.i0;
-  // Does the horizontal line intersect circle b1?  If not, the depth change is zero.
-  if (   FILTER(a.p().y-(arcs[b1].center.y+arcs[b1].radius),
-                 perturbed_predicate_sqrt<HorizontalDepthChange_A<+1>,HorizontalDepthChange_B,Beta<0,1>>(a.left?1:-1,aspoint(arcs,a.i0),aspoint(arcs,a.i1),aspoint(arcs,b1)))
-      || FILTER((arcs[b1].center.y-arcs[b1].radius)-a.p().y,
-                !perturbed_predicate_sqrt<HorizontalDepthChange_A<-1>,HorizontalDepthChange_B,Beta<0,1>>(a.left?1:-1,aspoint(arcs,a.i0),aspoint(arcs,a.i1),aspoint(arcs,b1))))
-    return 0;
 
-  // Determine whether b01 and b12 are above the horizontal line
-  const bool b01_above = circle_intersections_upwards(arcs,a,b01),
-             b12_above = circle_intersections_upwards(arcs,a,b12);
-  const bool b1_positive = arcs[b1].positive;
-  if (b01_above != b12_above) {
-    // The (b0,b1,b2) arc intersects the horizontal line exactly once.  We first determine whether this intersection is to the right of bc1 = b1.center.
-    const bool bh_right_of_bc1 = b01_above ^ b1_positive;
-    // Next, we compute whether x01 lies to the right of c2
-    const bool x01_right_of_bc1 = circle_intersection_right_of_center(arcs,a,b1);
-    // If these differ we are done, otherwise the result depends on whether x01 is inside b1
-    return (b12_above?-1:1) * (bh_right_of_bc1 != x01_right_of_bc1 ? bh_right_of_bc1
-                                                                   : bh_right_of_bc1 ^ !circle_intersection_inside_circle(arcs,a,b1));
-  } else {
-    // The (b0,b1,b2) arc intersects the horizontal line either zero or two times.  First, we rule out zero times.
-    const int q0 = b01.q1,
-              q2 = b12.q0,
-              shift = b01_above ? 1 : 3, // Shift so that the vertical axis oriented towards the horizontal line becomes the positive x-axis
-              sq0 = (q0+shift)&3,
-              sq2 = (q2+shift)&3;
-    const bool zero_intersections = !b1_positive ^ (q0 != q2 ? sq2 > sq0
-                                                             : circle_intersections_upwards(arcs,b01.reverse(),b12) ^ (q0==1 || q0==2));
-    if (zero_intersections)
-      return 0;
-    // If both intersections occur to the same side of x01.x, there's no depth change
-    if (!circle_intersection_inside_circle(arcs,a,b1))
-      return 0;
-    // A depth change!
-    return b1_positive ? -1 : 1;
+Vector<HorizontalVertex,2> circle_horizontal_intersections(Arcs arcs, const int arc, const Quantized y) {
+  Vector<HorizontalVertex,2> i;
+  i.x.arc = i.y.arc = arc;
+  i.x.y = i.y.y = y;
+  i.x.left = false;
+  i.y.left = true;
+  // Compute quadrants
+  const bool below = upwards(aspoint_horizontal<2>(y),aspoint_center(arcs,arc));
+  i.x.q0 = 3*below;
+  i.y.q0 = 1+below;
+  // Compute interval x coordinates
+  const auto a = arcs[arc];
+  const auto s = assume_safe_sqrt(sqr(Interval(a.radius))-sqr(Interval(a.center.y)-y));
+  i.x.x = a.center.x + s;
+  i.y.x = a.center.x - s;
+  return i;
+}
+
+namespace {
+struct HorizontalA { template<class TV> static PredicateType<3,TV> eval(const TV S0, const TV S1, const TV S2) {
+  const auto c0 = S0.xy(), c1 = S1.xy();
+  const auto r0 = S0.z,    r1 = S1.z;
+  const auto y = S2.y;
+  const auto dc = c1-c0;
+  const auto sqr_dc = esqr_magnitude(dc);
+  return (((y-c0.y)<<1)-dc.y)*sqr_dc-dc.y*(r0+r1)*(r0-r1);
+}};
+struct HorizontalB { template<class TV> static PredicateType<1,TV> eval(const TV S0, const TV S1, const TV S2) {
+  return S0.x-S1.x;
+}};}
+static bool circle_intersection_below_horizontal(Arcs arcs, const Vertex a01, const HorizontalVertex a0y) {
+  assert(a01.i0==a0y.arc);
+  return FILTER(a0y.y-a01.p().y,
+                perturbed_predicate_sqrt<HorizontalA,HorizontalB,Beta<0,1>>(a01.left?1:-1,aspoint(arcs,a01.i0),aspoint(arcs,a01.i1),aspoint_horizontal(a0y.y)));
+}
+
+bool circle_arc_contains_horizontal_intersection(Arcs arcs, const Vertex a01, const Vertex a12, const HorizontalVertex a1y) {
+  assert(a01.i1==a12.i0 && a12.i0==a1y.arc);
+  const auto a10 = a01.reverse();
+  const bool flip = !arcs[a01.i1].positive;
+  const int q0 = a01.q1,
+            q2 = a12.q0,
+            qy = a1y.q0;
+  const bool qy_down = qy==1 || qy==2;
+  if (q0!=q2) { // a012 starts and ends in different quadrants
+    if (q0==qy)
+      return flip ^ qy_down ^  circle_intersection_below_horizontal(arcs,a10,a1y);
+    else if (q2==qy)
+      return flip ^ qy_down ^ !circle_intersection_below_horizontal(arcs,a12,a1y);
+    else
+      return flip ^ (((qy-q0)&3)<((q2-q0)&3));
+  } else { // a012 starts and ends in the same quadrant
+    const bool small = circle_intersections_upwards(arcs,a10,a12) ^ (q0==1 || q0==2);
+    return flip ^ small ^ (   q0!=qy
+                           || (small ^ qy_down ^  circle_intersection_below_horizontal(arcs,a10,a1y))
+                           || (small ^ qy_down ^ !circle_intersection_below_horizontal(arcs,a12,a1y)));
   }
 }
 
+namespace {
+struct RightwardsA { template<class TV> static PredicateType<1,TV> eval(const TV S0, const TV S1, const TV S2) {
+  return S1.x-S0.x;
+}};
+template<int i> struct RightwardsC { template<class TV> static PredicateType<2,TV> eval(const TV S0, const TV S1, const TV S2) {
+  const auto S = choice<i>(S0,S1);
+  return sqr(S.z)-sqr(S2.y-S.y);
+}};}
+bool horizontal_intersections_rightwards(Arcs arcs, const HorizontalVertex ay, const HorizontalVertex by) {
+  assert(ay!=by && ay.y==by.y);
+  if (ay.arc==by.arc)
+    return ay.left;
+  return FILTER(by.x-ay.x,
+                perturbed_predicate_two_sqrts<RightwardsA,One,One,RightwardsC<0>,RightwardsC<1>>(ay.left?1:-1,by.left?-1:1,aspoint(arcs,ay.arc),aspoint(arcs,by.arc),aspoint_horizontal(ay.y)));
+}
 
 } // namespace other

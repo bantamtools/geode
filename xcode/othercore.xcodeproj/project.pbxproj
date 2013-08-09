@@ -81,7 +81,7 @@
 		205636A71703AB60000A42F9 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0450;
+				LastUpgradeCheck = 0460;
 				ORGANIZATIONNAME = Otherfab;
 			};
 			buildConfigurationList = 205636AA1703AB60000A42F9 /* Build configuration list for PBXProject "othercore" */;
