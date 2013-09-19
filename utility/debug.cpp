@@ -1,6 +1,4 @@
-//#####################################################################
-// Namespace debug
-//#####################################################################
+// Assertions and other debugging utilities
 #include <othercore/python/exceptions.h>
 #include <othercore/utility/debug.h>
 #include <othercore/utility/format.h>
@@ -27,8 +25,6 @@ using std::flush;
 void breakpoint() {
   BREAKPOINT(); // if you use this you need to step out of the signal handler to get a non-corrupt stack
 }
-
-namespace debug {
 
 static ErrorCallback error_callback = 0;
 
@@ -96,5 +92,4 @@ void assertion_failed(const char* function,const char* file,unsigned int line,co
     throw AssertionError(error);
 }
 
-}
 }

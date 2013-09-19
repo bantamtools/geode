@@ -3,6 +3,7 @@
 #include <othercore/geometry/ThickShell.h>
 #include <othercore/array/view.h>
 #include <othercore/math/constants.h>
+#include <othercore/math/copysign.h>
 #include <othercore/mesh/SegmentMesh.h>
 #include <othercore/mesh/TriangleMesh.h>
 #include <othercore/python/cast.h>

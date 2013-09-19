@@ -45,8 +45,9 @@ template<class TArray> struct IsShareableArray<const TArray>:public IsShareableA
 // Array<T> is shareable
 template<class T> struct IsShareableArray<Array<T>>:public mpl::true_{};
 
-template<class T,int d> OTHER_CORE_EXPORT PyObject* to_python(const Array<T,d>& array);
-template<class T,int d> struct FromPython<Array<T,d>>{OTHER_CORE_EXPORT static Array<T,d> convert(PyObject* object);};
+// this cannot be OTHER_CORE_EXPORT, since it's defined as a template in headers
+template<class T,int d> PyObject* to_python(const Array<T,d>& array);
+template<class T,int d> struct FromPython<Array<T,d>>{static Array<T,d> convert(PyObject* object);};
 template<class T,int d> struct has_to_python<Array<T,d>> : public has_to_python<T> {};
 template<class T,int d> struct has_from_python<Array<T,d>> : public has_from_python<T> {};
 
@@ -377,8 +378,7 @@ public:
     STATIC_ASSERT_SAME(typename boost::remove_const<T>::type,typename boost::remove_const<typename TArray::value_type>::type);
     int append_m = append_array.size(),
         m_new = m_+append_m;
-    if (max_size_<m_new)
-      grow_buffer(m_new);
+    preallocate(m_new);
     for (int i=0;i<append_m;i++)
       other::const_cast_(data_[m_+i]) = append_array[i];
     m_ = m_new;

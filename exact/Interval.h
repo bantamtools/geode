@@ -3,14 +3,15 @@
 
 // Modified from code by Tyson Brochu, 2011
 
-#include <othercore/utility/config.h>
-#include <othercore/geometry/forward.h>
+#include <othercore/exact/config.h>
+#include <othercore/geometry/Box.h>
 #include <othercore/math/constants.h>
 #include <othercore/python/repr.h>
-#include <fenv.h>
+#include <othercore/utility/rounding.h>
 namespace other {
 
 struct Interval;
+struct IntervalScope;
 using std::ostream;
 
 // IMPORTANT: All interval arithmetic must occur within an IntervalScope (see scope.h).
@@ -19,6 +20,8 @@ using std::ostream;
 template<> struct IsScalar<Interval> : public mpl::true_ {};
 
 struct Interval {
+  typedef IntervalScope Scope;
+
   // For now, we use double precision arithmetic unconditionally.  This is particularly important for constructions,
   // where we want to error range to be better than float precision in most cases.
   typedef double T;
@@ -92,6 +95,10 @@ struct Interval {
   Interval thickened(T delta) const {
     assert(fegetround() == FE_UPWARD);
     return Interval(-(nlo+delta),hi+delta);
+  }
+
+  Box<double> box() const {
+    return Box<double>(-nlo,hi);
   }
 };
 
@@ -186,7 +193,8 @@ inline Interval Interval::operator*(const Interval x) const {
       r.hi  = b * d;
     }
   }
-  assert(-r.nlo <= r.hi);
+
+  assert(!(-r.nlo > r.hi)); // Use 'not greater' instead of 'less than or equal' so that nan won't trigger this
   return r;
 }
 
@@ -289,4 +297,18 @@ template<int m> static inline Box<Vector<Quantized,m>> snap_box(const Vector<Int
   return box;
 }
 
+static inline Interval abs(const Interval x) {
+  if(x.nlo > 0) {
+    if(x.hi > 0) { // x.nlo > 0 && x.hi > 0
+      return Interval(0, max(x.nlo, x.hi));
+    }
+    else { // x.nlo > 0 && x.hi <= 0
+      return Interval(-x.hi, x.nlo);
+    }
+  }
+  else {
+    return x;
+  }
 }
+
+} // namespace other
