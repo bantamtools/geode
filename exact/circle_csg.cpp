@@ -764,6 +764,10 @@ Tuple<Quantizer<real,2>,Nested<ExactCircleArc>> quantize_circle_arcs(Nested<cons
     }
   }
   #endif
+  
+  if( output.size() == input.size() )
+    std::cerr << "mismatched size in quantize_circle_arcs. input != output" << std::endl;
+
   return tuple(quant,output.freeze());
 }
 
