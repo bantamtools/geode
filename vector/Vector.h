@@ -18,6 +18,7 @@
 #include <othercore/python/to_python.h>
 #include <boost/type_traits/common_type.hpp>
 #include <othercore/python/config.h>
+#include <othercore/utility/remove_const_reference.h>
 #include <cmath>
 namespace other {
 
@@ -56,7 +57,6 @@ class Vector
     BOOST_STATIC_ASSERT(d>3);
     struct Unusable{};
 public:
-    template<class T2> struct Rebind{typedef Vector<T2,d> type;};
     typedef typename mpl::if_<IsScalar<T>,T,Unusable>::type Scalar;
     typedef T Element;
     typedef T value_type; // for stl
@@ -94,7 +94,7 @@ public:
     explicit Vector(const Vector<T2,d2>& v)
     {
         BOOST_STATIC_ASSERT(d2<=d);
-        for(int i=0;i<d2;i++) array[i]=(T)v[i];
+        for(int i=0;i<d2;i++) array[i]=T(v[i]);
         for(int i=d2;i<d;i++) array[i]=T();
     }
 
@@ -359,7 +359,7 @@ public:
     Vector<T,d+1> append(const T& element) const
     {Vector<T,d+1> r;for(int i=0;i<d;i++) r[i]=(*this)[i];r[d]=element;return r;}
 
-    template<int d2> Vector<T,d+d2> append_elements(const Vector<T,d2>& elements)
+    template<int d2> Vector<T,d+d2> extend(const Vector<T,d2>& elements)
     {Vector<T,d+d2> r;
     for(int i=0;i<d;i++) r[i]=(*this)[i];
     for(int i=0;i<d2;i++) r[i+d]=elements[i];
@@ -453,6 +453,14 @@ sqrt(const Vector<T,d>& v)
 template<class T,int d> inline Vector<T,d>
 inverse(const Vector<T,d>& v)
 {Vector<T,d> r;for(int i=0;i<d;i++) r.array[i]=1/v.array[i];return r;}
+
+template<class T, int d> auto
+sign(const Vector<T, d> v) -> Vector<typename remove_const_reference<decltype(sign(v[0]))>::type,d> {
+  Vector<typename remove_const_reference<decltype(sign(v[0]))>::type,d> result;
+  for(int i = 0; i < d; ++i)
+    result[i] = sign(v[i]);
+  return result;
+}
 
 template<class T,int d>
 inline Vector<T,d> wrap(const Vector<T,d>& value,const Vector<T,d>& lower,const Vector<T,d>& upper)

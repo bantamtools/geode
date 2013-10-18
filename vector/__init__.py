@@ -9,6 +9,7 @@
 from __future__ import (division,absolute_import)
 
 import platform
+import numpy
 from numpy import *
 if platform.system()=='Windows':
   import other_all as other_core
@@ -141,6 +142,8 @@ def signed_angle_between(u,v,n):
 
 def angle(v):
   v = asarray(v)
+  if iscomplexobj(v):
+    return numpy.angle(v)
   assert v.shape[-1]==2
   return atan2(v[...,1],v[...,0])
 
@@ -186,13 +189,22 @@ def rotate_left_90(v):
   rv[...,1] = v[...,0]
   return rv
 
-# Hash the raw binary data in a numpy array
 def ahash(*args):
+  '''Hash the raw binary data in a numpy array'''
   return hash(''.join(asarray(a).tostring() for a in args))
 
 def homogeneous_times(A,b):
   y = Matrix(A[...,:-1])*b+A[...,-1]
   return asarray(y[...,:-1]/y[...,-1,None])
+
+def compact_str(v):
+  '''Stringify a numpy array with no whitespace'''
+  def s(a):
+    try:
+      return '[%s]'%','.join(map(s,a))
+    except TypeError:
+      return str(a)
+  return s(v)
 
 from . import (Rotation,Frame)
 from .Frame import Frames

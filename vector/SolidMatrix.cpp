@@ -71,14 +71,14 @@ SolidMatrix(const SolidMatrixStructure& structure)
   lengths.fill(1); // account for diagonal
   for (auto& s : structure.sparse)
     lengths[s.x]++;
-  NestedArray<int> sparse_j(lengths);
+  Nested<int> sparse_j(lengths);
   for (int i=0;i<structure.n;i++)
     sparse_j(i,--lengths[i]) = i;
   for (auto& s : structure.sparse) {
     int i,j;s.get(i,j);
     sparse_j(i,--lengths[i]) = j;
   }
-  const_cast_(sparse_A) = NestedArray<Matrix<T,d>>::zeros_like(sparse_j);
+  const_cast_(sparse_A) = Nested<Matrix<T,d>>::zeros_like(sparse_j);
   for (int i=0;i<sparse_j.size();i++) {
     sort(sparse_j[i]);
     OTHER_ASSERT(sparse_j.size(i) && sparse_j(i,0)==i); // ensure diagonal exists
@@ -302,7 +302,7 @@ dense() const {
   OTHER_ASSERT(valid());
   const int n = sparse_j.size();
   Array<TMatrix,2> dense(n,n);
-  for (int i=0;i<n;i++){
+  for (int i=0;i<n;i++) {
     dense(i,i) = sparse_A(i,0);
     for (int k=1;k<sparse_j.size(i);k++) {
       int j = sparse_j(i,k);
@@ -320,7 +320,13 @@ dense() const {
     for (int a=0;a<nodes.size();a++) for(int b=0;b<nodes.size();b++)
       dense(nodes[a],nodes[b]) += outer_product(B*U[a],U[b]);
   }
-  return scalar_view_own(dense.flat).reshape_own(3*n,3*n);
+  Array<T,2> final(TV::m*n,TV::m*n,false);
+  for (int i=0;i<n;i++)
+    for (int j=0;j<n;j++)
+      for (int k=0;k<TV::m;k++)
+        for (int l=0;l<TV::m;l++)
+          final(i*TV::m+k,j*TV::m+l) = dense(i,j)(k,l);
+  return final;
 }
 
 template<class TV> Ref<SolidDiagonalMatrix<TV>> SolidMatrix<TV>::

@@ -25,6 +25,7 @@ AirPressure::AirPressure(Ref<TriangleMesh> mesh,Array<const TV> X,bool closed,in
   , side(side)
   , skip_rotation_terms(false)
   , initial_volume(side*mesh->volume(X))
+  , volume(initial_volume)
 {
   OTHER_ASSERT(abs(side)==1);
   temperature = 293; // room temperature
@@ -65,7 +66,8 @@ void AirPressure::structure(SolidMatrixStructure& structure) const {
 }
 
 void AirPressure::update_position(Array<const TV> X_, bool definite) {
-  OTHER_ASSERT(!definite || skip_rotation_terms);
+  if (definite && !skip_rotation_terms)
+    OTHER_NOT_IMPLEMENTED("Refusing to fix definiteness unless skip_rotation_terms is true");
   OTHER_ASSERT(X_.size()>=mesh->nodes());
   X = X_;
   volume = side*mesh->volume(X);

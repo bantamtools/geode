@@ -12,6 +12,17 @@ namespace mpl=boost::mpl;
 
 template<class T,int d> class OTHER_CORE_CLASS_EXPORT Vector;
 
+// Convenience aliases for the most common Vectors
+typedef Vector<real,1> Vec1;
+typedef Vector<real,2> Vec2;
+typedef Vector<real,3> Vec3;
+typedef Vector<real,4> Vec4;
+
+typedef Vector<int,1> Vec1i;
+typedef Vector<int,2> Vec2i;
+typedef Vector<int,3> Vec3i;
+typedef Vector<int,4> Vec4i;
+
 struct Zero;
 template<class T> class Quaternion;
 template<class TV> class Rotation;

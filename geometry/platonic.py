@@ -14,11 +14,11 @@ def tetrahedron_mesh():
 
 def cube_mesh():
   X = array([[0,0,0],[0,0,1],[0,1,0],[0,1,1],[1,0,0],[1,0,1],[1,1,0],[1,1,1]],dtype=real)
-  mesh = TriangleMesh([[0,1,2], [2,1,3], 
-                       [1,0,5], [5,0,4], 
-                       [3,1,7], [7,1,5], 
-                       [0,2,4], [4,2,6], 
-                       [2,3,6], [6,3,7], 
+  mesh = TriangleMesh([[0,1,2], [2,1,3],
+                       [1,0,5], [5,0,4],
+                       [3,1,7], [7,1,5],
+                       [0,2,4], [4,2,6],
+                       [2,3,6], [6,3,7],
                        [5,6,7], [6,5,4]])
   return mesh,X
 
@@ -48,7 +48,9 @@ def grid_topology(nx,ny):
   return TriangleMesh(tris.reshape(-1,3))
 
 def torus_topology(nx,ny):
-  '''Construct a torus TriangleMesh with nx by ny vertices.'''
+  '''Construct a torus TriangleMesh with nx by ny vertices.
+  A matching position array would have shape (nx,ny,3).
+  If you want geometry too, consider using surface_of_revolution with periodic=True.'''
   i = ny*arange(nx).reshape(-1,1)
   j = arange(ny)
   ip = (i+ny)%(nx*ny)
@@ -60,7 +62,7 @@ def torus_topology(nx,ny):
   tris[:,:,1,2] = ip+jp
   return TriangleMesh(tris.reshape(-1,3))
 
-def cylinder_topology(na,nz,closed=False):
+def cylinder_topology(nz,na,closed=False):
   '''Construct a open cylinder TriangleMesh with na triangles around and nz along.
   closed can be either a single bool or an array of two bools (one for each end).'''
   closed = asarray(closed)
@@ -80,14 +82,16 @@ def cylinder_topology(na,nz,closed=False):
   if c0: tris = maximum(0,tris.ravel()-(na-1))
   return TriangleMesh(tris.reshape(-1,3))
 
-def surface_of_revolution(base,axis,radius,height,resolution,closed=False):
+def surface_of_revolution(base,axis,radius,height,resolution,closed=False,periodic=False):
   '''Construct a surface of revolution with given radius and height curves.
   closed can be either a single bool or an array of two bools (one for each end).
-  For each closed end, height should have one more point than radius.'''
+  For each closed end, height should have one more point than radius.
+  If periodic is true, toroidal topology is used.'''
   closed = asarray(closed,dtype=int32)
   c0,c1 = closed if closed.ndim else (closed,closed)
   assert radius.ndim<=1 and height.ndim<=1
   assert height.size>=1+c0+c1
+  assert not periodic or (not c0 and not c1)
   height = height.reshape(-1)
   axis = asarray(axis)
   x = unit_orthogonal_vector(axis)
@@ -96,9 +100,13 @@ def surface_of_revolution(base,axis,radius,height,resolution,closed=False):
   circle = x*cos(a).reshape(-1,1)-y*sin(a).reshape(-1,1)
   X = base+radius[...,None,None]*circle+height[c0:len(height)-c1,None,None]*axis
   X = concatenate(([[base+height[0]*axis]] if c0 else []) + [X.reshape(-1,3)] + ([[base+height[-1]*axis]] if c1 else []))
-  return cylinder_topology(resolution,len(height)-1,closed=closed),X
+  if periodic:
+    return torus_topology(len(height),resolution),X
+  else:
+    return cylinder_topology(len(height)-1,resolution,closed=closed),X
 
-def revolve_around_curve(curve,radius,resolution,tangent=None,closed=False):
+
+def revolve_around_curve(curve,radius,resolution,tangent=None,closed=False,periodic=False):
   '''Construct a surface via variable radius thickening of a curve.
   closed can be either a single bool or an array of two bools (one for each end).
   For each closed end, height should have one more point than radius.'''
@@ -120,8 +128,11 @@ def revolve_around_curve(curve,radius,resolution,tangent=None,closed=False):
   a = 2*pi/resolution*arange(resolution)[:,None]+roll
   X = curve[c0:n-c1,None]+radius[...,None,None]*(x[:,None]*cos(a)+y[:,None]*sin(a))
   X = concatenate(([[curve[0]]] if c0 else []) + [X.reshape(-1,3)] + ([[curve[-1]]] if c1 else []))
-  return cylinder_topology(resolution,n-1,closed=closed),X
-  
+  if periodic:
+    return torus_topology(n,resolution),X
+  else:
+    return cylinder_topology(n-1,resolution,closed=closed),X
+
 def open_cylinder_mesh(x0,x1,radius,na,nz=None):
   '''radius may be a scalar or a 1d array'''
   radius = asarray(radius)
@@ -144,7 +155,7 @@ def open_cylinder_mesh(x0,x1,radius,na,nz=None):
   circle = x*cos(a).reshape(-1,1)-y*sin(a).reshape(-1,1)
   height = arange(nz+1)/(nz+1)
   X = x0+radius[...,None,None]*circle+arange(nz+1).reshape(-1,1,1)/nz*(x1-x0)
-  return cylinder_topology(na,nz),X.reshape(-1,3)
+  return cylinder_topology(nz,na),X.reshape(-1,3)
 
 def capsule_mesh(x0,x1,radius,n=30):
   x0 = asarray(x0)

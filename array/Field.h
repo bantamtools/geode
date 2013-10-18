@@ -43,6 +43,14 @@ public:
   explicit Field(const Array<T>& source)
     : flat(source) {}
 
+  Field(const Hashtable<Id,T>& source, const int size, const T def = T()) {
+    flat.resize(size);
+    for (auto& s : flat)
+      s = def;
+    for (const auto& p : source)
+      flat[p.key.idx()] = p.data;
+  }
+
   Field& operator=(const Field<Element,Id>& source) {
     flat = source.flat;
     return *this;
@@ -69,8 +77,23 @@ public:
     return flat.valid(i.idx());
   }
 
+  // Type safe conversion to go from positions in the field back to an Id
+  Id ptr_to_id(const T* x) const {
+    Id result = Id(x - flat.begin());
+    assert(valid(result));
+    return result;
+  }
+
   Id append(const T& x) OTHER_ALWAYS_INLINE {
     return Id(flat.append(x));
+  }
+
+  template<class TArray> void extend(const TArray& append_array) {
+    flat.extend(append_array);
+  }
+
+  void preallocate(const int m_new, const bool copy_existing_elements=true) {
+    flat.preallocate(m_new, copy_existing_elements);
   }
 
   Field<Element,Id> copy() const {

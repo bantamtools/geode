@@ -32,7 +32,6 @@ class Vector<T,2>
 {
     struct Unusable{};
 public:
-    template<class T2> struct Rebind{typedef Vector<T2,2> type;};
     typedef typename mpl::if_<IsScalar<T>,T,Unusable>::type Scalar;
     typedef T Element;
     typedef T value_type; // for stl
@@ -59,11 +58,11 @@ public:
     {}
 
     template<class T2> explicit Vector(const Vector<T2,2>& vector)
-        :x((T)vector.x),y((T)vector.y)
+        :x(T(vector.x)),y(T(vector.y))
     {}
 
     template<class T2> explicit Vector(const Vector<T2,1>& vector)
-        :x((T)vector.x),y(T())
+        :x(T(vector.x)),y()
     {}
 
     template<class TVector>
@@ -227,11 +226,15 @@ public:
     bool elements_equal() const
     {return x==y;}
 
-    static Vector componentwise_min(const Vector& v1,const Vector& v2)
-    {return Vector(other::min(v1.x,v2.x),other::min(v1.y,v2.y));}
+    static Vector componentwise_min(const Vector& v1,const Vector& v2) {
+      using other::min;
+      return Vector(min(v1.x,v2.x),min(v1.y,v2.y));
+    }
 
-    static Vector componentwise_max(const Vector& v1,const Vector& v2)
-    {return Vector(other::max(v1.x,v2.x),other::max(v1.y,v2.y));}
+    static Vector componentwise_max(const Vector& v1,const Vector& v2) {
+      using other::max;
+      return Vector(max(v1.x,v2.x),max(v1.y,v2.y));
+    }
 
     Vector projected_on_unit_direction(const Vector& direction) const
     {return dot(*this,direction)*direction;}
@@ -273,6 +276,9 @@ public:
     static Vector ones()
     {return Vector(1,1);}
 
+    Vector xy() const
+    {return *this;}
+
     Vector<T,1> horizontal_vector() const
     {return Vector<T,1>(x);}
 
@@ -301,13 +307,13 @@ public:
     template<class TArray>
     bool contains_all(const TArray& elements) const
     {STATIC_ASSERT_SAME(typename TArray::Element,T);
-    for(int i=0;i<elements.size();i++) if(!contains(elements(i))) return false;
+    for(int i=0;i<elements.size();i++) if(!contains(elements[i])) return false;
     return true;}
 
     template<class TArray>
     bool contains_any(const TArray& elements) const
     {STATIC_ASSERT_SAME(typename TArray::Element,T);
-    for(int i=0;i<elements.size();i++) if(contains(elements(i))) return true;
+    for(int i=0;i<elements.size();i++) if(contains(elements[i])) return true;
     return false;}
 
     Vector<T,1> remove_index(const int index) const
@@ -319,7 +325,7 @@ public:
     Vector<T,3> append(const T& element) const
     {return Vector<T,3>(x,y,element);}
 
-    template<int d2> Vector<T,2+d2> append_elements(const Vector<T,d2>& elements) const
+    template<int d2> Vector<T,2+d2> extend(const Vector<T,d2>& elements) const
     {Vector<T,2+d2> r;r[0]=x;r[1]=y;for(int i=0;i<d2;i++) r[i+2]=elements[i];return r;}
 
     Vector<T,2> sorted() const

@@ -4,14 +4,18 @@
 #include <othercore/geometry/Box.h>
 #include <othercore/geometry/AnalyticImplicit.h>
 #include <othercore/geometry/Ray.h>
+#include <othercore/array/NdArray.h>
+#include <othercore/array/Nested.h>
+#include <othercore/array/view.h>
 #include <othercore/python/from_python.h>
 #include <othercore/python/exceptions.h>
+#include <othercore/python/numpy.h>
+#include <othercore/python/Ptr.h>
+#include <othercore/python/wrap.h>
 #include <othercore/math/cube.h>
 #include <othercore/utility/format.h>
 #include <othercore/structure/Tuple.h>
 namespace other {
-
-typedef real T;
 
 #ifdef OTHER_PYTHON
 
@@ -91,48 +95,6 @@ template<class T,int d> string Box<Vector<T,d>>::repr() const {
   return format("Box(%s,%s)",tuple_repr(min),tuple_repr(max));
 }
 
-// This is a fast routine to do ray box intersections
-// box_enlargement modifies the bounds of the box -- it's not a thickness
-template<class T,int d> bool Box<Vector<T,d>>::lazy_intersects(const Ray<TV>& ray,T box_enlargement) const {
-  OTHER_NOT_IMPLEMENTED();
-}
-
-// This is a fast routine to do ray box intersections
-// box_enlargement modifies the bounds of the box -- it's not a thickness
-template<> bool Box<Vector<T,2>>::lazy_intersects(const Ray<Vector<T,2>>& ray,T box_enlargement) const {
-  BOOST_STATIC_ASSERT(d==2);
-  // This comes from a paper "An efficient and Robust Ray-Box Intersection algorithm" by williams, barrus, morley, and Shirley
-  // http://www.cs.utah.edu/~rmorley/pubs/box.pdf
-  if(!ray.computed_lazy_box_intersection_acceleration_data)
-      ray.compute_lazy_box_intersection_acceleration_data();
-  Vector<T,2> extremes[2] = {min-box_enlargement,max+box_enlargement};
-  T tmin =                (extremes[  ray.direction_is_negative.x].x-ray.start.x)*ray.inverse_direction.x;
-  T tmax =                (extremes[1-ray.direction_is_negative.x].x-ray.start.x)*ray.inverse_direction.x;
-  tmin = other::max(tmin, (extremes[  ray.direction_is_negative.y].y-ray.start.y)*ray.inverse_direction.y);
-  tmax = other::min(tmax, (extremes[1-ray.direction_is_negative.y].y-ray.start.y)*ray.inverse_direction.y);
-  return tmin<=tmax && 0<=tmax && tmin<=ray.t_max;
-}
-
-// This is a fast routine to do ray box intersections
-// box_enlargement modifies the bounds of the box -- it's not a thickness
-template<> bool Box<Vector<T,3>>::lazy_intersects(const Ray<Vector<T,3>>& ray,T box_enlargement) const {
-  BOOST_STATIC_ASSERT(d==3);
-  // This comes from a paper "An efficient and Robust Ray-Box Intersection algorithm" by williams, barrus, morley, and Shirley
-  // http://www.cs.utah.edu/~rmorley/pubs/box.pdf
-  if(!ray.computed_lazy_box_intersection_acceleration_data)
-      ray.compute_lazy_box_intersection_acceleration_data();
-  Vector<T,3> extremes[2] = {min-box_enlargement,max+box_enlargement};
-  T tmin =                (extremes[  ray.direction_is_negative.x].x-ray.start.x)*ray.inverse_direction.x;
-  T tmax =                (extremes[1-ray.direction_is_negative.x].x-ray.start.x)*ray.inverse_direction.x;
-  tmin = other::max(tmin, (extremes[  ray.direction_is_negative.y].y-ray.start.y)*ray.inverse_direction.y);
-  tmax = other::min(tmax, (extremes[1-ray.direction_is_negative.y].y-ray.start.y)*ray.inverse_direction.y);
-  tmin = other::max(tmin, (extremes[  ray.direction_is_negative.z].z-ray.start.z)*ray.inverse_direction.z);
-  tmax = other::min(tmax, (extremes[1-ray.direction_is_negative.z].z-ray.start.z)*ray.inverse_direction.z);
-  return tmin<=tmax && 0<=tmax && tmin<=ray.t_max;
-}
-
-typedef Vector<T,3> TV;
-
 #define INSTANTIATION_HELPER(T,d) \
   template OTHER_CORE_EXPORT string Box<Vector<T,d>>::name(); \
   template OTHER_CORE_EXPORT string Box<Vector<T,d>>::repr() const; \
@@ -141,12 +103,76 @@ typedef Vector<T,3> TV;
   template OTHER_CORE_EXPORT Vector<T,d>::Scalar Box<Vector<T,d>>::phi(const Vector<T,d>&) const; \
   OTHER_ONLY_PYTHON(template OTHER_CORE_EXPORT PyObject* to_python<T,d>(const Box<Vector<T,d>>&)); \
   OTHER_ONLY_PYTHON(template OTHER_CORE_EXPORT Box<Vector<T,d>> FromPython<Box<Vector<T,d>>>::convert(PyObject*));
-INSTANTIATION_HELPER(T,1)
-INSTANTIATION_HELPER(T,2)
-INSTANTIATION_HELPER(T,3)
-#ifndef _WIN32
-template bool Box<Vector<T,2>>::lazy_intersects(const Ray<Vector<T,2>>&,T) const;
-template bool Box<Vector<T,3>>::lazy_intersects(const Ray<Vector<T,3>>&,T) const;
+INSTANTIATION_HELPER(real,1)
+INSTANTIATION_HELPER(real,2)
+INSTANTIATION_HELPER(real,3)
+
+#ifdef OTHER_PYTHON
+
+static void bounding_box_py_helper(const int depth, Array<Box<real>>& box, PyObject* object) {
+  if (const auto array = numpy_from_any(object,NumpyDescr<real>::descr(),0,100,NPY_ARRAY_CARRAY_RO,0)) {
+    // object is a rectangular numpy array
+    const int rank = PyArray_NDIM((PyArrayObject*)array);
+    if (!rank) {
+      OTHER_DECREF(array);
+      throw TypeError("bounding_box: possibly nested array of vectors expected, found a bare scalar");
+    }
+    const int d = PyArray_DIMS((PyArrayObject*)array)[rank-1];
+    if (!box.size())
+      box.resize(d);
+    if (box.size() != d) {
+      OTHER_DECREF(array);
+      throw TypeError(format("bounding_box: vectors of different sizes found, including %d and %d",box.size(),d));
+    }
+    const int count = PyArray_SIZE((PyArrayObject*)array)/d;
+    const real* data = (const real*)PyArray_DATA((PyArrayObject*)array);
+    for (int i=0;i<count;i++)
+      for (int j=0;j<d;j++)
+        box[j].enlarge(data[i*d+j]);
+    OTHER_DECREF(array);
+  } else {
+    if (depth > 20)
+      throw RuntimeError("bounding_box: maximum recursion depth exceeded, maybe you passed in a str?");
+    // object is either badly formed or has irregular dimensions.  Loop over the structure manually.
+    const auto iterator = steal_ref_check(PyObject_GetIter(object));
+    while (const auto item = steal_ptr(PyIter_Next(&*iterator)))
+      bounding_box_py_helper(depth+1,box,item.get());
+    if (PyErr_Occurred()) // PyIter_Next returns 0 for both done and error, so check what happened
+      throw_python_error();
+  }
+}
+
+static PyObject* bounding_box_py(PyObject* object) {
+  if (is_numpy_array(object)) {
+    const auto array = from_python<NdArray<const real>>(object);
+    OTHER_ASSERT(array.rank()>=2);
+    if (array.shape.back()==2)
+      return to_python(bounding_box(vector_view<2>(array.flat)));
+    else if (array.shape.back()==3)
+      return to_python(bounding_box(vector_view<3>(array.flat)));
+    else
+      throw TypeError(format("bounding_box: 2D or 3D vectors expected, got %dD",array.shape.back()));
+  } else if (is_nested_array(object))
+    return bounding_box_py(&*nested_array_from_python_helper(object).y);
+
+  // object is neither a numpy array nor a Nested, so loop over it manually
+  Array<Box<real>> box;
+  bounding_box_py_helper(0,box,object);
+  if (box.size()==2)
+    return to_python(Box<Vector<real,2>>(vec(box[0].min,box[1].min),           vec(box[0].max,box[1].max)));
+  else if (box.size()==3)
+    return to_python(Box<Vector<real,3>>(vec(box[0].min,box[1].min,box[2].min),vec(box[0].max,box[1].max,box[2].max)));
+  else
+    throw TypeError(format("bounding_box: 2D or 3D vectors expected, got %dD",box.size()));
+}
+
 #endif
 
+}
+using namespace other;
+
+void wrap_box_vector() {
+#ifdef OTHER_PYTHON
+  OTHER_FUNCTION_2(bounding_box,bounding_box_py)
+#endif
 }

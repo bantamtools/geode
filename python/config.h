@@ -4,6 +4,14 @@
 #ifdef OTHER_PYTHON
 #ifdef __APPLE__
 #include <Python/Python.h>
+// Clean up macros in anticipation of C++ headers
+#undef isspace
+#undef isupper
+#undef islower
+#undef isalpha
+#undef isalnum
+#undef toupper
+#undef tolower
 #else
 #undef _POSIX_C_SOURCE
 #undef _XOPEN_SOURCE
@@ -105,11 +113,11 @@ using ::PyTypeObject;
 // Use atomics to ensure thread safety in pure C++ code
 
 #define OTHER_INCREF(op) \
-  ((void)other::fetch_and_add(&((PyObject*)(op))->ob_refcnt,1l))
+  ((void)other::fetch_and_add(&((PyObject*)(op))->ob_refcnt,(ssize_t)1l))
 #define OTHER_XINCREF(op) do { \
   if (op) OTHER_INCREF(op); } while (false)
 #define OTHER_DECREF(op) do { \
-  if (other::fetch_and_add(&((PyObject*)(op))->ob_refcnt,-1l)==1)\
+  if (other::fetch_and_add(&((PyObject*)(op))->ob_refcnt,(ssize_t)-1l)==1)\
     OTHER_PY_DEALLOC(op); } while(false)
 #define OTHER_XDECREF(op) do { \
   if (op) OTHER_DECREF(op); } while (false)

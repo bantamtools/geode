@@ -45,11 +45,12 @@
 #include <othercore/geometry/Box.h>
 #include <othercore/geometry/Plane.h>
 #include <othercore/geometry/Triangle3d.h>
-#include <othercore/geometry/Segment3d.h>
+#include <othercore/geometry/Segment.h>
 #include <othercore/random/Random.h>
 #include <othercore/structure/Hashtable.h>
 
 #include <boost/function.hpp>
+#include <boost/mpl/if.hpp>
 
 #ifdef USE_OPENMESH
 
@@ -196,7 +197,6 @@ static inline PyObject* to_python(BaseHandle h) {
   return ::other::to_python(h.idx());
 }
 #endif
-
 }
 
 namespace other {
@@ -224,6 +224,30 @@ template<> struct FromPython<EdgeHandle> {
 template<> struct FromPython<HalfedgeHandle> {
   static HalfedgeHandle convert(PyObject* object) {
     return HalfedgeHandle((unsigned int)from_python<int>(object));
+  }
+};
+
+template<class T> struct FromPython<OpenMesh::VPropHandleT<T>> {
+  static OpenMesh::VPropHandleT<T> convert(PyObject* object) {
+    return OpenMesh::VPropHandleT<T>((unsigned int)from_python<int>(object));
+  }
+};
+
+template<class T> struct FromPython<OpenMesh::HPropHandleT<T>> {
+  static OpenMesh::HPropHandleT<T> convert(PyObject* object) {
+    return OpenMesh::HPropHandleT<T>((unsigned int)from_python<int>(object));
+  }
+};
+
+template<class T> struct FromPython<OpenMesh::FPropHandleT<T>> {
+  static OpenMesh::FPropHandleT<T> convert(PyObject* object) {
+    return OpenMesh::FPropHandleT<T>((unsigned int)from_python<int>(object));
+  }
+};
+
+template<class T> struct FromPython<OpenMesh::EPropHandleT<T>> {
+  static OpenMesh::EPropHandleT<T> convert(PyObject* object) {
+    return OpenMesh::EPropHandleT<T>((unsigned int)from_python<int>(object));
   }
 };
 
@@ -286,6 +310,15 @@ public:
     return prop;
   }
 
+  template<class PropType> PropType get_prop(const string& s) const {
+    PropType result;
+    if(!get_property_handle(result, s)) {
+      OTHER_FATAL_ERROR(format("Could not get property: %s",s));
+    }
+    return result;
+  }
+
+
   // add a bunch of vertices
   OTHER_CORE_EXPORT void add_vertices(RawArray<const TV> X);
 
@@ -316,6 +349,9 @@ public:
   // get an edge as a Segment
   OTHER_CORE_EXPORT Segment<Vector<real, 3> > segment(EdgeHandle eh) const;
   OTHER_CORE_EXPORT Segment<Vector<real, 3> > segment(HalfedgeHandle heh) const;
+
+  // compute the cotan weight for an edge
+  OTHER_CORE_EXPORT real cotan_weight(EdgeHandle eh) const;
 
   // get the vertex handles incident to the given halfedge
   OTHER_CORE_EXPORT Vector<VertexHandle,2> vertex_handles(HalfedgeHandle heh) const;
@@ -392,8 +428,24 @@ public:
     return OTriMesh::normal(fh);
   }
 
+  // re-publish
+  inline Point &point(VertexHandle vh) {
+    return OTriMesh::point(vh);
+  }
+
+  inline Point const &point(VertexHandle vh) const {
+    return OTriMesh::point(vh);
+  }
+
+  // get an interpolated point from a face and barycentric coordinates
+  OTHER_CORE_EXPORT Point point(FaceHandle fh, Vector<real,3> const &bary) const;
+
   // get an interpolated normal at any point on the mesh
   OTHER_CORE_EXPORT Normal smooth_normal(FaceHandle fh, Vector<real,3> const &bary) const;
+
+  // garbage collection, but also returns a map of old to new vertex handles
+  // the map does not contains old vertex handles that have been deleted.
+  OTHER_CORE_EXPORT unordered_map<VertexHandle, VertexHandle, Hasher> garbage_collection_with_map();
 
   // get rid of all infinite or nan vertices (they are simply deleted, along with incident faces)
   OTHER_CORE_EXPORT int remove_infinite_vertices();
@@ -428,7 +480,7 @@ public:
   OTHER_CORE_EXPORT Ref<TriMesh> inverse_extract_faces(vector<FaceHandle> const &faces) const;
 
   // compute the 2D silhouettes of the mesh as seem from the given rotation (with rotation*(0,0,1) as the normal)
-  OTHER_CORE_EXPORT vector<vector<Vector<real,2>>> silhouette(const Rotation<TV>& rotation) const;
+  OTHER_CORE_EXPORT Nested<Vector<real,2>> silhouette(const Rotation<TV>& rotation) const;
 
   // get the halfedges bounding the given set of faces (for all halfedges, face_handle(he) is in faces)
   OTHER_CORE_EXPORT unordered_set<HalfedgeHandle, Hasher> boundary_of(vector<FaceHandle> const &faces) const;
@@ -448,8 +500,8 @@ public:
   OTHER_CORE_EXPORT unordered_map<VertexHandle, double, Hasher> geodesic_distance(vector<VertexHandle> const &sources,
                                                                 vector<VertexHandle> const &sinks) const;
 
-  // compute and return the approximate shortest path from one point to another
-  OTHER_CORE_EXPORT vector<VertexHandle> shortest_path(VertexHandle source, VertexHandle sink) const;
+  // compute and return the approximate shortest path from one point to another (only through vertices)
+  OTHER_CORE_EXPORT vector<VertexHandle> vertex_shortest_path(VertexHandle source, VertexHandle sink) const;
 
   // compute the closest face to a point by breadth-first search starting at the given vertex/face
   OTHER_CORE_EXPORT FaceHandle local_closest_face(Point const &p, FaceHandle start) const;
@@ -466,6 +518,12 @@ public:
   // returns the newly created edges (including the old one). Both end points
   // have to be boundary vertices for this to happen.
   OTHER_CORE_EXPORT vector<EdgeHandle> separate_edge(EdgeHandle eh);
+
+  // split the mesh along a string of edges. If the edges form loops, this
+  // results in two holes per loop. All non-loop connected components create
+  // a single hole. Returns all vertices that were split, and all vertices they
+  // were split into.
+  OTHER_CORE_EXPORT vector<VertexHandle> separate_edges(vector<EdgeHandle> ehs);
 
   // cut the mesh with a plane (negative side will be removed)
   OTHER_CORE_EXPORT void cut(Plane<real> const &p, double epsilon = 1e-4, double area_hack = 0);
@@ -498,6 +556,7 @@ public:
   OTHER_CORE_EXPORT void translate(const TV& c);
   OTHER_CORE_EXPORT void rotate(const Rotation<TV>& R, const TV& center=TV());
   OTHER_CORE_EXPORT void transform(const Frame<TV>& F);
+  OTHER_CORE_EXPORT void transform(const Matrix<double,4>&M);
 
   // flip all faces inside out
   OTHER_CORE_EXPORT void invert();
@@ -512,15 +571,22 @@ public:
   OTHER_CORE_EXPORT real area(RawArray<const FaceHandle> faces) const;
 
   // Warning: these construct new arrays or copy memory
-  OTHER_CORE_EXPORT Array<Vector<int,3> > elements() const;
-  OTHER_CORE_EXPORT Array<Vector<real,3> > X_python() const;
+  OTHER_CORE_EXPORT Array<Vector<int,3>> elements() const;
+  OTHER_CORE_EXPORT Array<Vector<int,2>> segments() const;
+  OTHER_CORE_EXPORT Array<Vector<real,3>> X_python() const;
+  OTHER_CORE_EXPORT Field<Vector<Vector<real,2>,3>,FaceHandle> face_texcoords() const;
   OTHER_CORE_EXPORT void set_X_python(RawArray<const Vector<real,3>> new_X);
   OTHER_CORE_EXPORT void set_vertex_normals(RawArray<const Vector<real,3>> normals);
   OTHER_CORE_EXPORT void set_vertex_colors(RawArray<const Vector<real,3>> colors);
+  OTHER_CORE_EXPORT void set_face_texcoords(RawField<const Vector<Vector<real,2>,3>,FaceHandle> texcoords);
 
   // Warning: reference goes invalid if the mesh is changed
   OTHER_CORE_EXPORT RawArray<Vector<real,3> > X();
   OTHER_CORE_EXPORT RawArray<const Vector<real,3> > X() const;
+
+  OTHER_CORE_EXPORT Ref<SimplexTree<Vector<real,3>,2>> face_tree() const;
+  OTHER_CORE_EXPORT Ref<SimplexTree<Vector<real,3>,1>> edge_tree() const;
+  OTHER_CORE_EXPORT Ref<ParticleTree<Vector<real,3>>> point_tree() const;
 
   // Warning: reference goes invalid if the mesh is changed
   template<class PropHandle> RawField<typename PropHandle::Value,typename prop_handle_type<PropHandle>::type> prop(PropHandle p) {
@@ -539,6 +605,7 @@ public:
   // Split a mesh into connected components
   OTHER_CORE_EXPORT vector<Ref<TriMesh> > component_meshes() const;
   OTHER_CORE_EXPORT vector<Ref<TriMesh> > nested_components() const;
+  OTHER_CORE_EXPORT Ref<TriMesh> largest_connected_component() const;
 
   // Convenience functions for use in range-based for loops
   inline Range<HandleIter<VertexIter>> vertex_handles() { return handle_range(vertices_sbegin(),vertices_end()); }
@@ -562,5 +629,200 @@ public:
 OTHER_CORE_EXPORT Ref<TriMesh> merge(vector<Ref<const TriMesh>> meshes);
 
 }
+
+// insert some more property writer/readers into OpenMesh::IO
+namespace OpenMesh { namespace IO {
+
+template<class T> struct invalid_binary;
+template<class T> struct valid_binary;
+
+template<class T> struct invalid_binary {
+  typedef T value_type;
+  static const bool is_streamable = false;
+  static size_t size_of(void) { OTHER_ASSERT(false); return UnknownSize; }
+  static size_t size_of(const value_type &v) { OTHER_ASSERT(false); return 0; };
+  static size_t store(std::ostream& os, const value_type& v, bool swap=false) { OTHER_ASSERT(false); return 0; }
+  static size_t restore(std::istream& is, value_type& v, bool swap=false) { OTHER_ASSERT(false); return 0; }
+};
+
+// for default-constructible T only
+// OpenMesh already has store/restore specializations for binary<std::vector<T>>
+// for fundamental types T. Sadly, those require the vector to be pre-sized in
+// restore and are therefore fundamentally useless and incompatible. Avoid using
+// IO::size_of, IO::store, IO::restore for all vectors with fundamental types,
+// for which the compiler may randomly choose the OpenMesh version of binary<>.
+// Instead, use the valid_binary<std::vector<T>> functions directly.
+template<class T> struct valid_binary<std::vector<T>> {
+  typedef std::vector<T> value_type;
+
+  static const bool is_streamable = binary<T>::is_streamable;
+
+  static size_t size_of(void) { return UnknownSize; }
+  static size_t size_of(const value_type &v) {
+    size_t bytes = 0;
+
+    int n = v.size();
+    bytes += IO::size_of(n);
+
+    for (int i = 0; i < n; ++i)
+      bytes += IO::size_of(v[i]);
+
+    return bytes;
+  }
+
+  static size_t store(std::ostream& os, const value_type& v, bool swap=false) {
+    size_t bytes = 0;
+
+    int n = v.size();
+    bytes += IO::store(os, n, swap);
+
+    for (int i = 0; i < n; ++i)
+      bytes += IO::store(os, v[i], swap);
+
+    return os.good() ? bytes : 0;
+  }
+
+  static size_t restore(std::istream& is, value_type& v, bool swap=false) {
+    size_t bytes = 0;
+
+    int size;
+    bytes += IO::restore(is, size, swap);
+
+    v.resize(size);
+    for (int i = 0; i < size; ++i) {
+      bytes += IO::restore(is, v[i], swap);
+    }
+
+    return is.good() ? bytes : 0;
+  }
+};
+
+template<class T> struct binary<std::vector<T>>: public boost::mpl::if_c<binary<T>::is_streamable, valid_binary<std::vector<T>>, invalid_binary<std::vector<T>>>::type {};
+
+// dynamic size because size of content may not be constant
+template<class T, class U> struct binary<std::pair<T,U>> {
+  typedef std::pair<T, U> value_type;
+  static const bool is_streamable = binary<T>::is_streamable && binary<U>::is_streamable;
+  static size_t size_of(void) { return UnknownSize; }
+  static size_t size_of(const value_type &v) {
+    return IO::size_of(v.first) + IO::size_of(v.second);
+  }
+
+  static size_t store(std::ostream& os, const value_type& v, bool swap=false) {
+    size_t bytes = 0;
+    bytes += IO::store(os, v.first, swap);
+    bytes += IO::store(os, v.second, swap);
+    OTHER_ASSERT(bytes == IO::size_of(v));
+    return os.good() ? bytes : 0;
+  }
+
+  static size_t restore(std::istream& is, value_type& v, bool swap=false) {
+    size_t bytes = 0;
+    bytes += IO::restore(is, v.first, swap);
+    bytes += IO::restore(is, v.second, swap);
+    OTHER_ASSERT(bytes == IO::size_of(v));
+    return is.good() ? bytes : 0;
+  }
+};
+
+// for default-constructible T and U
+template<class T, class U, class Hasher> struct binary<other::unordered_map<T, U, Hasher>> {
+  typedef other::unordered_map<T, U, Hasher> value_type;
+  static const bool is_streamable = binary<T>::is_streamable && binary<U>::is_streamable;
+  static size_t size_of(void) { return UnknownSize; }
+  static size_t size_of(const value_type &v) {
+    size_t bytes = 0;
+
+    int n = v.size();
+    bytes += IO::size_of(n);
+
+    for (auto const &p : v)
+      bytes += IO::size_of(p);
+
+    return bytes;
+  }
+
+  static size_t store(std::ostream& os, const value_type& v, bool swap=false) {
+    size_t bytes = 0;
+
+    int n = v.size();
+    bytes += IO::store(os, n, swap);
+
+    for (auto const &pair : v)
+      bytes += IO::store(os, pair, swap);
+
+    OTHER_ASSERT(bytes == IO::size_of(v));
+    return os.good() ? bytes : 0;
+  }
+
+  static size_t restore(std::istream& is, value_type& v, bool swap=false) {
+    size_t bytes = 0;
+
+    v.clear();
+
+    int n;
+    bytes += IO::restore(is, n, swap);
+
+    for (int i = 0; i < n; ++i) {
+      std::pair<T,U> pair;
+      bytes += IO::restore(is, pair, swap);
+      v.insert(pair);
+    }
+
+    OTHER_ASSERT(bytes == IO::size_of(v));
+    return is.good() ? bytes : 0;
+  }
+};
+
+// allow Refs as U, but U must be default constructible
+template<class T, class U, class Hasher> struct binary<other::unordered_map<T, other::Ref<U>, Hasher>> {
+  typedef other::unordered_map<T, other::Ref<U>, Hasher> value_type;
+  static const bool is_streamable = binary<T>::is_streamable && binary<other::Ref<U>>::is_streamable;
+  static size_t size_of(void) { return UnknownSize; }
+  static size_t size_of(const value_type &v) {
+    size_t bytes = 0;
+
+    int n = v.size();
+    bytes += IO::size_of(n);
+
+    for (auto const &p : v)
+      bytes += IO::size_of(p);
+
+    return bytes;
+  }
+
+  static size_t store(std::ostream& os, const value_type& v, bool swap=false) {
+    size_t bytes = 0;
+
+    int n = v.size();
+    bytes += IO::store(os, n, swap);
+
+    for (auto const &pair : v)
+      bytes += IO::store(os, pair, swap);
+
+    OTHER_ASSERT(bytes == IO::size_of(v));
+    return os.good() ? bytes : 0;
+  }
+
+  static size_t restore(std::istream& is, value_type& v, bool swap=false) {
+    size_t bytes = 0;
+
+    v.clear();
+
+    int n;
+    bytes += IO::restore(is, n, swap);
+
+    for (int i = 0; i < n; ++i) {
+      std::pair<T,other::Ref<U>> p(T(), other::new_<U>());
+      bytes += IO::restore(is, p, swap);
+      v.insert(p);
+    }
+
+    OTHER_ASSERT(bytes == IO::size_of(v));
+    return is.good() ? bytes : 0;
+  }
+};
+
+}}
 
 #endif // USE_OPENMESH

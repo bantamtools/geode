@@ -189,7 +189,7 @@ public:
   vector<T> allowed;
 
   void set(const T& value_) {
-    if (!equals<T>::eval(*Base::value,value_)) {
+    if (!Equals<T>::eval(*Base::value,value_)) {
       if(allowed.size() && !other::contains(allowed,value_))
         throw ValueError("value not in allowed values for " + name);
       this->set_value(Clamp::clamp(value_));
@@ -277,7 +277,7 @@ public:
 
   bool same_default(PropBase& other_) const {
     Prop* other = other_.cast<T>();
-    return other && equals<T>::eval(default_,other->default_);
+    return other && Equals<T>::eval(default_,other->default_);
   }
 
   string value_str(bool use_default) const {
@@ -334,6 +334,10 @@ public:
   }
 };
 
+template<class T> inline std::ostream& operator<<(std::ostream& output, const PropRef<T>& ref) {
+  return output<<ref();
+}
+
 #ifdef OTHER_PYTHON
 
 OTHER_CORE_EXPORT PyObject* to_python(const PropBase& prop);
@@ -347,10 +351,6 @@ template<class T> PyObject* ptr_to_python(const Prop<T>* prop) {
 
 template<class T> PyObject* to_python(const PropRef<T>& prop) {
   return to_python(static_cast<PropBase&>(prop.self));
-}
-
-template<class T> inline std::ostream& operator<<(std::ostream& output, const PropRef<T>& ref) {
-  return output<<ref();
 }
 
 template<> struct FromPython<PropBase&> { static PropBase& convert(PyObject* object); };

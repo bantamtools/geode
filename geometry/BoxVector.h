@@ -2,8 +2,9 @@
 // Class Box<Vector<T,d>>
 //#####################################################################
 //
-// An axis aligned d-dimensional box.  Set are operations are (conservatively) exact,
-// but arithmetic (sum, scalar multiply, etc.) is not.
+// An axis aligned d-dimensional box.  Set operations are (conservatively) exact,
+// but arithmetic (sum, scalar multiply, etc.) is not.  Use Interval if conservative
+// arithmetic is desired.
 //
 //#####################################################################
 #pragma once
@@ -96,6 +97,10 @@ public:
 
   Box<TV> operator-() const {
     return Box<TV>(-max,-min);
+  }
+
+  Box<T> operator[](const int i) const {
+    return Box<T>(min[i],max[i]);
   }
 
   Box<TV>& operator+=(const Box<TV>& r) {
@@ -346,7 +351,6 @@ public:
   T phi(const TV& X) const;
   static std::string name();
   string repr() const;
-  bool lazy_intersects(const Ray<TV>& ray,T box_enlargement) const;
 };
 
 }

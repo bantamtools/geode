@@ -3,8 +3,7 @@
 //##################################################################### 
 #include <othercore/geometry/Plane.h>
 #include <othercore/geometry/Ray.h>
-#include <othercore/geometry/Segment2d.h>
-#include <othercore/geometry/Segment3d.h>
+#include <othercore/geometry/Segment.h>
 namespace other{
 //#####################################################################
 // Function Intersection
@@ -45,7 +44,7 @@ template<class T> typename Plane<T>::TV Plane<T>::
 segment_intersection(Segment<TV> const &s) const {
   T interpolation_fraction;
   segment_intersection(s.x0, s.x1, interpolation_fraction);
-  return s.interpolated(interpolation_fraction);
+  return s.interpolate(interpolation_fraction);
 }
   
 //#####################################################################

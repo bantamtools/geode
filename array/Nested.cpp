@@ -1,7 +1,8 @@
 //#####################################################################
-// Class NestedArray
+// Class Nested
 //#####################################################################
-#include <othercore/array/NestedArray.h>
+#include <othercore/array/Nested.h>
+#include <othercore/array/convert.h>
 #include <othercore/python/Class.h>
 namespace other {
 
@@ -52,13 +53,21 @@ fail:
   return 0;
 }
 
-Vector<Ref<>,2> nested_array_from_python_helper(PyObject* object) {
+bool is_nested_array(PyObject* object) {
   OTHER_ASSERT(nested_array_type);
-  if (!PyObject_IsInstance(object,(PyObject*)nested_array_type))
-    throw_type_error(object,nested_array_type);
+  return PyObject_IsInstance(object,(PyObject*)nested_array_type)!=0;
+}
+
+Vector<Ref<>,2> nested_array_from_python_helper(PyObject* object) {
   return vec(steal_ref_check(PyObject_GetAttr(object,&*offsets_string)),
              steal_ref_check(PyObject_GetAttr(object,&*flat_string)));
 }
+
+NESTED_CONVERSIONS(int)
+NESTED_CONVERSIONS(float)
+NESTED_CONVERSIONS(double)
+NESTED_CONVERSIONS(Vector<float,2>)
+NESTED_CONVERSIONS(Vector<double,2>)
 
 #endif
 }

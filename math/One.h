@@ -27,6 +27,12 @@ struct One {
   static One one() {
     return One();
   }
+
+  // Make One usable as an expression functor in exact/perturb.h
+  static const int degree = 0;
+#ifdef OTHER_VARIADIC 
+  template<class... Args> static One eval(const Args&... args) { return One(); }
+#endif
 };
 
 template<class T> static inline const T& operator*(const T& x, const One) {

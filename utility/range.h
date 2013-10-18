@@ -1,9 +1,13 @@
 #pragma once
-#include <assert.h>
 
+#include <othercore/utility/config.h>
+#include <boost/utility/declval.hpp>
+#include <cassert>
 namespace other {
 
 template<class Iter> struct Range {
+  typedef decltype(*boost::declval<Iter>()) Reference;
+
   const Iter lo, hi;
 
   Range(const Iter& lo, const Iter& hi)
@@ -11,11 +15,16 @@ template<class Iter> struct Range {
 
   const Iter& begin() const { return lo; }
   const Iter& end() const { return hi; }
+
+  Iter operator[](const int i) const { assert(0<=i && i<hi-lo); return lo+i; }
+
+  Reference front() const { assert(lo!=hi); return *lo; }
+  Reference back() const { assert(lo!=hi); return *(hi-1); }
 };
 
 template<> struct Range<int> {
   int lo, hi;
-  
+
   struct Iter {
     int i;
     explicit Iter(int i) : i(i) {}
@@ -37,6 +46,11 @@ template<> struct Range<int> {
 
   Iter begin() const { return Iter(lo); }
   Iter end() const { return Iter(hi); }
+
+  int operator[](const int i) const { assert(0<=i && i<hi-lo); return lo+i; }
+
+  int front() const { assert(lo<hi); return lo; }
+  int back() const { assert(lo<hi); return hi-1; }
 
   bool contains(int i) const { return lo <= i && i < hi; }
 };

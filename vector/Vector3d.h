@@ -32,7 +32,6 @@ class Vector<T,3>
 {
     struct Unusable{};
 public:
-    template<class T2> struct Rebind{typedef Vector<T2,3> type;};
     typedef typename mpl::if_<IsScalar<T>,T,Unusable>::type Scalar;
     typedef T Element;
     typedef T value_type; // for stl
@@ -61,11 +60,11 @@ public:
     {}
 
     template<class T2> explicit Vector(const Vector<T2,3>& vector)
-        :x((T)vector.x),y((T)vector.y),z((T)vector.z)
+        :x(T(vector.x)),y(T(vector.y)),z(T(vector.z))
     {}
 
     explicit Vector(const Vector<T,2>& vector)
-        :x(vector.x),y(vector.y),z(0)
+        :x(vector.x),y(vector.y),z()
     {}
 
     template<class TVector,class TIndices>
@@ -348,7 +347,7 @@ public:
     Vector<T,4> append(const T& element) const
     {return Vector<T,4>(x,y,z,element);}
 
-    template<int d2> Vector<T,3+d2> append_elements(const Vector<T,d2>& elements) const
+    template<int d2> Vector<T,3+d2> extend(const Vector<T,d2>& elements) const
     {Vector<T,3+d2> r;r[0]=x;r[1]=y;r[2]=z;for(int i=0;i<d2;i++) r[i+3]=elements[i];return r;}
 
     Vector<T,3> sorted() const

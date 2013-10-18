@@ -17,6 +17,7 @@
 #include <othercore/utility/range.h>
 #include <boost/type_traits/remove_const.hpp>
 #include <iomanip>
+#include <vector>
 namespace other {
 
 template<class T> struct IsArray<RawArray<T> >:public mpl::true_{};
@@ -186,7 +187,9 @@ public:
     : flat(source.flat), m(source.m), n(source.n) {}
 
   RawArray(int m, int n, T* data)
-    : flat(m*n,data), m(m), n(n) {}
+    : flat(m*n,data), m(m), n(n) {
+    assert(m>=0 && n>=0);
+  }
 
   const RawArray& operator=(const RawArray& source) const {
     assert(sizes()==source.sizes());
@@ -235,6 +238,10 @@ public:
 
   Subarray<T> column(int j) const {
     return Subarray<T>(flat,j,flat.size(),n);
+  }
+
+  RawArray<T> back() const {
+    return (*this)[m-1];
   }
 
   bool valid(const Vector<int,2>& index) const {
@@ -358,6 +365,11 @@ public:
     : flat(source.flat), m(source.m), n(source.n), mn(source.mn)
   {}
 
+  RawArray(int m, int n, int mn, T* data)
+    : flat(m*n*mn,data), m(m), n(n), mn(mn) {
+    assert(m>=0 && n>=0 && mn>=0);
+  }
+
   RawArray& operator=(const RawArray& source) const {
     assert(sizes()==source.sizes());
     flat = source.flat;
@@ -391,6 +403,11 @@ public:
 
   T& operator[](const Vector<int,3>& index) const {
     return operator()(index.x,index.y,index.z);
+  }
+
+  RawArray<T> operator()(const int i, const int j) const {
+    assert(unsigned(i)<unsigned(m) && unsigned(j)<unsigned(n));
+    return RawArray<T>(mn,data()+(i*n+j)*mn);
   }
 
   RawArray<T,2> operator[](int i) const {
@@ -429,6 +446,13 @@ public:
   RawArray slice(int imin,int imax) const {
     assert(unsigned(imin)<=unsigned(imax) && unsigned(imax)<=unsigned(m));
     return RawArray(imax-imin,n,mn,data()+imin*n*mn);
+  }
+
+  // Extract a subarray at a fixed value of the given axis
+  template<int axis> Subarray<T,2> sub(const int i) const {
+    BOOST_STATIC_ASSERT(axis<2); // For now, the last dimension of a Subarray must be contiguous
+    assert(unsigned(i)<unsigned(sizes()[axis]));
+    return axis==0 ? (*this)[i] : Subarray<T,2>(m,mn,n*mn,data()+i*mn);
   }
 
   RawArray<const Element,3> const_() const {

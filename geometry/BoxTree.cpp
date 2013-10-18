@@ -5,6 +5,7 @@
 #include <othercore/array/IndirectArray.h>
 #include <othercore/array/ProjectedArray.h>
 #include <othercore/array/sort.h>
+#include <othercore/exact/config.h>
 #include <othercore/geometry/Box.h>
 #include <othercore/geometry/Sphere.h>
 #include <othercore/geometry/traverse.h>
@@ -14,8 +15,8 @@ namespace other{
 using std::cout;
 using std::endl;
 
-template<> OTHER_DEFINE_TYPE(BoxTree<Vector<real,2> >)
-template<> OTHER_DEFINE_TYPE(BoxTree<Vector<real,3> >)
+template<> OTHER_DEFINE_TYPE(BoxTree<Vector<real,2>>)
+template<> OTHER_DEFINE_TYPE(BoxTree<Vector<real,3>>)
 
 namespace {
 
@@ -23,7 +24,7 @@ template<class T,int d> inline T center(const Vector<T,d>& x, int axis) {
   return x[axis];
 }
 
-template<class T,int d> inline T center(const Box<Vector<T,d> >& box, int axis) {
+template<class T,int d> inline T center(const Box<Vector<T,d>>& box, int axis) {
   return (T).5*(box.min[axis]+box.max[axis]);
 }
 
@@ -71,10 +72,10 @@ build(BoxTree<TV>& self, RawArray<const Range<int>> ranges, RawArray<const Geo> 
 
   // Recursively split along largest axis if necessary
   if (self.is_leaf(node))
-    sort(self.p.slice(r.lo,r.hi));
+    sort(self.p.slice(r.lo,r.hi).const_cast_());
   else {
     const int axis = box.sizes().argmax();
-    int* pp = self.p.data();
+    int* pp = const_cast<int*>(self.p.data());
     std::nth_element(pp+r.lo,
                      pp+ranges[2*node+1].hi,
                      pp+r.hi,indirect_comparison(geo,CenterCompare(axis)));
@@ -105,12 +106,11 @@ static inline Range<int> leaf_range(int prims, int leaf_size) {
   return range(leaves-1,2*leaves-1);
 }
 
-template<class TV> BoxTree<TV>::
-BoxTree(RawArray<const TV> geo,int leaf_size)
+template<class TV> BoxTree<TV>::BoxTree(RawArray<const TV> geo,int leaf_size)
   : leaf_size(check_leaf_size(leaf_size))
   , leaves(leaf_range(geo.size(),leaf_size))
   , depth(other::depth(leaves.size()))
-  , p(IdentityMap(geo.size()).copy())
+  , p(arange(geo.size()).copy())
   , ranges(other::ranges(geo.size(),leaf_size))
   , boxes(max(0,leaves.hi),false)
 {
@@ -118,12 +118,11 @@ BoxTree(RawArray<const TV> geo,int leaf_size)
     build(*this,ranges,geo,0);
 }
 
-template<class TV> BoxTree<TV>::
-BoxTree(RawArray<const Box<TV>> geo,int leaf_size)
+template<class TV> BoxTree<TV>::BoxTree(RawArray<const Box<TV>> geo,int leaf_size)
   : leaf_size(check_leaf_size(leaf_size))
   , leaves(leaf_range(geo.size(),leaf_size))
   , depth(other::depth(leaves.size()))
-  , p(IdentityMap(geo.size()).copy())
+  , p(arange(geo.size()).copy())
   , ranges(other::ranges(geo.size(),leaf_size))
   , boxes(max(0,leaves.hi),false)
 {
@@ -131,11 +130,18 @@ BoxTree(RawArray<const Box<TV>> geo,int leaf_size)
     build(*this,ranges,geo,0);
 }
 
-template<class TV> BoxTree<TV>::
-~BoxTree() {}
+template<class TV> BoxTree<TV>::BoxTree(const BoxTree<TV>& other)
+  : leaf_size(other.leaf_size)
+  , leaves(other.leaves)
+  , depth(other.depth)
+  , p(other.p)
+  , ranges(other.ranges)
+  , boxes(other.boxes.copy()) // Don't share ownership with geometry
+{}
 
-template<class TV> void BoxTree<TV>::
-update_nonleaf_boxes() {
+template<class TV> BoxTree<TV>::~BoxTree() {}
+
+template<class TV> void BoxTree<TV>::update_nonleaf_boxes() {
   for(int n=leaves.lo-1;n>=0;n--)
     boxes[n] = Box<TV>::combine(boxes[2*n+1],boxes[2*n+2]);
 }
@@ -173,7 +179,7 @@ check(RawArray<const TV> X) const {
   count.subset(p) += 1;
   OTHER_ASSERT(count.contains_only(1));
   int culls = 0, leaves = 0;
-  traverse(*this,CheckVisitor<TV>(*this,X,culls,leaves));
+  single_traverse(*this,CheckVisitor<TV>(*this,X,culls,leaves));
   OTHER_ASSERT(culls==boxes.size() && leaves==this->leaves.size());
 }
 
@@ -190,9 +196,10 @@ any_box_intersection(const Shape& shape) const {
 }
 
 #define INSTANTIATE(T,d) \
-  template class BoxTree<Vector<T,d> >; \
+  template class BoxTree<Vector<T,d>>; \
   template OTHER_CORE_EXPORT bool BoxTree<Vector<T,d>>::any_box_intersection(const Box<Vector<T,d>>&) const; \
   template OTHER_CORE_EXPORT bool BoxTree<Vector<T,d>>::any_box_intersection(const Sphere<Vector<T,d>>&) const;
+template BoxTree<Vector<ExactInt,2>>::BoxTree(RawArray<const Box<Vector<ExactInt,2>>>,int);
 INSTANTIATE(real,2)
 INSTANTIATE(real,3)
 }

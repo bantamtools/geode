@@ -6,6 +6,7 @@
 #include <othercore/python/forward.h>
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/static_assert.hpp>
+#include <boost/detail/endian.hpp>
 #include <stdint.h>
 #include <string>
 namespace other {
@@ -25,8 +26,13 @@ template<class I> static inline I cast_uint128(const uint128_t& n) {
 #else
 
 class uint128_t {
+#if defined(BOOST_LITTLE_ENDIAN)
   uint64_t lo,hi;
+#elif defined(BOOST_BIG_ENDIAN)
+  uint64_t hi,lo;
+#endif
 public:
+
   uint128_t()
     :lo(),hi() {}
 
@@ -133,5 +139,10 @@ OTHER_CORE_EXPORT string str(uint128_t n);
 OTHER_CORE_EXPORT ostream& operator<<(ostream& output, uint128_t n);
 OTHER_CORE_EXPORT PyObject* to_python(uint128_t n);
 template<> struct FromPython<uint128_t>{OTHER_CORE_EXPORT static uint128_t convert(PyObject* object);};
+
+#if defined(__GNUC__) && defined(__LP64__)
+OTHER_CORE_EXPORT string str(__int128_t n);
+OTHER_CORE_EXPORT ostream& operator<<(ostream& output, __int128_t n);
+#endif
 
 }

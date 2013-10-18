@@ -30,7 +30,7 @@ public:
     {}
 
     SymmetricMatrix(const DiagonalMatrix<T,2>& matrix)
-        :x00(matrix.x00),x10(0),x11(matrix.x11)
+        :x00(matrix.x00),x10(),x11(matrix.x11)
     {}
 
     SymmetricMatrix(const T y00,const T y10,const T y11)
@@ -197,7 +197,7 @@ public:
     else return Vector<T,2>(1,0);}
 
     T maxabs() const
-    {return maxabs(x00,x10,x11);}
+    {return other::maxabs(x00,x10,x11);}
 
     static SymmetricMatrix identity_matrix()
     {return SymmetricMatrix(1,0,1);}

@@ -34,8 +34,8 @@ sort_rows(SparseMatrix& self)
 }
 
 SparseMatrix::
-SparseMatrix(NestedArray<int> J,Array<T> A)
-    :J(J),A(NestedArray<T>::reshape_like(A,J)),cholesky(false)
+SparseMatrix(Nested<int> J,Array<T> A)
+    :J(J),A(Nested<T>::reshape_like(A,J)),cholesky(false)
 {
     OTHER_ASSERT(!J.flat.size() || J.flat.min()>=0);
     columns_ = J.size()?J.flat.max()+1:0;
@@ -44,7 +44,8 @@ SparseMatrix(NestedArray<int> J,Array<T> A)
     sort_rows(*this);
 }
 
-SparseMatrix::SparseMatrix(const Hashtable<Vector<int,2>,T>& entries, const Vector<int,2>& sizes) {
+SparseMatrix::SparseMatrix(const Hashtable<Vector<int,2>,T>& entries, const Vector<int,2>& sizes)
+  : cholesky(false) {
   // Count rows and columns
   int rows=0;
   for (auto& k : entries)
@@ -60,8 +61,8 @@ SparseMatrix::SparseMatrix(const Hashtable<Vector<int,2>,T>& entries, const Vect
     lengths[k.key[0]]++;
 
   // Compute offsets
-  const_cast_(J) = NestedArray<int>(lengths);
-  const_cast_(A) = NestedArray<T>::zeros_like(J);
+  const_cast_(J) = Nested<int>(lengths);
+  const_cast_(A) = Nested<T>::zeros_like(J);
 
   // Fill in entries
   for (auto& k : entries) {
@@ -80,13 +81,10 @@ SparseMatrix::SparseMatrix(const Hashtable<Vector<int,2>,T>& entries, const Vect
   sort_rows(*this);
 }
 
-SparseMatrix::
-SparseMatrix(Private)
-{}
+SparseMatrix::SparseMatrix(Nested<const int> J, Nested<T> A, Array<const int> diagonal_index, const bool cholesky, Private)
+  : J(J), A(A), cholesky(cholesky), diagonal_index(diagonal_index) {}
 
-SparseMatrix::
-~SparseMatrix()
-{}
+SparseMatrix::~SparseMatrix() {}
 
 int SparseMatrix::
 find_entry(const int i,const int j) const
@@ -228,12 +226,7 @@ incomplete_cholesky_factorization(const T modified_coefficient,const T zero_tole
         if(i==rows()-1 && denominator<=zero_tolerance) denominator=zero_tolerance; // ensure last diagonal element is not zero
         C[row_diagonal_index]=1/denominator;} // finally, store the diagonal element in inverted form
 
-    Ref<SparseMatrix> CM=new_<SparseMatrix>(Private());
-    const_cast_(CM->J)=J;
-    const_cast_(CM->A)=NestedArray<T>::reshape_like(C,J);
-    CM->diagonal_index=diagonal_index;
-    CM->cholesky=true;
-    return CM;
+    return new_<SparseMatrix>(J,Nested<T>::reshape_like(C,J),diagonal_index,true,Private());
 }
 
 void SparseMatrix::
@@ -270,7 +263,7 @@ void wrap_sparse_matrix()
 {
     typedef SparseMatrix Self;
     Class<Self>("SparseMatrix")
-        .OTHER_INIT(NestedArray<int>,Array<T>)
+        .OTHER_INIT(Nested<int>,Array<T>)
         .OTHER_METHOD(rows)
         .OTHER_METHOD(columns)
         .OTHER_FIELD(J)

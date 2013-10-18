@@ -2,6 +2,7 @@
 // Numpy interface functions
 //#####################################################################
 #include <othercore/python/numpy.h>
+#include <othercore/python/wrap.h>
 #include <boost/detail/endian.hpp>
 #include <boost/cstdint.hpp>
 #include <stdio.h>
@@ -48,6 +49,17 @@ PyTypeObject* numpy_array_type() {
   return &PyArray_Type;
 }
 
+static PyTypeObject* recarray = 0;
+PyTypeObject* numpy_recarray_type() {
+  OTHER_ASSERT(recarray);
+  return recarray;
+}
+static void _set_recarray_type(PyObject* type) {
+  OTHER_ASSERT(PyType_Check(type));
+  Py_INCREF(type);
+  recarray = (PyTypeObject*)type;
+}
+
 void throw_array_conversion_error(PyObject* object, int flags, int rank_range, PyArray_Descr* descr) {
   if (!PyArray_Check(object))
     PyErr_Format(PyExc_TypeError, "expected numpy array, got %s", object->ob_type->tp_name);
@@ -78,17 +90,25 @@ void check_numpy_conversion(PyObject* object, int flags, int rank_range, PyArray
 
 #else // !defined(OTHER_PYTHON)
 
+// CHAR_BIT isn't defined for some build configurations so we use __CHAR_BIT__ instead which seems to work in both clang and gcc
+// It would probably be safe to just use 8 if this fails
+#ifndef _WIN32
+#define OTHER_CHAR_BIT __CHAR_BIT__
+#else
+#define OTHER_CHAR_BIT 8
+#endif
+
 // Modified from numpy/npy_common.h
 typedef unsigned char npy_bool;
-#define NPY_BITSOF_BOOL (sizeof(npy_bool)*CHAR_BIT)
-#define NPY_BITSOF_CHAR (sizeof(char)*CHAR_BIT)
-#define NPY_BITSOF_SHORT (sizeof(short)*CHAR_BIT)
-#define NPY_BITSOF_INT (sizeof(int)*CHAR_BIT)
-#define NPY_BITSOF_LONG (sizeof(long)*CHAR_BIT)
-#define NPY_BITSOF_LONGLONG (sizeof(long long)*CHAR_BIT)
-#define NPY_BITSOF_FLOAT (sizeof(float)*CHAR_BIT)
-#define NPY_BITSOF_DOUBLE (sizeof(double)*CHAR_BIT)
-#define NPY_BITSOF_LONGDOUBLE (sizeof(long double)*CHAR_BIT)
+#define NPY_BITSOF_BOOL (sizeof(npy_bool)*OTHER_CHAR_BIT)
+#define NPY_BITSOF_CHAR (sizeof(char)*OTHER_CHAR_BIT)
+#define NPY_BITSOF_SHORT (sizeof(short)*OTHER_CHAR_BIT)
+#define NPY_BITSOF_INT (sizeof(int)*OTHER_CHAR_BIT)
+#define NPY_BITSOF_LONG (sizeof(long)*OTHER_CHAR_BIT)
+#define NPY_BITSOF_LONGLONG (sizeof(long long)*OTHER_CHAR_BIT)
+#define NPY_BITSOF_FLOAT (sizeof(float)*OTHER_CHAR_BIT)
+#define NPY_BITSOF_DOUBLE (sizeof(double)*OTHER_CHAR_BIT)
+#define NPY_BITSOF_LONGDOUBLE (sizeof(long double)*OTHER_CHAR_BIT)
 
 // Lifted from numpy/ndarraytypes.h
 enum NPY_TYPECHAR { NPY_GENBOOLLTR ='b',
@@ -185,4 +205,11 @@ void write_numpy(const string& filename,int rank,const npy_intp* dimensions,int 
   fclose(file);
 }
 
+}
+using namespace other;
+
+void wrap_numpy() {
+#ifdef OTHER_PYTHON
+  OTHER_FUNCTION(_set_recarray_type)
+#endif
 }
