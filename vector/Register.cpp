@@ -1,10 +1,10 @@
 //#####################################################################
 // Header Register
 //#####################################################################
+#include <othercore/vector/Register.h>
 #include <othercore/array/RawArray.h>
 #include <othercore/array/Array2d.h>
 #include <othercore/python/wrap.h>
-#include <othercore/vector/Register.h>
 #include <othercore/vector/Frame.h>
 #include <othercore/vector/DiagonalMatrix.h>
 #include <othercore/vector/Matrix.h>

@@ -56,12 +56,14 @@ template<int d> Tuple<Array<Vector<real,d>>, vector<int>> Bezier<d>::evaluate_co
     p2 = it->second->tangent_out;
 
     it++;
+    if(!b_closed) OTHER_ASSERT(it!=knots.end());
     if(it == knots.end()) it = knots.begin(); // wrap around at end
 
     p3 = it->second->tangent_in;
     p4 = it->second->pt;
 
-    if ((p4-p2).magnitude() > 1e-8) {
+    //ignore the segment if the two points are practically indistinguishable
+    if ((p4-p1).magnitude() > 1e-8 || (dot((p2-p1).normalized(),(p3-p4).normalized()) < 1-1e-7) ) {
       // first point in this segment
       forced.push_back(path.size());
       path.append(other::point(p1,p2,p3,p4,0));
@@ -173,8 +175,8 @@ template<int d> Array<Vector<real,d>> Bezier<d>::alen_evaluate(const InvertibleB
 
 template<int d> Span<d> Bezier<d>::segment(real t) const {
   auto it = knots.lower_bound(t);
-  if(it==knots.end()) return Span<d>(it->second,it->second,it->first,it->first);
-  if(it != knots.begin() ) --it;
+  OTHER_ASSERT(it != knots.end());
+  if (it != knots.begin()) --it;
   auto iit = it; ++iit;
   return Span<d>(it->second,iit->second,it->first,iit->first);
 }

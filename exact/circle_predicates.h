@@ -16,7 +16,7 @@ struct Vertex {
   uint8_t q0,q1; // Quadrants relative to i0's center and i1's center, respectively
   exact::Vec2 rounded; // The nearly exactly rounded intersect, differing from the exact intersection by at most vertex::tolerance.
 
-  static const Quantized tolerance() { return 2; }
+  static Quantized tolerance() { return 2; }
 
   bool operator==(const Vertex v) const {
     return i0==v.i0 && i1==v.i1 && left==v.left;
@@ -94,7 +94,7 @@ OTHER_CORE_EXPORT bool circles_intersect(Arcs arcs, const int arc0, const int ar
 template<bool add=false> bool circle_intersections_upwards(Arcs arcs, const Vertex a, const Vertex b);
 
 // Tests if an arc segment is less then a half circle
-bool circle_intersections_ccw(Arcs arcs, const Vertex v0, const Vertex v1);
+bool circle_intersections_ccw(Arcs arcs, const Vertex v01, const Vertex v02);
 
 // Does the piece of a1 between a01 and a12 intersect the piece of b1 between b01 and b12 (degree 6)?  a1 and b1 are assumed to intersect at ab.
 bool circle_arcs_intersect(Arcs arcs, const Vertex a01, const Vertex a12,
@@ -143,6 +143,9 @@ bool circle_intersects_horizontal(Arcs arcs, const int arc, const Quantized y);
 
 // Assuming the circle intersects the horizontal line, generate structs for each intersection.
 Vector<HorizontalVertex,2> circle_horizontal_intersections(Arcs arcs, const int arc, const Quantized y);
+
+// Is the a01 intersection below a0y?
+bool circle_intersection_below_horizontal(Arcs arcs, const Vertex a01, const HorizontalVertex a0y);
 
 // Does the piece of a1 between a01 and a12 contain the given horizontal intersection (degree 3)?
 bool circle_arc_contains_horizontal_intersection(Arcs arcs, const Vertex a01, const Vertex a12, const HorizontalVertex a1y);

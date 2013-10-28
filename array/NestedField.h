@@ -5,6 +5,7 @@
 // A wrapper around Nested for accessing with ids
 //
 //#####################################################################
+#pragma once
 
 #include <othercore/array/Nested.h>
 #include <othercore/array/RawField.h>

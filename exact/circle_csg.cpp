@@ -564,27 +564,13 @@ static void unravel_helper_arc(const RawArray<ExactCircleArc> arcs, const int c0
   }
 }
 
-Tuple<Quantizer<real,2>,Nested<ExactCircleArc>> quantize_circle_arcs(Nested<const CircleArc> input, const Box<Vector<real,2>> min_bounds) {
+// This function must have OTHER_NEVER_INLINE to ensure Clang doesn't move IntervalScope initialization above non-interval arithmetic
+OTHER_NEVER_INLINE Tuple<Quantizer<real,2>,Nested<ExactCircleArc>> quantize_circle_arcs_scoped(const Nested<const CircleArc> input, const Box<Vector<real,2>> min_bounds, const Quantizer<Quantized, 2> quant) {
+  IntervalScope scope;
   const Quantized allowed_vertex_error = constructed_arc_endpoint_error_bound() + Vertex::tolerance() + 1;
   const Quantized allowed_vertex_error_sqr = sqr(allowed_vertex_error);
 
-  Box<Vector<real,2>> box = min_bounds;
-  box.enlarge(approximate_bounding_box(input));
-
-  // Enlarge box quite a lot so that we can closely approximate lines.
-  // The error in approximating a straight segment of length L by a circular arc of radius R is
-  //   er = L^2/(8*R)
-  // If the maximum radius is R, the error due to quantization is
-  //   eq = R/bound
-  // Equating these, we get
-  //   R/bound = L^2/(8*R)
-  //   R^2 = L^2*bound/8
-  //   R = L*sqrt(bound/8)
-  const real max_radius = sqrt(exact::bound/8)*box.sizes().max();
-  const auto quant = quantizer(box.thickened(max_radius));
-
   // Quantize and implicitize each arc
-  IntervalScope scope;
   auto output = Nested<ExactCircleArc,false>();
   auto new_contour = Array<ExactCircleArc>();
 
@@ -767,6 +753,24 @@ Tuple<Quantizer<real,2>,Nested<ExactCircleArc>> quantize_circle_arcs(Nested<cons
   return tuple(quant,output.freeze());
 }
 
+Tuple<Quantizer<real,2>,Nested<ExactCircleArc>> quantize_circle_arcs(const Nested<const CircleArc> input, const Box<Vector<real,2>> min_bounds) {
+  Box<Vector<real,2>> box = min_bounds;
+  box.enlarge(approximate_bounding_box(input));
+
+  // Enlarge box quite a lot so that we can closely approximate lines.
+  // The error in approximating a straight segment of length L by a circular arc of radius R is
+  //   er = L^2/(8*R)
+  // If the maximum radius is R, the error due to quantization is
+  //   eq = R/bound
+  // Equating these, we get
+  //   R/bound = L^2/(8*R)
+  //   R^2 = L^2*bound/8
+  //   R = L*sqrt(bound/8)
+  const real max_radius = sqrt(exact::bound/8)*box.sizes().max();
+  const auto quant = quantizer(box.thickened(max_radius));
+  return quantize_circle_arcs_scoped(input, min_bounds, quant);
+}
+
 #if 0
 // This version doesn't cull small arcs
 
@@ -802,6 +806,15 @@ Nested<CircleArc> unquantize_circle_arcs(const Quantizer<real,2> quant, Nested<c
   for (const int p : range(input.size())) {
     const int base = input.offsets[p];
     const auto in = input[p];
+    if(in.size() == 1) { // Catch any size one circle arcs and convert them into full circles
+      const auto el = in[0].center - EV2(in[0].radius, 0);
+      const auto er = in[0].center + EV2(in[0].radius, 0);
+      result.append_empty();
+      result.append_to_back(CircleArc(quant.inverse(er), in[0].positive ? 1 : -1));
+      result.append_to_back(CircleArc(quant.inverse(el), in[0].positive ? 1 : -1));
+      continue;
+    }
+
     out.resize(in.size(),false,false);
     cull.resize(in.size(),false,false);
     const int n = in.size();

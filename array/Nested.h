@@ -193,6 +193,13 @@ public:
     flat.append(element);
   }
 
+  // Remove an element from the last subarray
+  void pop_from_back() {
+    assert(!back().empty());
+    flat.pop();
+    --offsets.back();
+  }
+
   // Extend the last subarray
   template<class TArray> void extend_back(const TArray& append_array) {
     static_assert(!frozen,"To use extend_back, set frozen=false and eventually call freeze()");
@@ -225,8 +232,9 @@ template<class TA> Nested<typename TA::value_type> make_nested(const TA& a0) {
   return nested;
 }
 
-template<class TA> Nested<typename TA::value_type> make_nested(const TA& a0, const TA& a1) {
-  Nested<typename TA::value_type> nested(asarray(vec((int)a0.size(),(int)a1.size())),false);
+template<class TA0,class TA1> Nested<typename TA0::value_type> make_nested(const TA0& a0, const TA1& a1) {
+  STATIC_ASSERT_SAME(typename TA0::value_type,typename TA1::value_type);
+  Nested<typename TA0::value_type> nested(asarray(vec((int)a0.size(),(int)a1.size())),false);
   nested[0] = a0;
   nested[1] = a1;
   return nested;
@@ -256,6 +264,10 @@ template<class T,bool f> static inline const Nested<T,f>& concatenate(const Nest
 template<class T,bool f0,bool f1> Nested<typename boost::remove_const<T>::type,false> concatenate(const Nested<T,f0>& a0, const Nested<T,f1>& a1) {
   return Nested<typename boost::remove_const<T>::type,false>(concatenate(a0.offsets,a0.offsets.back()+a1.offsets.slice(1,a1.offsets.size())),
                                                              concatenate(a0.flat,a1.flat));
+}
+
+template<class T,bool f> static inline Hash hash_reduce(const Nested<T,f>& a) {
+  return Hash(a.offsets,a.flat);
 }
 
 #ifdef OTHER_PYTHON

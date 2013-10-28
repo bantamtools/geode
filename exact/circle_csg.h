@@ -41,6 +41,14 @@ struct ExactCircleArc {
   int index; // Index into the symbolic perturbation
   bool positive; // True if the arc is traversed counterclockwise
   bool left; // True if we use the intersection between this arc and the next to the left of the segment joining their centers
+  ExactCircleArc() = default;
+  ExactCircleArc(const Vector<Quantized,2> _center, const Quantized _radius, const int _index, const bool _positive, const bool _left)
+   : center(_center)
+   , radius(_radius)
+   , index(_index)
+   , positive(_positive)
+   , left(_left)
+  {}
 };
 
 // Tweak quantized circles so that they intersect.
@@ -74,7 +82,7 @@ OTHER_CORE_EXPORT void reverse_arcs(Nested<CircleArc> arcs);
 
 // Quantize from approximate to exact representations, taking care to ensure validity of the quantized result.
 // If min_bounds isn't empty the Quantizer will use an appropriate scale to work with other features inside of min_bounds
-OTHER_CORE_EXPORT Tuple<Quantizer<real,2>,Nested<ExactCircleArc>> quantize_circle_arcs(Nested<const CircleArc> arcs, const Box<Vector<real,2>> min_bounds=Box<Vector<real,2>>::empty_box());
+OTHER_CORE_EXPORT Tuple<Quantizer<real,2>,Nested<ExactCircleArc>> quantize_circle_arcs(const Nested<const CircleArc> arcs, const Box<Vector<real,2>> min_bounds=Box<Vector<real,2>>::empty_box());
 OTHER_CORE_EXPORT Nested<CircleArc> unquantize_circle_arcs(const Quantizer<real,2> quant, Nested<const ExactCircleArc> input);
 
 // exact_split_circle_arcs prunes away contours that are too small to intersect with a horizontal line.  Normally this can be
@@ -92,5 +100,11 @@ static inline CircleArc operator*(const Rotation<Vector<real,2>>& a, const Circl
 static inline CircleArc operator*(const Frame<Vector<real,2>>& a,    const CircleArc& c) { return CircleArc(a*c.x,c.q); }
 static inline CircleArc operator+(const Vector<real,2>& t, const CircleArc& c) { return CircleArc(t+c.x,c.q); }
 static inline CircleArc operator+(const CircleArc& c, const Vector<real,2>& t) { return CircleArc(t+c.x,c.q); }
+
+// Hashing for circle arcs
+template<> struct is_packed_pod<CircleArc> : public mpl::true_{};
+static inline Hash hash_reduce(const ExactCircleArc& a) {
+  return Hash(a.center,a.radius,a.index,a.positive,a.left);
+}
 
 }

@@ -10,8 +10,8 @@
 #include <othercore/array/Array3d.h>
 #include <othercore/array/Array4d.h>
 #include <othercore/array/NdArray.h>
-#include <othercore/python/numpy.h>
 #include <othercore/array/Nested.h>
+#include <othercore/python/numpy.h>
 #include <othercore/python/stl.h>
 namespace other {
 
