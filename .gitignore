@@ -14,3 +14,7 @@ Release*/
 *.xcuserstate
 *.xcbkptlist
 xcuserdata
+.sconsign.dblite
+SConstruct
+config.py
+setup.cfg

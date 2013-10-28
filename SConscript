@@ -1,8 +1,11 @@
+from os.path import expanduser
+othercam = expanduser("~") + '/othercam'
+
 Import('env library external windows clang toplevel')
 
 toplevel('othercore','.')
 
-external('openmesh',libpath=['/usr/local/lib/OpenMesh'],flags=['USE_OPENMESH'],libs=['OpenMeshCore','OpenMeshTools'],requires=['boost_link'])
+external('openmesh',libpath=[ othercam+'/OpenMesh-2.0/cmake/Build/lib/OpenMesh'],cpppath=[othercam+'/OpenMesh-2.0/src',othercam+'/gmm-4.2/include'],flags=['USE_OPENMESH'],libs=['OpenMeshCore','OpenMeshTools'],requires=['boost_link'])
 env = env.Clone(use_libpng=1,use_libjpeg=1,use_openexr=0,use_openmesh=1,use_gmp=1)
 # Minimal dependencies:
 # env = env.Clone(use_libpng=0,use_libjpeg=0,use_openexr=0,use_openmesh=0,use_python=0)
