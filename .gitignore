@@ -10,9 +10,14 @@
 *.vcxproj.user
 Debug*/
 Release*/
-*.xcuserdata
-*.xcuserstate
-*.xcbkptlist
+/config.py
+.sconsign.dblite
+.sconf_temp
+config.log
+build
+dist
+*.egg-info
+*.so
 xcuserdata
 .sconsign.dblite
 SConstruct
