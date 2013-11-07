@@ -7,33 +7,33 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		205636B61703AC0C000A42F9 /* __init__.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = __init__.py; path = ../__init__.py; sourceTree = "<group>"; };
-		205636B71703AC0C000A42F9 /* array */ = {isa = PBXFileReference; lastKnownFileType = folder; name = array; path = ../array; sourceTree = "<group>"; };
+		205636B61703AC0C000A42F9 /* __init__.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = __init__.py; path = ../geode/__init__.py; sourceTree = "<group>"; };
+		205636B71703AC0C000A42F9 /* array */ = {isa = PBXFileReference; lastKnownFileType = folder; name = array; path = ../geode/array; sourceTree = "<group>"; };
 		205636B81703AC0C000A42F9 /* bin */ = {isa = PBXFileReference; lastKnownFileType = folder; name = bin; path = ../bin; sourceTree = "<group>"; };
 		205636B91703AC0C000A42F9 /* build */ = {isa = PBXFileReference; lastKnownFileType = folder; name = build; path = ../build; sourceTree = "<group>"; };
-		205636BA1703AC0C000A42F9 /* force */ = {isa = PBXFileReference; lastKnownFileType = folder; name = force; path = ../force; sourceTree = "<group>"; };
-		205636BB1703AC0C000A42F9 /* geometry */ = {isa = PBXFileReference; lastKnownFileType = folder; name = geometry; path = ../geometry; sourceTree = "<group>"; };
-		205636BC1703AC0C000A42F9 /* image */ = {isa = PBXFileReference; lastKnownFileType = folder; name = image; path = ../image; sourceTree = "<group>"; };
-		205636BD1703AC0C000A42F9 /* math */ = {isa = PBXFileReference; lastKnownFileType = folder; name = math; path = ../math; sourceTree = "<group>"; };
-		205636BE1703AC0C000A42F9 /* mesh */ = {isa = PBXFileReference; lastKnownFileType = folder; name = mesh; path = ../mesh; sourceTree = "<group>"; };
-		205636BF1703AC0C000A42F9 /* module.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = module.cpp; path = ../module.cpp; sourceTree = "<group>"; };
-		205636C01703AC0C000A42F9 /* openmesh */ = {isa = PBXFileReference; lastKnownFileType = folder; name = openmesh; path = ../openmesh; sourceTree = "<group>"; };
-		205636C11703AC0C000A42F9 /* python */ = {isa = PBXFileReference; lastKnownFileType = folder; name = python; path = ../python; sourceTree = "<group>"; };
-		205636C21703AC0C000A42F9 /* random */ = {isa = PBXFileReference; lastKnownFileType = folder; name = random; path = ../random; sourceTree = "<group>"; };
+		205636BA1703AC0C000A42F9 /* force */ = {isa = PBXFileReference; lastKnownFileType = folder; name = force; path = ../geode/force; sourceTree = "<group>"; };
+		205636BB1703AC0C000A42F9 /* geometry */ = {isa = PBXFileReference; lastKnownFileType = folder; name = geometry; path = ../geode/geometry; sourceTree = "<group>"; };
+		205636BC1703AC0C000A42F9 /* image */ = {isa = PBXFileReference; lastKnownFileType = folder; name = image; path = ../geode/image; sourceTree = "<group>"; };
+		205636BD1703AC0C000A42F9 /* math */ = {isa = PBXFileReference; lastKnownFileType = folder; name = math; path = ../geode/math; sourceTree = "<group>"; };
+		205636BE1703AC0C000A42F9 /* mesh */ = {isa = PBXFileReference; lastKnownFileType = folder; name = mesh; path = ../geode/mesh; sourceTree = "<group>"; };
+		205636BF1703AC0C000A42F9 /* module.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = module.cpp; path = ../geode/module.cpp; sourceTree = "<group>"; };
+		205636C01703AC0C000A42F9 /* openmesh */ = {isa = PBXFileReference; lastKnownFileType = folder; name = openmesh; path = ../geode/openmesh; sourceTree = "<group>"; };
+		205636C11703AC0C000A42F9 /* python */ = {isa = PBXFileReference; lastKnownFileType = folder; name = python; path = ../geode/python; sourceTree = "<group>"; };
+		205636C21703AC0C000A42F9 /* random */ = {isa = PBXFileReference; lastKnownFileType = folder; name = random; path = ../geode/random; sourceTree = "<group>"; };
 		205636C31703AC0C000A42F9 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = README.md; path = ../README.md; sourceTree = "<group>"; };
-		205636C41703AC0C000A42F9 /* SConscript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = SConscript; path = ../SConscript; sourceTree = "<group>"; };
-		205636C51703AC0C000A42F9 /* solver */ = {isa = PBXFileReference; lastKnownFileType = folder; name = solver; path = ../solver; sourceTree = "<group>"; };
-		205636C61703AC0C000A42F9 /* structure */ = {isa = PBXFileReference; lastKnownFileType = folder; name = structure; path = ../structure; sourceTree = "<group>"; };
-		205636C71703AC0C000A42F9 /* utility */ = {isa = PBXFileReference; lastKnownFileType = folder; name = utility; path = ../utility; sourceTree = "<group>"; };
-		205636C81703AC0C000A42F9 /* value */ = {isa = PBXFileReference; lastKnownFileType = folder; name = value; path = ../value; sourceTree = "<group>"; };
-		205636C91703AC0C000A42F9 /* vector */ = {isa = PBXFileReference; lastKnownFileType = folder; name = vector; path = ../vector; sourceTree = "<group>"; };
+		205636C41703AC0C000A42F9 /* SConscript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = SConscript; path = ../geode/SConscript; sourceTree = "<group>"; };
+		205636C51703AC0C000A42F9 /* solver */ = {isa = PBXFileReference; lastKnownFileType = folder; name = solver; path = ../geode/solver; sourceTree = "<group>"; };
+		205636C61703AC0C000A42F9 /* structure */ = {isa = PBXFileReference; lastKnownFileType = folder; name = structure; path = ../geode/structure; sourceTree = "<group>"; };
+		205636C71703AC0C000A42F9 /* utility */ = {isa = PBXFileReference; lastKnownFileType = folder; name = utility; path = ../geode/utility; sourceTree = "<group>"; };
+		205636C81703AC0C000A42F9 /* value */ = {isa = PBXFileReference; lastKnownFileType = folder; name = value; path = ../geode/value; sourceTree = "<group>"; };
+		205636C91703AC0C000A42F9 /* vector */ = {isa = PBXFileReference; lastKnownFileType = folder; name = vector; path = ../geode/vector; sourceTree = "<group>"; };
+		D94004D6182AFA9D00F7452A /* svg */ = {isa = PBXFileReference; lastKnownFileType = folder; name = svg; path = ../geode/svg; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		205636A51703AB60000A42F9 = {
 			isa = PBXGroup;
 			children = (
-				205636B61703AC0C000A42F9 /* __init__.py */,
 				205636B71703AC0C000A42F9 /* array */,
 				205636B81703AC0C000A42F9 /* bin */,
 				205636B91703AC0C000A42F9 /* build */,
@@ -42,34 +42,36 @@
 				205636BC1703AC0C000A42F9 /* image */,
 				205636BD1703AC0C000A42F9 /* math */,
 				205636BE1703AC0C000A42F9 /* mesh */,
-				205636BF1703AC0C000A42F9 /* module.cpp */,
 				205636C01703AC0C000A42F9 /* openmesh */,
 				205636C11703AC0C000A42F9 /* python */,
 				205636C21703AC0C000A42F9 /* random */,
-				205636C31703AC0C000A42F9 /* README.md */,
-				205636C41703AC0C000A42F9 /* SConscript */,
 				205636C51703AC0C000A42F9 /* solver */,
 				205636C61703AC0C000A42F9 /* structure */,
+				D94004D6182AFA9D00F7452A /* svg */,
 				205636C71703AC0C000A42F9 /* utility */,
 				205636C81703AC0C000A42F9 /* value */,
 				205636C91703AC0C000A42F9 /* vector */,
+				205636B61703AC0C000A42F9 /* __init__.py */,
+				205636BF1703AC0C000A42F9 /* module.cpp */,
+				205636C31703AC0C000A42F9 /* README.md */,
+				205636C41703AC0C000A42F9 /* SConscript */,
 			);
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXLegacyTarget section */
-		205636AC1703AB60000A42F9 /* othercore */ = {
+		205636AC1703AB60000A42F9 /* geode */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "has_libpng=0 has_libjpeg=0 has_openexr=0 has_openmesh=0 has_python=0";
-			buildConfigurationList = 205636AF1703AB60000A42F9 /* Build configuration list for PBXLegacyTarget "othercore" */;
+			buildArgumentsString = "use_libpng=0 use_libjpeg=0 use_openexr=0 use_openmesh=1 use_python=0";
+			buildConfigurationList = 205636AF1703AB60000A42F9 /* Build configuration list for PBXLegacyTarget "geode" */;
 			buildPhases = (
 			);
 			buildToolPath = /opt/local/bin/scons;
 			buildWorkingDirectory = "$(PROJECT_DIR)/../";
 			dependencies = (
 			);
-			name = othercore;
+			name = geode;
 			passBuildSettingsInEnvironment = 1;
 			productName = othercore;
 		};
@@ -82,7 +84,7 @@
 				LastUpgradeCheck = 0450;
 				ORGANIZATIONNAME = Otherfab;
 			};
-			buildConfigurationList = 205636AA1703AB60000A42F9 /* Build configuration list for PBXProject "othercore" */;
+			buildConfigurationList = 205636AA1703AB60000A42F9 /* Build configuration list for PBXProject "geode" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -93,7 +95,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				205636AC1703AB60000A42F9 /* othercore */,
+				205636AC1703AB60000A42F9 /* geode */,
 			);
 		};
 /* End PBXProject section */
@@ -158,7 +160,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = geode;
 			};
 			name = Debug;
 		};
@@ -167,14 +169,14 @@
 			buildSettings = {
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = geode;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		205636AA1703AB60000A42F9 /* Build configuration list for PBXProject "othercore" */ = {
+		205636AA1703AB60000A42F9 /* Build configuration list for PBXProject "geode" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				205636AD1703AB60000A42F9 /* Debug */,
@@ -183,7 +185,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		205636AF1703AB60000A42F9 /* Build configuration list for PBXLegacyTarget "othercore" */ = {
+		205636AF1703AB60000A42F9 /* Build configuration list for PBXLegacyTarget "geode" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				205636B01703AB60000A42F9 /* Debug */,
