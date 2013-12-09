@@ -33,6 +33,7 @@
 #include <limits>
 namespace geode {
 
+using std::type_info;
 template<class T,class TArray> class ArrayBase;
 
 template<class TArray,class Enabler=void> struct CanonicalizeConstArray{typedef TArray type;};
@@ -47,6 +48,9 @@ template<class TArray> struct SameArrayCanonical<TArray,TArray> { static bool sa
 }};
 
 template<class TA1,class TA2> struct SameArray : public SameArrayCanonical<typename CanonicalizeConstArray<TA1>::type,typename CanonicalizeConstArray<TA2>::type>{};
+
+// Throw IndexError with nice formatting.  Defined in Array.cpp
+GEODE_CORE_EXPORT void GEODE_NORETURN(out_of_bounds(const type_info& type, const int size, const int i)) GEODE_COLD;
 
 template<class T_,class TArray>
 class ArrayBase {
@@ -559,6 +563,14 @@ public:
   T_* end() const { // for stl
     return derived().data()+derived().size();
   }
+
+  T& at(const int i) const {
+    const TArray& self = derived();
+    const int m = self.size();
+    if (unsigned(i) >= unsigned(m))
+      out_of_bounds(typeid(T),m,i);
+    return self[i];
+  }
 };
 
 template<class T,class TArray> inline bool isnan(const ArrayBase<T,TArray>& a_) {
@@ -582,7 +594,7 @@ template<class T,int d> static inline bool isnan(const Array<T,d>& a) {
 }
 
 template<class T,class TArray1,class TArray2> inline typename ScalarPolicy<T>::type dot(const ArrayBase<T,TArray1>& a1_, const ArrayBase<T,TArray2>& a2_) {
-  typedef typename ScalarPolicy<T>::type Scalar;
+  typedef typename ScalarPolicy<typename boost::remove_const<T>::type>::type Scalar;
   const TArray1& a1 = a1_.derived();
   const TArray2& a2 = a2_.derived();
   assert(a1.size()==a2.size());

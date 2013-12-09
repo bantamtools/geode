@@ -71,7 +71,7 @@ Ref<PropBase> make_prop(const string& n, PyObject* value) {
     return new_<Prop<int>>(n,from_python<int>(value));
   if (PyFloat_Check(value))
     return new_<Prop<double>>(n,from_python<double>(value));
-  if (PyString_Check(value))
+  if (PyString_Check(value) || PyUnicode_Check(value))
     return new_<Prop<string>>(n,from_python<string>(value));
   if (PySequence_Check(value)) {
     if (PyArray_Check(value)) {
@@ -108,7 +108,7 @@ template<class T> PropClamp<T,true>::~PropClamp() {}
 
 template<class T> Prop<T>& PropClamp<T,true>::set_min(const PropRef<T> p, real alpha) {
   Prop<T>& self = this->self();
-  GEODE_ASSERT(p->name != self.name && !(p->prop_min && p->prop_min->x->name == self.name));
+  GEODE_ASSERT(p->name() != self.name() && !(p->prop_min && p->prop_min->x->name() == self.name()));
   prop_min.reset(new Tuple<PropRef<T>,Ref<Listen>,real>(p,listen(p,curry(&Self::minimize,this)),alpha));
   minimize();
   return self;
@@ -116,7 +116,7 @@ template<class T> Prop<T>& PropClamp<T,true>::set_min(const PropRef<T> p, real a
 
 template<class T> Prop<T>& PropClamp<T,true>::set_max(const PropRef<T> p, real alpha) {
   auto& self = this->self();
-  GEODE_ASSERT(p->name != self.name && !(p->prop_max && p->prop_max->x->name == self.name));
+  GEODE_ASSERT(p->name() != self.name() && !(p->prop_max && p->prop_max->x->name() == self.name()));
   prop_max.reset(new Tuple<PropRef<T>,Ref<Listen>,real>(p,listen(p,curry(&Self::maximize,this)),alpha));
   maximize();
   return self;

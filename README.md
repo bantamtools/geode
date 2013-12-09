@@ -13,7 +13,7 @@ For C++:
 
 * [boost >= 1.46](http://www.boost.org): Various C++ utility libraries (Boost Software License)
 * [scons >= 2.0](http://www.scons.org): A build system (MIT license)
-* [gmp >= 5.0](http://gmplib.org): Arbitrary precision arithmetic (LGPL)
+* [gmp >= 4.0](http://gmplib.org): Arbitrary precision arithmetic (LGPL)
 * [cblas](http://www.netlib.org/blas/blast-forum/cblas.tgz): C wrappers for BLAS (BSD license)
 
 For Python:
@@ -54,10 +54,9 @@ If necessary, dependencies can be installed via one of
     sudo port -v install py26-scipy py26-py libpng libjpeg openexr # optional
     sudo port -v install gcc47 # If clang is unavailable
 
-
 Geode can then be installed from source via
 
-    git clone https//github.com/otherlab/geode.git
+    git clone https://github.com/otherlab/geode.git
     cd geode
 
     # Install c++ headers and libraries to /usr/local

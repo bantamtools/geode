@@ -7,18 +7,18 @@
 #include <stdio.h>
 namespace geode {
 
-template<class T> class ConstValue:public Value<T>
+template<class T> class ConstValue: public Value<T>
 {
 public:
   GEODE_NEW_FRIEND
   typedef Value<T> Base;
 private:
-  ConstValue(const T& value) {
+  ConstValue(const T& value, const string &name = string()): Value<T>(name) {
     this->set_value(value);
   }
 
   void update() const {
-    GEODE_FATAL_ERROR(); // We never go invalid, so this never be called
+    GEODE_FATAL_ERROR(); // We never go invalid, so this should never be called
   }
 
   void dump(int indent) const {
@@ -30,8 +30,8 @@ private:
   }
 };
 
-template<class T> ValueRef<T> const_value(const T& value) {
-  return ValueRef<T>(new_<ConstValue<T> >(value));
+template<class T> ValueRef<T> const_value(const T& value, const string &name = string()) {
+  return ValueRef<T>(new_<ConstValue<T> >(value, name));
 }
 
 }

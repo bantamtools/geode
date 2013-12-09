@@ -45,7 +45,7 @@ template<class TArray> struct IsShareableArray<const TArray>:public IsShareableA
 // Array<T> is shareable
 template<class T> struct IsShareableArray<Array<T>>:public mpl::true_{};
 
-// this cannot be GEODE_CORE_EXPORT, since it's defined as a template in headers
+// This cannot be GEODE_CORE_EXPORT, since it's defined as a template in headers
 template<class T,int d> PyObject* to_python(const Array<T,d>& array);
 template<class T,int d> struct FromPython<Array<T,d>>{static Array<T,d> convert(PyObject* object);};
 template<class T,int d> struct has_to_python<Array<T,d>> : public has_to_python<T> {};
@@ -479,8 +479,8 @@ template<class T,int d>   static inline const RawArray<T>       asarray(Vector<T
 template<class T,int d>   static inline const RawArray<const T> asarray(const Vector<T,d>& v)      { return RawArray<const T>(d,v.begin()); }
 template<class T>         static inline const RawArray<T>&      asarray(const RawArray<T>& v)      { return v; }
 template<class T>         static inline const RawArray<T>       asarray(const Array<T>& v)         { return v; }
-template<class T,class A> static inline const RawArray<T>       asarray(std::vector<T,A>& v)       { return RawArray<T>(v.size(),&v[0]); }
-template<class T,class A> static inline const RawArray<const T> asarray(const std::vector<T,A>& v) { return RawArray<const T>(v.size(),&v[0]); }
+template<class T,class A> static inline const RawArray<T>       asarray(std::vector<T,A>& v)       { assert(v.size() <= std::numeric_limits<int>::max()); return RawArray<T>(int(v.size()),&v[0]); }
+template<class T,class A> static inline const RawArray<const T> asarray(const std::vector<T,A>& v) { assert(v.size() <= std::numeric_limits<int>::max()); return RawArray<const T>(int(v.size()),&v[0]); }
 template<class T,class A> static inline const A&                asarray(const ArrayBase<T,A>& v)   { return v.derived(); }
 
 template<class T,int d>   static inline const RawArray<const T> asconstarray(T (&v)[d])                 { return RawArray<const T>(d,v); }

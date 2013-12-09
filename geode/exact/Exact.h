@@ -1,6 +1,10 @@
 // Multiprecision integer arithmetic for exact geometric predicates
 #pragma once
 
+#ifndef GEODE_GMP
+#error geode/exact requires gmp support: recompile with use_gmp=1 or check config.log for gmp errors
+#endif
+
 #include <geode/exact/config.h>
 #include <geode/array/RawArray.h>
 #include <geode/math/One.h>
@@ -10,8 +14,17 @@
 #include <gmp.h>
 namespace geode {
 
-struct Uninit {};
-static const Uninit uninit = Uninit();
+// If we have gmp 4, set up some compatibility routines
+#if __GNU_MP__ < 5
+static inline void mpn_neg(mp_limb_t* rp, const mp_limb_t* sp, mp_size_t n) {
+  mpn_sub_1(rp,sp,n,1);
+  for (int i=0;i<int(n);i++)
+    rp[i] = ~rp[i];
+}
+static inline void mpn_sqr(mp_limb_t* rp, const mp_limb_t* sp, mp_size_t n) {
+  mpn_mul_n(rp,sp,sp,n);
+}
+#endif
 
 // A fixed width 2's complement integer compatible with GMP's low level interface.
 // See http://gmplib.org/manual/Low_002dlevel-Functions.html#Low_002dlevel-Functions.

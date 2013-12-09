@@ -12,6 +12,7 @@ namespace geode {
 struct Hasher;
 template<class T> class Ptr;
 template<class T> class Ref;
+template<class I,class Enable=void> struct Range;
 
 // Convenience struct for marking that function semantics have changed
 struct Mark {};
@@ -53,6 +54,10 @@ struct null {
     return boost::shared_ptr<T>();
   }
 };
+
+// Marker for special uninitialized constructors
+struct Uninit {};
+static const Uninit uninit = Uninit();
 
 // GEODE_REMOVE_PARENS((a,b,c)) = a,b,c
 #define GEODE_REMOVE_PARENS_HELPER(...) __VA_ARGS__

@@ -21,7 +21,8 @@ from .Matrix import Matrix
 geode_wrap._set_matrix_type(Matrix)
 
 # Rename some numpy functions to be more like C++
-from numpy import (square as sqr, arctan2 as atan2, arcsin as asin, arccos as acos, arctan as atan)
+from numpy import (square as sqr, arctan2 as atan2, arcsin as asin, arccos as acos, arctan as atan,
+                   arcsinh as asinh, arccosh as acosh, arctanh as atanh)
 from numpy.linalg import norm as magnitude
 
 SolidMatrix = {2:SolidMatrix2d,3:SolidMatrix3d}
@@ -63,8 +64,8 @@ def axis_vector(axis,d=3,dtype=real):
 def magnitudes_and_normalized(v):
   "returns magnitudes(v),normalized(v), but doesn't compute magnitudes twice"
   mags = magnitudes(v)
-  result = v/mags[...,newaxis]
   zeros = mags==0
+  result = v/(mags+zeros)[...,None]
   if any(zeros):
     fallback = axis_vector(0,v.shape[-1])
     if isinstance(zeros,ndarray):
