@@ -141,7 +141,7 @@ public:
 
   Vector<int,2> index(const int i) const {
     int x = i/n;
-    return vec(x, i-x);
+    return vec(x, i-x*n);
   }
 
   T& operator[](const Vector<int,d>& index) const {
@@ -206,6 +206,10 @@ public:
 
   RawArray<T,3> reshape(int m_new, int n_new, int mn_new) const {
     return flat.reshape(m_new,n_new,mn_new);
+  }
+
+  const Array<T,1>& reshape_own(int m_new) const {
+    return flat.reshape_own(m_new);
   }
 
   const Array<T,2> reshape_own(int m_new,int n_new) const {

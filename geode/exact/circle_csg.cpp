@@ -122,7 +122,7 @@ Nested<ExactCircleArc> exact_split_circle_arcs(Nested<const ExactCircleArc> unpr
     const auto contour = unpruned[p];
 
     // This assert checks for contours that are a single repeated point
-    // prune_small_contours will removing these, but they shouldn't be generated in the first place.
+    // prune_small_contours will remove these, but they shouldn't be generated in the first place.
     assert(!(contour.size()==2 && contour[0].left!=contour[1].left));
 
     for (const auto& arc : contour)
@@ -223,7 +223,7 @@ Nested<ExactCircleArc> exact_split_circle_arcs(Nested<const ExactCircleArc> unpr
           }
         };
         const Vertex sort_start = is_full_circle ? other[0].reverse() : vertices[i]; // For a full circle use an arbitrary vertex for the start
-        sort(other.slice(0 + is_full_circle, other.size()), PairOrder(arcs,sort_start));
+        sort(other.slice(is_full_circle,other.size()),PairOrder(arcs,sort_start));
       }
     }
 
@@ -253,7 +253,7 @@ Nested<ExactCircleArc> exact_split_circle_arcs(Nested<const ExactCircleArc> unpr
       Depth(const BoxTree<EV2>& tree, Next next, Arcs arcs, Vertices vertices, const HorizontalVertex start)
         : tree(tree), next(next), arcs(arcs), vertices(vertices)
         , start(start)
-        , start_xmin(ceil(-start.x.nlo)) // Safe to round up since we'll be comparing against conservative integer boxes
+        , start_xmin(ceil(start.x.box().min)) // Safe to round up since we'll be comparing against conservative integer boxes
         // If we intersect no other arcs, the depth depends on the orientation of direction = (1,0) relative to the starting arc
         , depth(local_horizontal_depth(arcs,start)) {}
 
@@ -374,7 +374,7 @@ static bool tweak_arcs_to_intersect(RawArray<ExactCircleArc> arcs, const int i, 
   // Conservatively check if circles might be too far apart to intersect (i.e. ri+rj <= dc)
   if(!certainly_less(dc_interval,Interval(ri)+Interval(rj))) {
     const auto d_interval = (dc_interval-Interval(ri)-Interval(rj))*Interval(.5);
-    const auto d = Quantized(floor(d_interval.hi + 1)); // Quantize up
+    const auto d = Quantized(floor(d_interval.box().max + 1)); // Quantize up
     ri += d;
     rj += d;
     changed = true;
@@ -382,7 +382,7 @@ static bool tweak_arcs_to_intersect(RawArray<ExactCircleArc> arcs, const int i, 
   // Conservatively check if inner circle is too small to intersect (i.e. abs(ri-rj) >= dc)
   if(!certainly_less(Interval(abs(ri-rj)),dc_interval)) {
     Quantized& small_r = ri<rj?ri:rj; // We will grow the smaller radius
-    small_r = max(ri,rj)-Quantized(ceil(-dc_interval.nlo-1));
+    small_r = max(ri,rj)-Quantized(ceil(dc_interval.box().min-1));
     changed = true;
   }
 
@@ -447,8 +447,8 @@ static Tuple<Quantized, Vector<Quantized,2>> construct_circle_radius_and_center(
 
 #if CHECK_CONSTRUCTIONS
   // Check that min_r correctly computed
-  GEODE_ASSERT(!is_negative(small_mul(4,sqr(min_r)) - d_sqr));
-  GEODE_ASSERT((min_r == min_valid_r) || is_negative(small_mul(4,sqr(min_r - Exact<1>(1))) - d_sqr)); // Check that we are at min_r or subtracting 1 gives in imaginary root
+  GEODE_ASSERT(!is_negative(sqr(min_r<<1) - d_sqr));
+  GEODE_ASSERT((min_r == min_valid_r) || is_negative(sqr((min_r<<1) - Exact<1>(2)) - d_sqr)); // Check that we are at min_r or subtracting 1 gives in imaginary root
 #endif
 
   const Quantized qr = round(magnitude(.25*abs(q+1/q)*(x0-x1)));
@@ -459,9 +459,9 @@ static Tuple<Quantized, Vector<Quantized,2>> construct_circle_radius_and_center(
   const Vector<Quantized,2> midpoint = snap_div(ex0 + ex1, Exact<1>(2), false);
 
   assert(is_nonzero(d_sqr));
-  const Exact<2> c_root_num = small_mul(4,sqr(r)) - d_sqr;
+  const Exact<2> c_root_num = sqr(r<<1) - d_sqr;
   assert(!is_negative(c_root_num));
-  const Exact<2> c_root_denom = small_mul(4, d_sqr);
+  const Exact<2> c_root_denom = d_sqr<<2;
   const auto ortho = delta.orthogonal_vector();
 
   const Vector<Quantized,2> h = ((q>0)^(abs(q)>1)?1:-1)*Vector<Quantized, 2>(sign(ortho))*snap_div(emul(c_root_num,esqr(ortho)), c_root_denom, true);

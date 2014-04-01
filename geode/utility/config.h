@@ -16,6 +16,17 @@ typedef double real;
 #endif
 }
 
+#ifdef __clang__
+#define GEODE_CLANG_ONLY(...) __VA_ARGS__
+#define GEODE_CLANG_VERSION_GE(major,minor) \
+  (   !defined(CLANG_VERSION_MAJOR) \
+   || (    CLANG_VERSION_MAJOR>(major) \
+       || (CLANG_VERSION_MAJOR==(major) && CLANG_VERSION_MINOR>=(minor))))
+#else
+#define GEODE_CLANG_ONLY(...)
+#define GEODE_CLANG_VERSION_GE(major,minor) false
+#endif
+
 #define GEODE_NO_EXPORT // For documentation purposes
 
 #ifndef _WIN32
@@ -64,8 +75,10 @@ typedef double real;
 
 #ifdef __clang__
 #  define GEODE_HAS_FEATURE(feature) __has_feature(feature)
+#  define GEODE_HAS_INCLUDE __has_include
 #else
 #  define GEODE_HAS_FEATURE(feature) false
+#  define GEODE_HAS_INCLUDE(header) false
 #endif
 
 #if !defined(__clang__) || GEODE_HAS_FEATURE(cxx_noexcept)

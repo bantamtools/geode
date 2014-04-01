@@ -18,5 +18,13 @@ GEODE_CORE_EXPORT string repr(PyObject* x);
 GEODE_CORE_EXPORT string repr(const float x);
 GEODE_CORE_EXPORT string repr(const double x);
 GEODE_CORE_EXPORT string repr(const long double x);
+GEODE_CORE_EXPORT string repr(const string& s);
+GEODE_CORE_EXPORT string repr(const char* s);
+
+// Make repr work on nonconst char arrays
+static inline string repr(char s[]) {
+  const char* p = s;
+  return repr(p);
+}
 
 }

@@ -11,12 +11,15 @@
 #include <geode/array/Array.h>
 #include <geode/math/hash.h>
 #include <geode/math/integer_log.h>
+#include <geode/python/Ptr.h>
+#include <geode/structure/Tuple.h>
 #include <geode/utility/type_traits.h>
 #include <boost/aligned_storage.hpp>
 #include <vector>
 namespace geode {
 
 using std::vector;
+using std::ostream;
 template<class TK,class T> struct HashtableIter;
 template<class TK,class T> class Hashtable;
 
@@ -90,6 +93,10 @@ public:
 
   Hashtable(const int estimated_max_size=5) {
     initialize_new_table(estimated_max_size);
+  }
+
+  Hashtable(const Tuple<>&) { // Allow conversion from empty tuples
+    initialize_new_table(5);
   }
 
   ~Hashtable() {}
@@ -338,10 +345,36 @@ struct HashtableIter {
   }
 };
 
+template<class K> ostream& operator<<(ostream& output, const Hashtable<K>& h) {
+  output << "set([";
+  bool first = true;
+  for (const auto& v : h) {
+    if (first) first = false;
+    else output << ',';
+    output << v;
+  }
+  return output << "])";
+}
+
+template<class K,class V> ostream& operator<<(ostream& output, const Hashtable<K,V>& h) {
+  output << '{';
+  bool first = true;
+  for (const auto& v : h) {
+    if (first) first = false;
+    else output << ',';
+    output << v.key() << ':' << v.data();
+  }
+  return output << '}';
+}
+
 // Python conversion
 #ifdef GEODE_PYTHON
 template<class K> struct has_to_python<Hashtable<K>> : public has_to_python<K> {};
-template<class K,class V> struct has_to_python<Hashtable<K,V>> : public mpl::and_<has_to_python<K>,has_to_python<V>> {};
+template<class K> struct has_from_python<Hashtable<K>> : public has_from_python<K> {};
+template<class K,class V> struct has_to_python<Hashtable<K,V>>
+  : public mpl::and_<has_to_python<K>,has_to_python<V>> {};
+template<class K,class V> struct has_from_python<Hashtable<K,V>>
+  : public mpl::and_<has_from_python<K>,has_from_python<V>> {};
 
 template<class K> PyObject* to_python(const Hashtable<K>& h) {
   return to_python_set(h);
@@ -368,6 +401,29 @@ fail:
   Py_XDECREF(dict);
   return 0;
 }
+
+template<class K> struct FromPython<Hashtable<K>> { static Hashtable<K> convert(PyObject* object) {
+  Hashtable<K> result;
+  const auto it = steal_ref_check(PyObject_GetIter(object));
+  while (auto item = steal_ptr(PyIter_Next(&*it)))
+    result.set(from_python<K>(item.get()));
+  if (PyErr_Occurred())
+    throw_python_error();
+  return result;
+}};
+
+template<class K,class V> struct FromPython<Hashtable<K,V>> { static Hashtable<K,V> convert(PyObject* object) {
+  Hashtable<K,V> result;
+  const auto it = steal_ref_check(PyObject_GetIter(&*steal_ref_check(PyDict_Items(object))));
+  while (auto item = steal_ptr(PyIter_Next(&*it))) {
+    const auto kv = from_python<Tuple<K,V>>(&*item);
+    result.set(kv.x,kv.y);
+  }
+  if (PyErr_Occurred())
+    throw_python_error();
+  return result;
+}};
+
 #endif
 
 }
