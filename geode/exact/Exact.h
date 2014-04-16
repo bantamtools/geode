@@ -66,7 +66,7 @@ template<int d> struct Exact {
   template<int smaller_d> explicit Exact(const Exact<smaller_d>& rhs) {
     static_assert(d > smaller_d, "Can only assign if increasing precision"); // should fall back to default operator for a == b
     memcpy(n,&rhs.n,sizeof(rhs.n));
-    memset(n + smaller_d, 0, (d - smaller_d)*sizeof(n[0]));
+    memset(n + smaller_d, is_negative(rhs) ? 0xFF : 0, (d - smaller_d)*sizeof(n[0]));
   }
 };
 
@@ -297,5 +297,7 @@ template<class T> static inline T operator*(const T& x, const SmallShift s) {
 
 RawArray<mp_limb_t> trim(RawArray<mp_limb_t> x);
 RawArray<const mp_limb_t> trim(RawArray<const mp_limb_t> x);
+
+template<int d> Exact<d> abs(Exact<d> e) { return is_negative(e) ? -e : e; }
 
 }
