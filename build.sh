@@ -5,7 +5,8 @@ if [ "$1" = "clean" ] || [ "$1" = "distclean" ]; then
 else
   for type in debug release; do
     scons -j7 prefix='#build/$arch/$type' arch='nocona' install=0 $lib_setup_args \
-      openmesh_libpath='#/../OpenMesh-2.0/build/Build/lib/OpenMesh' openmesh_include='#/../OpenMesh-2.0/src' \
-      gmp_linkflags='../gmp/.libs/libgmp.dylib' gmp_include='#/../gmp' gmp_libpath='' gmp_publiclibs='' type=$type
+      openmesh_libpath='' openmesh_publiclibs='' openmesh_include='#/../OpenMesh-2.0/src' openmesh_linkflags='../OpenMesh-2.0/build/Build/lib/OpenMesh/libOpenMeshCore.dylib ../OpenMesh-2.0/build/Build/lib/OpenMesh/libOpenMeshTools.dylib' \
+      gmp_linkflags='../gmp/.libs/libgmp.dylib' gmp_include='#/../gmp' gmp_libpath='' gmp_publiclibs='' \
+      type=$type
   done
 fi
