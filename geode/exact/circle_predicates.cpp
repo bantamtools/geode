@@ -432,7 +432,8 @@ template<bool add> bool circle_intersections_upwards(Arcs arcs, const Vertex a, 
                         : rightwards(aspoint_center(arcs,a.i0),aspoint_center(arcs,a.i1)) ^ a.left
                   : perturbed_upwards<add>(a.left^add?-1:1,b.left?1:-1,aspoint(arcs,a.i0),aspoint(arcs,a.i1),aspoint(arcs,b.i1)));
 }
-
+template bool circle_intersections_upwards<false>(Arcs arcs, const Vertex a, const Vertex b);
+template bool circle_intersections_upwards<true>(Arcs arcs, const Vertex a, const Vertex b);
 // Are the intersections of two circles with a third counterclockwise?  In other words, is the triangle c0,x01,x02 positively oriented?
 // The two intersections are assumed to exist.
 static bool circle_intersections_ccw_helper(Arcs arcs, const Vertex v0, const Vertex v1) {
