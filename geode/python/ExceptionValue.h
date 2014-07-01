@@ -10,12 +10,9 @@
 //#####################################################################
 #pragma once
 
-#include <geode/utility/config.h>
-#include <geode/utility/safe_bool.h>
-#include <boost/shared_ptr.hpp>
+#include <geode/utility/smart_ptr.h>
 namespace geode {
 
-using boost::shared_ptr;
 class SavedExceptionBase;
 
 class ExceptionValue {
@@ -28,8 +25,8 @@ public:
 
   GEODE_CORE_EXPORT void throw_() const;
 
-  operator SafeBool<Self>::type() const { // Allow conversion to bool without allowing conversion to T
-    return safe_bool<Self>(error);
+  explicit operator bool() const {
+    return bool(error);
   }
 };
 

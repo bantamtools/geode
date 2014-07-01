@@ -13,7 +13,6 @@
 #include <geode/math/sse.h>
 #include <geode/python/repr.h>
 #include <geode/utility/rounding.h>
-#include <boost/detail/endian.hpp>
 namespace geode {
 
 struct Interval;
@@ -137,13 +136,6 @@ static inline bool certainly_opposite_sign(const Interval a, const Interval b) {
 
 static inline bool certainly_less(const Interval a, const Interval b) {
   return a.hi < -b.nlo;
-}
-
-// +-1 if the interval is definitely nonzero, otherwise zero
-static inline int weak_sign(const Interval x) {
-  return certainly_positive(x) ?  1
-       : certainly_negative(x) ? -1
-                               :  0;
 }
 
 static inline Interval min(const Interval& a, const Interval& b) {
@@ -301,20 +293,12 @@ static inline ostream& operator<<(ostream& output, const Interval x) {
   return output << c << "+-" << x.hi-c;
 }
 
-// Are all intervals in a vector smaller than threshold?
+// Are all intervals in a vector strictly smaller than threshold?
 template<int m> static inline bool small(const Vector<Interval,m>& xs, const double threshold) {
   for (auto& x : xs)
     if (x.nlo+x.hi >= threshold)
       return false;
   return true;
-}
-
-// Snap an interval vector to integers, rounding to the best integer guess
-template<int m> static inline Vector<Quantized,m> snap(const Vector<Interval,m>& xs) {
-  Vector<Quantized,m> r;
-  for (int i=0;i<m;i++)
-    r[i] = Quantized(round(xs[i].center()));
-  return r;
 }
 
 // Conservatively expand an integer to an integer box
@@ -423,9 +407,9 @@ struct Interval {
   }
 
   Box<double> box() const {
-#if defined(BOOST_LITTLE_ENDIAN)
+#if GEODE_ENDIAN == GEODE_LITTLE_ENDIAN
     union { __m128d s; struct { double nlo,hi; } d; } u;
-#elif defined(BOOST_BIG_ENDIAN)
+#elif GEODE_ENDIAN == GEODE_BIG_ENDIAN
     union { __m128d s; struct { double hi,nlo; } d; } u;
 #endif
     u.s = s;
@@ -456,13 +440,6 @@ static inline bool certainly_opposite_sign(const Interval a, const Interval b) {
 static inline bool certainly_less(const Interval a, const Interval b) {
   // a.hi < -b.nlo
   return _mm_movemask_epi8(_mm_castpd_si128(_mm_cmplt_pd(_mm_shuffle_pd(a.s,a.s,1),-b.s))) & 1;
-}
-
-// +-1 if the interval is definitely nonzero, otherwise zero
-static inline int weak_sign(const Interval x) {
-  return certainly_positive(x) ?  1
-       : certainly_negative(x) ? -1
-                               :  0;
 }
 
 static inline Interval min(const Interval a, const Interval b) {
@@ -577,14 +554,6 @@ template<int m> static inline bool small(const Vector<Interval,m>& xs, const dou
   return !_mm_movemask_epi8(bad);
 }
 
-// Snap an interval vector to integers, rounding to the best integer guess
-template<int m> static inline Vector<Quantized,m> snap(const Vector<Interval,m>& xs) {
-  Vector<Quantized,m> r;
-  for (int i=0;i<m;i++)
-    r[i] = Quantized(round(xs[i].center()));
-  return r;
-}
-
 // Conservatively expand an integer to an integer box
 template<int m> static inline Box<Vector<Quantized,m>> snap_box(const Vector<Interval,m>& xs) {
   Box<Vector<Quantized,m>> box;
@@ -614,5 +583,32 @@ static inline Interval abs(const Interval x) {
 }
 
 #endif // GEODE_INTERVAL_SSE
+
+// +-1 if the interval is definitely nonzero, otherwise zero
+static inline int weak_sign(const Interval x) {
+  return certainly_positive(x) ?  1
+       : certainly_negative(x) ? -1
+                               :  0;
+}
+
+static inline bool overlap(const Interval x, const Interval y) {
+  return !(certainly_less(x,y) || certainly_less(y,x));
+}
+
+// The center of an interval vector
+template<int m> static inline Vector<double,m> center(const Vector<Interval,m>& xs) {
+  Vector<double,m> c;
+  for (int i=0;i<m;i++)
+    c[i] = xs[i].center();
+  return c;
+}
+
+// Snap an interval vector to integers, rounding to the best integer guess
+template<int m> static inline Vector<Quantized,m> snap(const Vector<Interval,m>& xs) {
+  Vector<Quantized,m> r;
+  for (int i=0;i<m;i++)
+    r[i] = Quantized(round(xs[i].center()));
+  return r;
+}
 
 } // namespace geode

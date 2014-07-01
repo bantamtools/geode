@@ -8,7 +8,6 @@
 #include <geode/structure/Hashtable.h>
 #include <geode/utility/Log.h>
 #include <geode/vector/convert.h>
-#include <boost/dynamic_bitset.hpp>
 namespace geode {
 
 using Log::cout;
@@ -132,8 +131,7 @@ FaceId HalfedgeMesh::add_face(const Vector<VertexId,3> v) {
   // Create missing edges
   const int new_edges = 2*(3-e0.valid()-e1.valid()-e2.valid());
   if (new_edges) {
-    int e_next = halfedges_.size();
-    halfedges_.flat.resize(e_next+new_edges,false);
+    int e_next = halfedges_.flat.extend(new_edges,uninit);
     #define ENSURE_EDGE(e,ep,en,vs,vd,ep_always,en_always) \
       if (!e.valid()) { \
         e = HalfedgeId(e_next++); \
@@ -197,10 +195,8 @@ void HalfedgeMesh::split_face(const FaceId f, const VertexId c) {
   GEODE_ASSERT(isolated(c));
   const auto e = halfedges(f);
   const auto v = vertices(f);
-  const int f_base = face_to_edge_.size();
-  const int e_base = halfedges_.size();
-  face_to_edge_.flat.resize(f_base+2,false);
-  halfedges_.flat.resize(e_base+6,false);
+  const int f_base = face_to_edge_.flat.extend(2,uninit);
+  const int e_base = halfedges_.flat.extend(6,uninit);
   const FaceId f0 = f,
                f1(f_base),
                f2(f_base+1);
@@ -261,7 +257,7 @@ void HalfedgeMesh::permute_vertices(RawArray<const int> permutation, bool check)
   GEODE_ASSERT(n_vertices()==vertex_to_edge_.size()); // Require no erased vertices
 
   // Permute vertex_to_edge_ out of place
-  Array<HalfedgeId> new_vertex_to_edge(vertex_to_edge_.size(),false);
+  Array<HalfedgeId> new_vertex_to_edge(vertex_to_edge_.size(),uninit);
   if (check) {
     new_vertex_to_edge.fill(HalfedgeId(erased_id));
     for (const auto v : vertices()) {
@@ -280,7 +276,7 @@ void HalfedgeMesh::permute_vertices(RawArray<const int> permutation, bool check)
     e.src = VertexId(permutation[e.src.id]);
 }
 
-void HalfedgeMesh::assert_consistent() const {
+void HalfedgeMesh::assert_consistent(bool check_double_halfedges) const {
   // Check that all indices are in their valid ranges, that bidirectional links match, and a few other properties.
   GEODE_ASSERT(!(n_halfedges()&1));
   for (const auto v : vertices()) {
@@ -314,7 +310,7 @@ void HalfedgeMesh::assert_consistent() const {
   }
 
   // Check that no two halfedges share the same vertices
-  {
+  if (check_double_halfedges) {
     Hashtable<Vector<VertexId,2>> pairs;
     for (const auto e : halfedges())
       GEODE_ASSERT(pairs.set(vertices(e)));
@@ -337,7 +333,7 @@ void HalfedgeMesh::assert_consistent() const {
 }
 
 Array<Vector<int,3>> HalfedgeMesh::elements() const {
-  Array<Vector<int,3>> tris(n_faces(),false);
+  Array<Vector<int,3>> tris(n_faces(),uninit);
   for (const auto f : faces())
     tris[f.idx()] = Vector<int,3>(vertices(f));
   return tris;
@@ -380,7 +376,7 @@ int HalfedgeMesh::degree(VertexId v) const {
 
 Nested<HalfedgeId> HalfedgeMesh::boundary_loops() const {
   Nested<HalfedgeId> loops;
-  boost::dynamic_bitset<> seen(n_halfedges());
+  vector<bool> seen(n_halfedges());
   for (const auto start : halfedges())
     if (is_boundary(start) && !seen[start.idx()]) {
       auto e = start;

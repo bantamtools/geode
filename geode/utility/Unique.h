@@ -1,9 +1,11 @@
 #pragma once
 
 #include <geode/utility/move.h>
-#include <geode/utility/safe_bool.h>
 #include <algorithm>
 namespace geode {
+
+template<class T> class Unique;
+template<class T> struct is_smart_pointer<Unique<T>> : public mpl::true_ {};
 
 // Doesn't support custom deleter
 
@@ -77,8 +79,8 @@ public:
     }
   }
 
-  operator typename SafeBool<Unique>::type() const {
-    return safe_bool<Unique>(self);
+  explicit operator bool() const {
+    return bool(self);
   }
 
   Unique(const Unique& rhs) = delete;

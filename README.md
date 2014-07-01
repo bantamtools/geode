@@ -11,10 +11,10 @@ For questions or discussion, email geode-dev@googlegroups.com.
 
 For C++:
 
-* [boost >= 1.46](http://www.boost.org): Various C++ utility libraries (Boost Software License)
 * [scons >= 2.0](http://www.scons.org): A build system (MIT license)
 * [gmp >= 4.0](http://gmplib.org): Arbitrary precision arithmetic (LGPL)
 * [cblas](http://www.netlib.org/blas/blast-forum/cblas.tgz): C wrappers for BLAS (BSD license)
+* [boost >= 1.46](http://www.boost.org): Not needed if a C++11 standard library exists (Boost Software License)
 
 For Python:
 
@@ -31,23 +31,28 @@ Optional dependencies (see below for how to disable these):
 * [libjpeg](http://www.ijg.org): Lossy image format (Custom noncopyleft license)
 * [openmesh](http://www.openmesh.org): Halfedge triangle mesh data structure (LGPL)
 
-Geode makes extensive use of C++11 features, so a relatively recent C++ compiler is necessary.  So far the code has been tested on
+Geode makes extensive use of C++11 features, so a relatively recent C++ compiler is necessary.
+So far the code has been tested on
 
-* [gcc 4.6](http://gcc.gnu.org)
 * [gcc 4.7](http://gcc.gnu.org)
+* [gcc 4.8](http://gcc.gnu.org)
 * [clang 3.1](http://clang.llvm.org)
 * [clang 3.2](http://clang.llvm.org)
+* [clang 3.3](http://clang.llvm.org)
+* [clang 3.4](http://clang.llvm.org)
+* [clang 3.5](http://clang.llvm.org)
 
 ### Installation
 
 If necessary, dependencies can be installed via one of
 
     # Debian/Ubuntu
-    sudo apt-get install python python-numpy scons libboost-dev libgmp-dev
+    sudo apt-get install python python-numpy scons libgmp-dev
     sudo apt-get install python-scipy python-pytest libpng-dev libjpeg-dev libopenexr-dev # optional
 
     # Homebrew (recommended)
-    brew install scons boost openexr gfortran python
+    brew install scons openexr gfortran python
+    brew install boost # Not needed for 10.9 or later
     sudo pip install --upgrade pip setuptools numpy scipy pytest
 
     # MacPorts (not recommended).  If you have python 2.7, replace py26 with py27.

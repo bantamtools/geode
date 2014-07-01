@@ -152,7 +152,7 @@ protected:
   GEODE_CORE_EXPORT Array<int> internal_collect_boundary_garbage();
 
   GEODE_CORE_EXPORT TriangleTopology();
-  GEODE_CORE_EXPORT TriangleTopology(const TriangleTopology& mesh, bool copy = false);
+  GEODE_CORE_EXPORT TriangleTopology(const TriangleTopology& mesh, const bool copy=false);
   GEODE_CORE_EXPORT explicit TriangleTopology(TriangleSoup const &soup);
   GEODE_CORE_EXPORT explicit TriangleTopology(RawArray<const Vector<int,3>> faces);
 
@@ -181,6 +181,7 @@ public:
   inline VertexId   src     (HalfedgeId e)         const;
   inline VertexId   dst     (HalfedgeId e)         const;
   inline FaceId     face    (HalfedgeId e)         const;
+  inline int        face_index(HalfedgeId e)       const; // halfedge(face(he), face_index(he)) == he
   inline VertexId   vertex  (FaceId f, int i=0)    const;
   inline HalfedgeId halfedge(FaceId f, int i=0)    const;
   inline HalfedgeId left    (HalfedgeId e)         const;
@@ -249,11 +250,15 @@ public:
   // Compute the edge degree of a vertex in O(degree) time.
   GEODE_CORE_EXPORT int degree(VertexId v) const;
 
+  // Compute edge-connected components around a boundary vertex, optionally
+  // ignoring a set of edges (given as halfedges outgoing from v)
+  GEODE_CORE_EXPORT Nested<FaceId> surface_components(VertexId v) const;
+
   // Compute all boundary loops
-  Nested<HalfedgeId> boundary_loops() const;
+  GEODE_CORE_EXPORT Nested<HalfedgeId> boundary_loops() const;
 
   // Compute the Euler characteristic.
-  int chi() const {
+  inline int chi() const {
     return n_vertices()-n_edges()+n_faces();
   }
 
@@ -261,7 +266,7 @@ public:
   GEODE_CORE_EXPORT bool is_flip_safe(HalfedgeId e) const;
 
   // Run an expensive internal consistency check.  Safe to call even if the structure arrays are random noise.
-  GEODE_CORE_EXPORT void assert_consistent() const;
+  GEODE_CORE_EXPORT void assert_consistent(bool check_for_double_halfedges=true) const;
 
   // Print internal structure to Log::cout.  Safe to call even if the structure arrays are random noise.
   GEODE_CORE_EXPORT void dump_internals() const;
@@ -376,7 +381,7 @@ public:
 
   // Field management
 #define FIELD_ACCESS_FUNCTIONS(prim, Id, size_expr) \
-  template<class T> FieldId<T,Id> add_field(Field<T,Id> &f, int id = invalid_id) { \
+  template<class T> FieldId<T,Id> add_field(Field<T,Id> const &f, int id = invalid_id) { \
     if (id == invalid_id) \
       id = next_field_id++; \
     else \
@@ -446,6 +451,9 @@ public:
   // Add a new isolated vertex and return its id.
   GEODE_CORE_EXPORT VertexId add_vertex();
 
+  // Copy a vertex (creating a new one) with all fields attached to it
+  GEODE_CORE_EXPORT VertexId copy_vertex(VertexId v);
+
   // Add n isolated vertices and return the first id (new ids are contiguous)
   GEODE_CORE_EXPORT VertexId add_vertices(int n);
 
@@ -468,8 +476,13 @@ public:
   // Returns the offsets of the other vertex, face, and boundary ids in the new arrays.
   GEODE_CORE_EXPORT Vector<int,3> add(MutableTriangleTopology const &other);
 
-  // split the halfedge h with a new vertex c, which splits the adjacent face
-  // into itself and a face nf. The halfedge h (for which now dst(.) == c), and
+  // Extract a set of faces into a new MutableTriangleTopology, which is returned,
+  // along with two fields (on the returned mesh) giving vertex and face correspondences.
+  // All fields are carried copied.
+  GEODE_CORE_EXPORT Tuple<Ref<MutableTriangleTopology>, Field<VertexId, VertexId>, Field<FaceId, FaceId>> extract(RawArray<FaceId> const &faces);
+
+  // Split the halfedge h with a new vertex c, which splits the adjacent face
+  // into itself and a face nf. The halfedge h (now with dst(h) == c) and
   // the halfedge in nf for which now src(.) == c are returned in a vector, and
   // still have to be connected to the outside world with unsafe_set_reverse.
   Vector<HalfedgeId,2> unsafe_split_halfedge(HalfedgeId h, FaceId nf, VertexId c);
@@ -492,10 +505,26 @@ public:
   // are newly initialized.
   GEODE_CORE_EXPORT void split_face(FaceId f, VertexId c);
 
+  // Split a non-manifold vertex into one vertex for each edge-connected surface
+  // components (optionally given edges to ignore when computing the surface
+  // components, given as halfedges outgoing from v).
+  // Returns the original vertex, and all new vertices created. The original
+  // vertex is the first vertex returned.
+  GEODE_CORE_EXPORT Array<VertexId> split_nonmanifold_vertex(VertexId v);
+
+  // split all nonmanifold boundary vertices. The first element of result[i] is
+  // the original vertex that was split, the others are the added vertices.
+  GEODE_CORE_EXPORT Nested<VertexId> split_nonmanifold_vertices();
+
+  // Make a hole (two connected boundaries) at he. The new reverse(he) is returned
+  // first. This may create non-manifold vertices, which must be treated separately.
+  GEODE_CORE_EXPORT Vector<HalfedgeId, 2> split_along_edge(HalfedgeId he);
+
   // Split a face into three by inserting a new vertex.
   GEODE_CORE_EXPORT VertexId split_edge(HalfedgeId e);
 
   // Split an edge by inserting an existing isolated vertex in the center.
+  // If h is not a boundary halfedge, dst(h) = c afterwards.
   GEODE_CORE_EXPORT void split_edge(HalfedgeId h, VertexId c);
 
   // Erase the given vertex. Erases all incident faces. If erase_isolated is true, also erase other vertices that are now isolated.
@@ -613,6 +642,10 @@ inline VertexId TriangleTopology::dst(HalfedgeId e) const {
 inline FaceId TriangleTopology::face(HalfedgeId e) const {
   assert(valid(e));
   return e.id>=0 ? FaceId(e.id/3) : FaceId();
+}
+inline int TriangleTopology::face_index(HalfedgeId e) const {
+  assert(valid(e));
+  return e.id>=0 ? e.id - e.id/3*3 : -1;
 }
 inline HalfedgeId TriangleTopology::left(HalfedgeId e)  const { return reverse(prev(e)); }
 inline HalfedgeId TriangleTopology::right(HalfedgeId e) const { return next(reverse(e)); }
@@ -757,7 +790,7 @@ template<class Id> struct TriangleTopologyIter {
   // prefix
   TriangleTopologyIter &operator++() {
     assert(i != end); // don't let them iterate past the end
-    do { 
+    do {
       i.id++;
     } while (i!=end && mesh.erased(i));
     return *this;

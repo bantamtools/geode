@@ -25,7 +25,6 @@
 #include <geode/vector/ScalarPolicy.h>
 #include <geode/utility/STATIC_ASSERT_SAME.h>
 #include <geode/utility/type_traits.h>
-#include <boost/mpl/identity.hpp>
 #include <iostream>
 #include <limits>
 namespace geode {
@@ -129,7 +128,7 @@ public:
 
 private:
   template<class S> struct ElementOf{typedef typename S::Element type;};
-  typedef typename mpl::if_<IsVector<T>,ElementOf<T>,mpl::identity<Unusable> >::type::type ElementOfT;
+  typedef typename mpl::if_<IsVector<T>,ElementOf<T>,First<Unusable> >::type::type ElementOfT;
   typedef typename mpl::if_<is_const<T_>,const ElementOfT,ElementOfT>::type TOfT;
 public:
 
@@ -150,7 +149,8 @@ public:
     return !(*this==v);
   }
 
-  template<class TArray1> const TArray& operator+=(const ArrayBase<T,TArray1>& v) const {
+  template<class T1,class TArray1> const TArray& operator+=(const ArrayBase<T1,TArray1>& v) const {
+    STATIC_ASSERT_SAME(T,typename TArray1::Element);
     const TArray& self = derived();
     int m = self.size();
     const TArray1& v_ = v.derived();
@@ -173,7 +173,8 @@ public:
     return self;
   }
 
-  template<class TArray1> const TArray& operator-=(const ArrayBase<T,TArray1>& v) const {
+  template<class T1,class TArray1> const TArray& operator-=(const ArrayBase<T1,TArray1>& v) const {
+    STATIC_ASSERT_SAME(T,typename TArray1::Element);
     const TArray& self = derived();
     int m = self.size();
     const TArray1& v_ = v.derived();
@@ -641,7 +642,7 @@ template<class T0,class T1,class TA0,class TA1> Array<typename remove_const<T0>:
   const auto& a1 = a1_.derived();
   const int m0 = a0.size(),
             m1 = a1.size();
-  Array<typename remove_const<T0>::type> result(m0+m1,false);
+  Array<typename remove_const<T0>::type> result(m0+m1,uninit);
   result.slice(0,m0) = a0;
   result.slice(m0,m0+m1) = a1;
   return result;

@@ -6,10 +6,7 @@
 #include <geode/array/Array.h>
 #include <geode/math/isnan.h>
 #include <geode/utility/type_traits.h>
-#include <boost/mpl/or.hpp>
 namespace geode {
-
-namespace mpl = boost::mpl;
 
 template<class T,class TArray>
 class ArrayNdBase {
@@ -20,10 +17,8 @@ public:
 
   Array<T> flat; // one-dimensional data storage
 
-  ArrayNdBase() {}
-
-  ArrayNdBase(int size, bool initialize)
-    : flat(size,initialize) {}
+  template<class... Args> ArrayNdBase(const Args&... args)
+    : flat(args...) {}
 
   TArray& derived() {
     return static_cast<TArray&>(*this);

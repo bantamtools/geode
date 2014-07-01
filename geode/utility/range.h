@@ -3,6 +3,7 @@
 #include <geode/utility/config.h>
 #include <geode/utility/forward.h>
 #include <geode/utility/type_traits.h>
+#include <geode/utility/validity.h>
 #include <cassert>
 
 #ifdef GEODE_PYTHON
@@ -13,10 +14,16 @@
 
 namespace geode {
 
-template<class Iter,class Enable> struct Range {
-  typedef decltype(*declval<Iter>()) Reference;
+GEODE_VALIDITY_CHECKER(has_subtract,T,declval<T>()-declval<T>())
 
-  const Iter lo, hi;
+template<class Iter,class Enable> struct Range {
+  typedef decltype(*declval<Iter>()) reference;
+  typedef typename mpl::if_<has_subtract<Iter>,Iter,int>::type sub;
+  typedef decltype(declval<sub>()-declval<sub>()) Size;
+
+  Iter lo, hi;
+
+  Range() {}
 
   Range(const Iter& lo, const Iter& hi)
     :lo(lo),hi(hi) {}
@@ -24,10 +31,11 @@ template<class Iter,class Enable> struct Range {
   const Iter& begin() const { return lo; }
   const Iter& end() const { return hi; }
 
-  Iter operator[](const size_t i) const { assert(i<hi-lo); return lo+i; }
+  Size size() const { return hi-lo; }
+  template<class I> reference operator[](const I i) const { assert(i<hi-lo); return *(lo+i); }
 
-  Reference front() const { assert(lo!=hi); return *lo; }
-  Reference back() const { assert(lo!=hi); return *(hi-1); }
+  reference front() const { assert(lo!=hi); return *lo; }
+  reference back() const { assert(lo!=hi); return *(hi-1); }
 };
 
 template<class I> struct Range<I,typename enable_if<is_integral<I>>::type> {
@@ -43,13 +51,14 @@ template<class I> struct Range<I,typename enable_if<is_integral<I>>::type> {
   };
 
   Range()
-    : lo(0), hi(0) {}
+    : lo(), hi() {}
 
-  Range(I lo, I hi)
+  Range(const I lo, const I hi)
     : lo(lo), hi(hi) {
     assert(lo<=hi);
   }
 
+  bool empty() const { return hi == lo; }
   I size() const { return hi-lo; }
 
   Iter begin() const { return Iter(lo); }

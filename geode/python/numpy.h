@@ -20,6 +20,7 @@
 #include <geode/array/Array.h>
 #include <geode/array/IndirectArray.h>
 #include <geode/python/exceptions.h>
+#include <geode/structure/Tuple.h>
 #include <geode/utility/const_cast.h>
 namespace geode {
 
@@ -31,7 +32,7 @@ GEODE_CORE_EXPORT void GEODE_NORETURN(throw_not_owned());
 GEODE_CORE_EXPORT void GEODE_NORETURN(throw_array_conversion_error(PyObject* object, int flags, int rank_range, PyArray_Descr* descr));
 GEODE_CORE_EXPORT void check_numpy_conversion(PyObject* object, int flags, int rank_range, PyArray_Descr* descr);
 #endif
-GEODE_CORE_EXPORT size_t fill_numpy_header(Array<uint8_t>& header, int rank, const npy_intp* dimensions, int type_num); // Returns total data size in bytes
+GEODE_CORE_EXPORT Tuple<Array<uint8_t>,size_t> fill_numpy_header(int rank, const npy_intp* dimensions, int type_num); // Returns total data size in bytes
 GEODE_CORE_EXPORT void write_numpy(const string& filename, int rank, const npy_intp* dimensions, int type_num, void* data);
 
 // Export wrappers around numpy api functions so that other libraries don't need the PY_ARRAY_UNIQUE_SYMBOL, which can't be portably exported.
@@ -163,12 +164,12 @@ numpy_info(const NdArray<T>& array, void*& data, npy_intp* dimensions) {
 // Numpy_Shape_Match: Check whether dynamic type can be resized to fit a given numpy array
 
 template<class T> typename enable_if<NumpyIsScalar<T>,bool>::type
-numpy_shape_match(mpl::identity<T>,int rank,const npy_intp* dimensions) {
+numpy_shape_match(Types<T>,int rank,const npy_intp* dimensions) {
   return true;
 }
 
 template<class TV> typename enable_if<mpl::and_<NumpyIsStatic<TV>,mpl::not_<NumpyIsScalar<TV> > >,bool>::type
-numpy_shape_match(mpl::identity<TV>, int rank, const npy_intp* dimensions) {
+numpy_shape_match(Types<TV>, int rank, const npy_intp* dimensions) {
   if (rank!=NumpyRank<TV>::value) return false;
   npy_intp subdimensions[NumpyRank<TV>::value?NumpyRank<TV>::value:1];
   NumpyInfo<TV>::dimensions(subdimensions);
@@ -177,23 +178,23 @@ numpy_shape_match(mpl::identity<TV>, int rank, const npy_intp* dimensions) {
 }
 
 template<class T> bool
-numpy_shape_match(mpl::identity<const T>, int rank, const npy_intp* dimensions) {
-  return numpy_shape_match(mpl::identity<T>(),rank,dimensions);
+numpy_shape_match(Types<const T>, int rank, const npy_intp* dimensions) {
+  return numpy_shape_match(Types<T>(),rank,dimensions);
 }
 
 template<class T,int d> bool
-numpy_shape_match(mpl::identity<Array<T,d> >, int rank, const npy_intp* dimensions) {
-  return numpy_shape_match(mpl::identity<T>(),rank-d,dimensions+d);
+numpy_shape_match(Types<Array<T,d> >, int rank, const npy_intp* dimensions) {
+  return numpy_shape_match(Types<T>(),rank-d,dimensions+d);
 }
 
 template<class T,int d> bool
-numpy_shape_match(mpl::identity<RawArray<T,d> >, int rank, const npy_intp* dimensions) {
-  return numpy_shape_match(mpl::identity<T>(),rank-d,dimensions+d);
+numpy_shape_match(Types<RawArray<T,d> >, int rank, const npy_intp* dimensions) {
+  return numpy_shape_match(Types<T>(),rank-d,dimensions+d);
 }
 
 template<class T> bool
-numpy_shape_match(mpl::identity<NdArray<T> >, int rank, const npy_intp* dimensions) {
-  return numpy_shape_match(mpl::identity<T>(),NumpyRank<T>::value,dimensions+rank-NumpyRank<T>::value);
+numpy_shape_match(Types<NdArray<T> >, int rank, const npy_intp* dimensions) {
+  return numpy_shape_match(Types<T>(),NumpyRank<T>::value,dimensions+rank-NumpyRank<T>::value);
 }
 
 #ifdef GEODE_PYTHON
@@ -204,7 +205,7 @@ to_numpy(const TV& x) {
   // Extract memory layout information
   const int rank = numpy_rank(x);
   void* data;
-  Array<npy_intp> dimensions(rank,false);
+  Array<npy_intp> dimensions(rank,uninit);
   numpy_info(x,data,dimensions.data());
 
   // Make a new numpy array and copy the vector into it
@@ -223,7 +224,7 @@ to_numpy(TArray& array) {
   // Extract memory layout information
   const int rank = numpy_rank(array);
   void* data;
-  Array<npy_intp> dimensions(rank,false);
+  Array<npy_intp> dimensions(rank,uninit);
   numpy_info(array,data,dimensions.data());
 
   // Verify ownership
@@ -255,7 +256,7 @@ from_numpy(PyObject* object) { // Borrows reference to object
   const auto array = numpy_from_any(object,NumpyDescr<TV>::descr(),rank,rank,NPY_ARRAY_CARRAY_RO|NPY_ARRAY_FORCECAST);
 
   // Ensure appropriate dimensions
-  if (!numpy_shape_match(mpl::identity<TV>(),rank,PyArray_DIMS((PyArrayObject*)&*array)))
+  if (!numpy_shape_match(Types<TV>(),rank,PyArray_DIMS((PyArrayObject*)&*array)))
     throw_dimension_mismatch();
 
   return *(const TV*)(PyArray_DATA((PyArrayObject*)&*array));
@@ -263,7 +264,7 @@ from_numpy(PyObject* object) { // Borrows reference to object
 
 // Build an Array<T,d> from a compatible numpy array
 template<class T,int d> inline Array<T,d>
-from_numpy_helper(mpl::identity<Array<T,d>>, PyObject& array) {
+from_numpy_helper(Types<Array<T,d>>, PyObject& array) {
   PyObject* base = PyArray_BASE((PyArrayObject*)&array);
   Vector<int,d> counts;
   for (int i=0;i<d;i++){
@@ -274,9 +275,9 @@ from_numpy_helper(mpl::identity<Array<T,d>>, PyObject& array) {
 
 // Build an NdArray<T,d> from a compatible numpy array
 template<class T> inline NdArray<T>
-from_numpy_helper(mpl::identity<NdArray<T>>, PyObject& array) {
+from_numpy_helper(Types<NdArray<T>>, PyObject& array) {
   PyObject* base = PyArray_BASE((PyArrayObject*)&array);
-  Array<int> shape(PyArray_NDIM((PyArrayObject*)&array)-NumpyRank<T>::value,false);
+  Array<int> shape(PyArray_NDIM((PyArrayObject*)&array)-NumpyRank<T>::value,uninit);
   for (int i=0;i<shape.size();i++){
     shape[i] = (int)PyArray_DIMS((PyArrayObject*)&array)[i];
     GEODE_ASSERT(shape[i]==PyArray_DIMS((PyArrayObject*)&array)[i]);}
@@ -294,9 +295,9 @@ from_numpy(PyObject* object) { // Borrows reference to object
   if (is_numpy_array(object)) {
     // Already a numpy array: require an exact match to avoid hidden performance issues
     check_numpy_conversion(object,flags,rank_range,descr);
-    if (!numpy_shape_match(mpl::identity<TArray>(),PyArray_NDIM((PyArrayObject*)object),PyArray_DIMS((PyArrayObject*)object)))
+    if (!numpy_shape_match(Types<TArray>(),PyArray_NDIM((PyArrayObject*)object),PyArray_DIMS((PyArrayObject*)object)))
       throw_dimension_mismatch();
-    return from_numpy_helper(mpl::identity<TArray>(),*object);
+    return from_numpy_helper(Types<TArray>(),*object);
   } else if (!TArray::is_const)
     throw_type_error(object,numpy_array_type());
 
@@ -305,38 +306,37 @@ from_numpy(PyObject* object) { // Borrows reference to object
 
   // Ensure appropriate dimension
   const int rank = PyArray_NDIM((PyArrayObject*)&*array);
-  if (!numpy_shape_match(mpl::identity<TArray>(),rank,PyArray_DIMS((PyArrayObject*)&*array)))
+  if (!numpy_shape_match(Types<TArray>(),rank,PyArray_DIMS((PyArrayObject*)&*array)))
     throw_dimension_mismatch();
 
-  return from_numpy_helper(mpl::identity<TArray>(),array);
+  return from_numpy_helper(Types<TArray>(),array);
 }
 
 #endif
 
 // Write a numpy-convertible array to an .npy file
-// Note: Unlike other functions in this file, it is safe to call write_numpy without initializing either Python or Numpy.
+// Unlike other functions in this file, this is safe to call without initializing either Python or Numpy.
 template<class TArray> void
 write_numpy(const string& filename, const TArray& array) {
   // Extract memory layout information
   const int rank = numpy_rank(array);
   void* data;
-  Array<npy_intp> dimensions(rank,false);
+  Array<npy_intp> dimensions(rank,uninit);
   numpy_info(array,data,dimensions.data());
   // Write
   geode::write_numpy(filename,rank,dimensions.data(),NumpyScalar<TArray>::value,data);
 }
 
-// Generate an .npy file header for a numpy-convertible array
-// Note: Unlike other functions in this file, it is safe to call fill_numpy_header without initializing either Python or Numpy.
-template<class TArray> size_t
-fill_numpy_header(Array<uint8_t>& header,const TArray& array) {
+// Generate an .npy file header for a numpy-convertible array.  Returns header,data_size.
+// Unlike other functions in this file, this is safe to call without initializing either Python or Numpy.
+template<class TArray> Tuple<Array<uint8_t>,size_t> fill_numpy_header(const TArray& array) {
   // Extract memory layout information
   const int rank = numpy_rank(array);
   void* data;
-  Array<npy_intp> dimensions(rank,false);
+  Array<npy_intp> dimensions(rank,uninit);
   numpy_info(array,data,dimensions.data());
   // Fill header
-  return geode::fill_numpy_header(header,rank,dimensions.data(),NumpyScalar<TArray>::value);
+  return geode::fill_numpy_header(rank,dimensions.data(),NumpyScalar<TArray>::value);
 }
 
 }

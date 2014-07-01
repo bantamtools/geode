@@ -12,9 +12,9 @@
 #include <geode/geometry/SimplexTree.h>
 #include <geode/geometry/ParticleTree.h>
 #include <geode/geometry/Ray.h>
-#include <boost/algorithm/string.hpp>
 #include <geode/utility/path.h>
 #include <geode/vector/Rotation.h>
+#include <geode/utility/convert_case.h>
 #include <geode/utility/stl.h>
 #include <geode/openmesh/triangulator.h>
 #include <geode/vector/Frame.h>
@@ -136,7 +136,7 @@ static OpenMesh::IO::Options write_options(const TriMesh& mesh, const string& ex
 static void write_helper(const TriMesh& mesh, const string& filename, bool normals) {
   //OMSilencer silencer;
   //Disabler disabler;
-  string ext = boost::algorithm::to_lower_copy(path::extension(filename));
+  const auto ext = to_lower(path::extension(filename));
   if (!OpenMesh::IO::write_mesh(mesh, filename, write_options(mesh,ext,normals)))
     throw IOError(format("TriMesh::write: failed to write mesh to file '%s'", filename));
 }
@@ -152,7 +152,7 @@ void TriMesh::write_with_normals(string const &filename) const {
 void TriMesh::write(std::ostream &os, string const &extension) const {
   OMSilencer silencer;
   Disabler disabler;
-  string ext = boost::algorithm::to_lower_copy(extension);
+  const auto ext = to_lower(extension);
   if (!OpenMesh::IO::write_mesh(*this, os, ext, write_options(*this,ext)))
     throw IOError("TriMesh::write: failed to write mesh to stream");
 }
@@ -514,7 +514,7 @@ vector<FaceHandle> TriMesh::triangle_fan(vector<VertexHandle> const &ring, Verte
   return fh;
 }
 
-vector<FaceHandle> TriMesh::select_faces(boost::function<bool(FaceHandle)> pr) const {
+vector<FaceHandle> TriMesh::select_faces(function<bool(FaceHandle)> pr) const {
   vector<FaceHandle> result;
   for (FaceHandle fh : face_handles()) {
     if (pr(fh))
@@ -1264,7 +1264,7 @@ void TriMesh::set_vertex_colors(RawArray<const Vector<real,3>> colors) {
 
 Field<Vector<Vector<real,2>,3>,FaceHandle> TriMesh::face_texcoords() const {
   GEODE_ASSERT(has_halfedge_texcoords2D());
-  Field<Vector<Vector<real,2>,3>,FaceHandle> texcoords(n_faces(),false);
+  Field<Vector<Vector<real,2>,3>,FaceHandle> texcoords(n_faces(),uninit);
   for (const auto f : face_handles()) {
     const auto h = halfedge_handles(f);
     texcoords[f] = Vector<Vector<real,2>,3>(texcoord2D(h.x),
@@ -1441,8 +1441,8 @@ void TriMesh::invert_component(std::vector<FaceHandle> component) {
   // (ie if they have neighbors that are not in the vector)
 
   // get all half-edges and vertices in this component
-  std::vector<HalfedgeHandle> halfedges;
-  std::tr1::unordered_set<VertexHandle, Hasher> vertices;
+  vector<HalfedgeHandle> halfedges;
+  unordered_set<VertexHandle, Hasher> vertices;
 
   for (FaceHandle f : component) {
     for (ConstFaceHalfedgeIter fh = cfh_iter(f); fh; ++fh) {
@@ -1590,7 +1590,7 @@ Tuple<int,Array<int> > TriMesh::component_vertex_map() const {
       labels.set(i,labels.size());
 
   //map vertex to mesh/label id
-  Array<int> map(n_vertices(),false);
+  Array<int> map(n_vertices(),uninit);
   for (int i=0;i<union_find.size();i++)
     map[i] = labels.get(union_find.find(i));
 
@@ -1599,7 +1599,7 @@ Tuple<int,Array<int> > TriMesh::component_vertex_map() const {
 
 Array<int> TriMesh::component_face_map() const {
   Tuple<int,Array<int> > vmap = component_vertex_map();
-  Array<int> map(n_faces(),false);
+  Array<int> map(n_faces(),uninit);
   int i =0;
   for (ConstFaceIter f=faces_begin();f!=faces_end();++f) {
     auto v = vertex_handles(f);
@@ -1616,7 +1616,7 @@ vector<Ref<TriMesh> > TriMesh::component_meshes() const {
     meshes.push_back(new_<TriMesh>());
 
   // Add vertices
-  Array<VertexHandle> map(n_vertices(),false);
+  Array<VertexHandle> map(n_vertices(),uninit);
   for (int i=0;i<vmap.y.size();i++)
     map[i] = meshes[vmap.y[i]]->add_vertex(point(VertexHandle(i)));
   // Add faces

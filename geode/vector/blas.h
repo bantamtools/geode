@@ -27,7 +27,6 @@ extern "C" {
 #include <geode/array/RawArray.h>
 #include <geode/array/Array2d.h>
 #include <geode/geometry/Box.h>
-#include <boost/preprocessor/cat.hpp>
 namespace geode {
 
 // Problem-dependent parameter inspection
@@ -36,41 +35,51 @@ template<class T> GEODE_CORE_EXPORT int ilaenv(int ispec,const char* name,const 
 template<> struct FromPython<CBLAS_TRANSPOSE>{GEODE_CORE_EXPORT static CBLAS_TRANSPOSE convert(PyObject* object);};
 
 #define WRAP(declaration) \
-    static declaration GEODE_UNUSED; \
-    static declaration
-#define CBC(name) BOOST_PP_CAT(cblas_,BOOST_PP_CAT(a,name))
-
-#ifdef GEODE_MKL
-#define DECLARE(name,...)
-#define BC(name) BOOST_PP_CAT(a,name)
-#else
-#define DECLARE(name,...) extern "C" { int BOOST_PP_CAT(a,BOOST_PP_CAT(name,_))(__VA_ARGS__); }
-#define BC(name) BOOST_PP_CAT(a,BOOST_PP_CAT(name,_))
-#endif
+  static declaration GEODE_UNUSED; \
+  static declaration
 
 #define __blas_wrap_iterating__
 
-#define a s
-#define sa "a"
+#ifdef GEODE_MKL
+#  define BC(name) s##name
+#  define MKL_BC(name) mkl_s##name
+#  define DECLARE(name,...)
+#else
+#  define BC(name) s##name##_
+#  define DECLARE(name,...) extern "C" { int s##name##_(__VA_ARGS__); }
+#endif
+#define CBC(name) cblas_s##name
+#define SA(name) ("a" #name)
 #define T float
 #include "blas.h"
-#undef a
-#undef sa
+#undef SA
+#undef BC
+#undef CBC
+#undef MKL_BC
+#undef DECLARE
 #undef T
 
-#define a d
-#define sa "d"
+#ifdef GEODE_MKL
+#  define BC(name) d##name
+#  define MKL_BC(name) mkl_d##name
+#  define DECLARE(name,...)
+#else
+#  define BC(name) d##name##_
+#  define DECLARE(name,...) extern "C" { int d##name##_(__VA_ARGS__); }
+#endif
+#define CBC(name) cblas_d##name
+#define SA(name) ("d" #name)
 #define T double
 #include "blas.h"
-#undef a
-#undef sa
+#undef SA
+#undef BC
+#undef CBC
+#undef MKL_BC
+#undef DECLARE
 #undef T
 
 #undef __blas_wrap_iterating__
-#undef CBC
-#undef BC
 #undef WRAP
-#undef DECLARE
 
 }
 #endif
@@ -280,7 +289,7 @@ DECLARE(stedc,char*,int*,T*,T*,T*,int*,T*,int*,int*,int*,int*)
 WRAP(void stedc(RawArray<T> d, RawArray<T> e, Array<T,2>& z, Array<char>& work)) {
   int n=d.size();
   GEODE_ASSERT(n-1<=e.size() && e.size()<=n);
-  z.resize(n,n,false);
+  z.resize(n,n,uninit);
   if(!n) return;
   char *compz=const_cast<char*>("I");
   T lwork_T;int liwork,query=-1,ldz=z.n,info;
@@ -300,7 +309,7 @@ DECLARE(stegr,char*,char*,int*,T*,T*,T*,T*,int*,int*,T*,int*,T*,T*,int*,int*,T*,
 WRAP(void stegr(RawArray<T> d,RawArray<T> e,Box<T> range,Array<T>& w,Array<T,2>& z,Array<int>& isuppz,Array<char>& work)) {
   int n=d.size();
   GEODE_ASSERT(n==e.size());
-  w.resize(n,false);z.resize(n,n,false);isuppz.resize(2*n,false);
+  w.resize(n,uninit);z.resize(n,n,uninit);isuppz.resize(2*n,uninit);
   if(!n) return;
   char *jobz=const_cast<char*>("V"),*ran=const_cast<char*>(range.contains(Box<T>::full_box())?"A":"V");
   T lwork_T,unused_T;int liwork,m,query=-1,unused,ldz=z.n,info;
@@ -370,7 +379,7 @@ WRAP(void gelsd(Subarray<T,2> A,RawArray<T> b,Array<T>& work,Array<int>& iwork))
   int m=A.m,n=A.n;GEODE_ASSERT(max(m,n)==b.size());
   int one=1,ldb=max(1,b.size()),lwork=work.size(),info;
   if(!lwork){work.resize(1);iwork.resize(1);lwork=-1;}
-  Array<T> s(max(1,min(m,n)),false);T rcond;int rank;
+  Array<T> s(max(1,min(m,n)),uninit);T rcond;int rank;
   BC(gelsd)(&n,&m,&one,A.data(),const_cast<int*>(&A.stride),b.data(),&ldb,s.data(),&rcond,&rank,work.data(),&lwork,iwork.data(),&info);
   if(lwork<0){work.resize(max(1,(int)work[0]));iwork.resize(max(1,(int)iwork[0]));}
   if (info)
@@ -389,7 +398,7 @@ WRAP(void gelsd(Subarray<T,2> A,Array<T,2>b,Array<T>& work,Array<int>& iwork)) {
     iwork.resize(1);
     lwork=-1;
   }
-  Array<T> s(min(m,n),false);
+  Array<T> s(min(m,n),uninit);
   T rcond;
   int rank;
   BC(gelsd)(&n,&m,&nrhs,A.data(),const_cast<int*>(&A.stride),b.data(),&ldb,s.data(),&rcond,&rank,work.data(),&lwork,iwork.data(),&info);
@@ -475,7 +484,7 @@ DECLARE(gesv,int*,int*,T*,int*,int*,T*,int*,int*)
 WRAP(void gesv(RawArray<T,2> A,RawArray<T> b)) {
   GEODE_ASSERT(A.m==A.n && A.m==b.size());
   int one=1,lda=max(1,A.n),info;
-  Array<int> ipiv(A.m,false);
+  Array<int> ipiv(A.m,uninit);
   BC(gesv)(const_cast<int*>(&A.m),&one,A.data(),&lda,ipiv.data(),b.data(),const_cast<int*>(&A.n),&info);
 }
 
@@ -494,8 +503,8 @@ DECLARE(gecon,char*,int*,T*,int*,T*,T*,T*,int*,int*)
 WRAP(T gecon(char norm, RawArray<T,2> A, T anorm)) {
   GEODE_ASSERT(A.m==A.n && (norm=='1' || norm=='0' || norm=='I'));
   T rcond;int info;
-  Array<T> work(max(1,4*A.m),false);
-  Array<int> iwork(max(1,A.m),false);
+  Array<T> work(max(1,4*A.m),uninit);
+  Array<int> iwork(max(1,A.m),uninit);
   BC(gecon)(&norm,&A.m,A.data(),&A.n,&anorm,&rcond,work.data(),iwork.data(),&info);
   return rcond;
 }
@@ -513,7 +522,7 @@ WRAP(void sytrf(CBLAS_UPLO uplo, Subarray<T,2> A, RawArray<int> ipiv, Array<T>& 
 // Compute work.size() required by sytrf
 WRAP(int sytrf_work(CBLAS_UPLO uplo,Subarray<T,2> A)) {
   // Mkl appears to have a bug in the sytrf work query, so we do it ourselves
-  static const int nb=max(ilaenv<T>(1,sa"sytrf","L",1024,-1),ilaenv<T>(1,sa"sytrf","U",1024,-1));
+  static const int nb=max(ilaenv<T>(1,SA(sytrf),"L",1024,-1),ilaenv<T>(1,SA(sytrf),"U",1024,-1));
   return max(1,nb*A.m);
 }
 
@@ -536,14 +545,14 @@ WRAP(void sytrs(CBLAS_UPLO uplo,Subarray<const T,2> A,RawArray<const int> ipiv,R
 
 // Perform scaling and in-place transposition/copying of matrices.
 WRAP(void imatcopy(T alpha,Subarray<T,2> A)) {
-  BOOST_PP_CAT(mkl_,BC(imatcopy))('r','t',A.m,A.n,alpha,A.data(),A.n,A.m);
+  MKL_BC(imatcopy)('r','t',A.m,A.n,alpha,A.data(),A.n,A.m);
 }
 
 // Perform scaling and out-place transposition/copying of matrices.
 WRAP(void omatcopy(CBLAS_TRANSPOSE trans,T alpha,Subarray<const T,2> A,Subarray<T,2> B)) {
   int k=trans==CblasTrans?A.n:A.m,lda=max(1,A.stride),ldb=max(1,B.stride);
   GEODE_ASSERT(k==B.m && A.m+A.n-k==B.n);
-  BOOST_PP_CAT(mkl_,BC(omatcopy))('r',trans==CblasTrans?'t':'n',A.m,A.n,alpha,A.data(),lda,B.data(),ldb);
+  MKL_BC(omatcopy)('r',trans==CblasTrans?'t':'n',A.m,A.n,alpha,A.data(),lda,B.data(),ldb);
 }
 
 #endif
