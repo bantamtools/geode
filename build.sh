@@ -7,6 +7,6 @@ else
     scons -j7 prefix='#build/$arch/$type' arch='nocona' install=0 $lib_setup_args \
       openmesh_libpath='' openmesh_publiclibs='' openmesh_include='#/../OpenMesh-2.0/src' openmesh_linkflags='../OpenMesh-2.0/build/Build/lib/OpenMesh/libOpenMeshCore.dylib ../OpenMesh-2.0/build/Build/lib/OpenMesh/libOpenMeshTools.dylib' \
       gmp_linkflags='../gmp/.libs/libgmp.dylib' gmp_include='#/../gmp' gmp_libpath='' gmp_publiclibs='' \
-      type=$type
+      type=$type cxxflags_extra='-std=c++11 -stdlib=libc++' linkflags_extra='-stdlib=libc++'
   done
 fi
