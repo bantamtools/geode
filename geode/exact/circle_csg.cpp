@@ -433,7 +433,7 @@ static Vector<Exact<1>,2> rational_approximation(const real x) {
   // Thus abs(approx_num) will be <= exact::bound
   assert(abs(approx_num) <= exact::bound);
   if(denom > 0) {
-    assert(sign(approx_num) == sign(x));
+    assert(sign(approx_num) == 0 || sign(approx_num) == sign(x));
     return vec(Exact<1>(approx_num), Exact<1>(denom));
   }
   else {
