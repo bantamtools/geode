@@ -74,14 +74,25 @@ def test_circle_quantize():
   i = argmax(abs(arcs0.flat['q']-arcs1.flat['q']))
   q0,q1 = arcs0.flat['q'][i],arcs1.flat['q'][i]
   eq = abs(q0-q1)
-  print 'ex = %g, eq = %g (%d: %g to %g)'%(ex,eq,i,q0,q1)
+  comparison_str = 'ex = %g, eq = %g (%d: %g to %g)'%(ex,eq,i,q0,q1)
+  print comparison_str
+  show_results = False # Enable this if you want comparisons between expected and actual results
+  if show_results and not (ex<1e-6 and eq<3e-5):
+    plot_args = dict(full=False, label=True, dots=True)
+    import pylab
+    pylab.suptitle(comparison_str)
+    subplot_arcs(arcs0, 121, "Before Quantization", **plot_args)
+    subplot_arcs(arcs1, 122, "After Quantization", **plot_args)
+    pylab.show()
+
+
   assert ex<1e-6 and eq<3e-5 #This threshold is pretty agressive and might not work for many seeds
 
 def to_arcs(py_arcs):
   arrays = []
   for contour in py_arcs:
     arrays.append(asarray([((a[0][0],a[0][1]),a[1]) for a in contour], dtype=CircleArc))
-  return Nested(arrays)
+  return Nested(arrays, dtype=CircleArc)
 
 def test_circles():
   # Test quantization routine
@@ -131,12 +142,13 @@ def test_circles():
       print '(k,n,i) (%d,%d,%d)'%(k,n,i)
       random.seed(18183181+1000*k+10*n+i)
       arcs0 = canonicalize_circle_arcs(random_circle_arcs(n,k))
+      circle_arc_quantize_test(arcs0);
       if (k,n,i)==None: # Enable to visualize before union
         print
         print 'arcs0 = %s'%compact_str(arcs0)
         import pylab
         pylab.suptitle('k %d, n %d, i %d'%(k,n,i))
-        subplot_arcs(arcs0,full=full,label=label,dots=dots)
+        subplot_arcs(arcs0,**plot_args)
         pylab.show()
       arcs1 = canonicalize_circle_arcs(circle_arc_union(arcs0))
       error = 0 if n>=40 else inf if correct is None else arc_error(correct,arcs1)
@@ -185,19 +197,64 @@ def test_single_circle(show_results=False):
         pylab.show()
 
 
-def debug_offsets():
-  import pylab
-  import time
-  pylab.axes().set_aspect('equal')
+def test_offsets():
   random.seed(441424)
-  arcs0 = circle_arc_union(random_circle_arcs(1,400))
-  draw_circle_arcs(arcs0)
-  #arcs_off = offset_arcs(arcs0, 0.1)
-  shells = offset_shells(arcs0, 0.1, 10)
-  for s in shells:
-    draw_circle_arcs(s,dots=True)
-  pylab.show()
+  arcs0 = circle_arc_union(random_circle_arcs(10,10))
+
+  print "Offsetting arcs"
+  arcs1 = offset_arcs(arcs0, 0.1)
+  assert circle_arc_area(arcs1) > circle_arc_area(arcs0)
+
+  print "Offsetting arcs with shells"
+  shells = offset_shells(arcs0, 0.2, 10)
+  # Check that we have monatonically increasing area
+  prev_area, prev_arcs = 0, []
+  for arcs in [arcs0, arcs1] + shells:
+    area = circle_arc_area(arcs)
+
+    if not area > prev_area:
+      error = "Positive offset caused decrease in area from %g to %g" % (prev_area, area)
+      print error
+      if 0:
+        import pylab
+        pylab.suptitle(error)
+        subplot_arcs(prev_arcs, 121, "Previous shell", full=False)
+        subplot_arcs(arcs, 122, "After offset", full=False)
+        pylab.show()
+      assert False
+    prev_area, prev_arcs = area, arcs
+
+  print "Offsetting of open arcs"
+  arcs4 = offset_open_arcs(arcs0, 0.001) # Mostly this just ensures we don't hit any asserts
+  assert circle_arc_area(arcs4) > 0 # We should at least have a positive area
+
+def test_negative_offsets(seed=7056389):
+  print "Testing negative offset"
+  random.seed(seed)
+  d = 0.4
+  # Offset inward then outward would normally erode sharp features, but we can use a positive offset to generate a shape with no sharp features
+  arcs0 = offset_arcs(random_circle_arcs(10,10), d*1.5) # Generate random arcs and ensure features big enough to not disappear if we inset/offset again
+  inset = offset_arcs(arcs0, -d)
+  reset = offset_arcs(inset, d)
+  arcs0_area = circle_arc_area(arcs0)
+  inset_area = circle_arc_area(inset)
+  reset_area = circle_arc_area(reset)
+  assert inset_area < arcs0_area # Offset by negative amount should reduce area
+  area_error = abs(arcs0_area - reset_area)
+  assert area_error < 2e-6
+  # xor input arcs and result after inset/offset to get difference
+  delta = split_arcs_by_parity(Nested.concatenate(arcs0,reset))
+  # We expect thin features around edges of input arcs, but a small negative offset should erase everything
+  squeezed_delta = offset_arcs(delta,-1e-6)
+  assert len(squeezed_delta) == 0
+
+  # Check that a large negative offset leaves nothing
+  empty_arcs = offset_arcs(random_circle_arcs(10,10), -100.)
+  assert len(empty_arcs) == 0
 
 if __name__=='__main__':
-  #debug_offsets()
+  test_offsets()
+  test_negative_offsets()
+  test_circle_quantize()
+  test_single_circle()
   test_circles()

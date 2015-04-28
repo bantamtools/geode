@@ -14,4 +14,6 @@ void wrap_mesh() {
   GEODE_WRAP(corner_mesh)
   GEODE_WRAP(mesh_io)
   GEODE_WRAP(lower_hull)
+  GEODE_WRAP(decimate)
+  GEODE_WRAP(improve_mesh)
 }

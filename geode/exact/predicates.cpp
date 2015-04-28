@@ -10,25 +10,30 @@
 #include <geode/random/Random.h>
 namespace geode {
 
-using std::cout;
-using std::endl;
-using exact::Point;
-typedef exact::Point2 P2;
-typedef exact::Point3 P3;
+using exact::Perturbed;
+typedef exact::Perturbed2 P2;
+typedef exact::Perturbed3 P3;
+using exact::ImplicitlyPerturbed;
 
 // First, a trivial predicate, handled specially so that it can be partially inlined.
 
-template<int axis,int d> bool axis_less_degenerate(const Tuple<int,Vector<Quantized,d>> a, const Tuple<int,Vector<Quantized,d>> b) {
-  struct F { static void eval(RawArray<mp_limb_t> result, RawArray<const Vector<Exact<1>,d>> X) {
+template<int axis, class Perturbed> bool axis_less_degenerate(const Perturbed a, const Perturbed b) {
+  struct F { static void eval(RawArray<mp_limb_t> result, RawArray<const Vector<Exact<1>,Perturbed::ValueType::m>> X) {
     mpz_set(result,X[1][axis]-X[0][axis]);
   }};
-  const typename Point<d>::type X[2] = {a,b};
+  const Perturbed X[2] = {a,b};
   return perturbed_sign(F::eval,1,asarray(X));
 }
 
-#define IAL(d,axis) template bool axis_less_degenerate<axis,d>(const Tuple<int,Vector<Quantized,d>>,const Tuple<int,Vector<Quantized,d>>);
+#define IAL(d,axis) \
+  template bool axis_less_degenerate<axis,Perturbed<d>>(const Perturbed<d>,const Perturbed<d>); \
+  template bool axis_less_degenerate<axis,ImplicitlyPerturbed<d>>(const ImplicitlyPerturbed<d>,const ImplicitlyPerturbed<d>);
 IAL(2,0) IAL(2,1)
 IAL(3,0) IAL(3,1) IAL(3,2)
+#undef IAL
+
+template bool axis_less_degenerate<0,exact::ImplicitlyPerturbedCenter>(const exact::ImplicitlyPerturbedCenter,const exact::ImplicitlyPerturbedCenter);
+template bool axis_less_degenerate<1,exact::ImplicitlyPerturbedCenter>(const exact::ImplicitlyPerturbedCenter,const exact::ImplicitlyPerturbedCenter);
 
 // Polynomial predicates
 
@@ -72,25 +77,43 @@ struct SegmentIntersectionsOrdered { template<class TV> static inline PredicateT
              dc = c1-c0;
   return edet(c0-a0,dc)*edet(da,db)-edet(b0-a0,db)*edet(da,dc);
 }};}
-bool segment_intersections_ordered(const P2 a0, const P2 a1, P2 b0, P2 b1, P2 c0, P2 c1) {
+bool segment_intersections_ordered(const P2 a0, const P2 a1, const P2 b0, const P2 b1, const P2 c0, const P2 c1) {
   return perturbed_predicate<SegmentIntersectionsOrdered>(a0,a1,b0,b1,c0,c1)
        ^ segment_directions_oriented(a0,a1,b0,b1)
        ^ segment_directions_oriented(a0,a1,c0,c1);
 }
 
 namespace {
-struct SegmentIntersectionAbove { template<class TV> static inline PredicateType<3,TV> eval(const TV a0, const TV a1, const TV b0, const TV b1, const TV c0) {
+struct SegmentIntersectionAbovePoint { template<class TV> static inline PredicateType<3,TV> eval(const TV a0, const TV a1, const TV b0, const TV b1, const TV c0) {
   const auto da = a1-a0,
              db = b1-b0;
              // c1 == c1 + x*delta
              //dc = [dx, 0];
-  //return delta*(a0.y-c0.y)*edet(da,db)-edet(b0-a0,db)*da.y*delta;
-  return (a0.y-c0.y)*edet(da,db)-edet(b0-a0,db)*da.y;
+  //return delta*(a0.y-c0.y)*edet(da,db)-edet(b0-a0,db)*-da.y*delta;
+  return (a0.y-c0.y)*edet(da,db)+edet(b0-a0,db)*da.y;
 }};}
-bool segment_intersection_above(const P2 a0, const P2 a1, const P2 b0, const P2 b1, const P2 c) {
-  return perturbed_predicate<SegmentIntersectionAbove>(a0,a1,b0,b1,c)
-       ^ segment_directions_oriented(a0,a1,b0,b1)
-       ^ rightwards(a0,a1);
+bool segment_intersection_above_point(const P2 a0, const P2 a1, const P2 b0, const P2 b1, const P2 c) {
+  // If we could turn c into a segment by constructing c1 at (c.x + delta, c.y) and we use
+  // iab and iac as the intersections between a/b and a/c, we want to compute upwards(iac,iab)
+  // Order along 'a' is same as upwards(iac, iab) when upwards(a1,a0) is true
+  // Substituting into segment_intersections_ordered and simplifying we get:
+  return perturbed_predicate<SegmentIntersectionAbovePoint>(a0,a1,b0,b1,c)
+       ^ segment_directions_oriented(b0,b1,a0,a1);
+}
+
+namespace {
+struct RayIntersectionsRightwards { template<class TV> static inline PredicateType<3,TV> eval(const TV a0, const TV a1, const TV b0, const TV b1, const TV c) {
+  const auto da = a1 - a0;
+  const auto db = b1 - b0;
+  // a_intercept = a0.x + da.x*(c.y - a0.y)/da.y == a0.x + a_num / da.y
+  // b_intercept = b0.x + db.x*(c.y - b0.y)/db.y == b0.x + b_num / db.y
+  // (b_intercept - a_intercept) * da.y * db.y =
+  // (b0.x*db.y + b_num)*da.y - (a0.x*da.y + a_num)*db.y
+  // (b0.x - a0.x)*da.y*db.y + (c.y - b0.y)*db.x*da.y + (a0.y - c.y)*da.x*db.y
+  return (b0.x - a0.x)*da.y*db.y + (c.y - b0.y)*db.x*da.y + (a0.y - c.y)*da.x*db.y;
+}};}
+bool ray_intersections_rightwards(const P2 a0, const P2 a1, const P2 b0, const P2 b1, const P2 c) {
+  return perturbed_predicate<RayIntersectionsRightwards>(a0, a1, b0, b1, c) ^ upwards(a1,a0) ^ upwards(b1,b0);
 }
 
 #define ROW(d) tuple(esqr_magnitude(d),d.x,d.y) // Put the quadratic entry first so that subexpressions are lower order
@@ -196,8 +219,8 @@ static void predicate_tests() {
   const auto random = new_<Random>(9817241);
   for (int step=0;step<100;step++) {
     #define MAKE(i) \
-      const auto p##i = tuple(i,QV2(random->uniform<Vector<ExactInt,2>>(-exact::bound,exact::bound))); \
-      const TV2 x##i(p##i.y);
+      const auto p##i = P2(i,QV2(random->uniform<Vector<ExactInt,2>>(-exact::bound,exact::bound))); \
+      const TV2 x##i(p##i.value());
     MAKE(0) MAKE(1) MAKE(2) MAKE(3)
     GEODE_ASSERT(triangle_oriented(p0,p1,p2)==(F::triangle_oriented(x0,x1,x2)>0));
     GEODE_ASSERT(incircle(p0,p1,p2,p3)==(F::incircle(x0,x1,x2,x3)>0));
@@ -206,10 +229,10 @@ static void predicate_tests() {
   // Test behavior for large numbers, using the scale invariance and antisymmetry of incircle.
   for (const int i : range(exact::log_bound)) {
     const auto bound = ExactInt(1)<<i;
-    const auto p0 = tuple(0,QV2(-bound,-bound)), // Four points on a circle of radius sqrt(2)*bound
-               p1 = tuple(1,QV2( bound,-bound)),
-               p2 = tuple(2,QV2( bound, bound)),
-               p3 = tuple(3,QV2(-bound, bound));
+    const auto p0 = P2(0,QV2(-bound,-bound)), // Four points on a circle of radius sqrt(2)*bound
+               p1 = P2(1,QV2( bound,-bound)),
+               p2 = P2(2,QV2( bound, bound)),
+               p3 = P2(3,QV2(-bound, bound));
     GEODE_ASSERT(!incircle(p0,p1,p2,p3));
     GEODE_ASSERT( incircle(p0,p1,p3,p2));
   }

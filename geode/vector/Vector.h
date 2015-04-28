@@ -41,6 +41,10 @@ template<class T,int d> PyObject* to_python(const Vector<T,d>& vector);
 GEODE_DECLARE_VECTOR_CONVERSIONS(GEODE_CORE_EXPORT,2,int)
 GEODE_DECLARE_VECTOR_CONVERSIONS(GEODE_CORE_EXPORT,3,int)
 GEODE_DECLARE_VECTOR_CONVERSIONS(GEODE_CORE_EXPORT,4,int)
+GEODE_DECLARE_VECTOR_CONVERSIONS(GEODE_CORE_EXPORT,2,long)
+GEODE_DECLARE_VECTOR_CONVERSIONS(GEODE_CORE_EXPORT,3,long)
+GEODE_DECLARE_VECTOR_CONVERSIONS(GEODE_CORE_EXPORT,4,long)
+
 GEODE_DECLARE_VECTOR_CONVERSIONS(GEODE_CORE_EXPORT,2,short int)
 GEODE_DECLARE_VECTOR_CONVERSIONS(GEODE_CORE_EXPORT,3,short int)
 GEODE_DECLARE_VECTOR_CONVERSIONS(GEODE_CORE_EXPORT,4,short int)
@@ -66,9 +70,9 @@ public:
     typedef const T* const_iterator; // for stl
     template<class> class result;
     template<class V> class result<V(int)>:public mpl::if_<is_const<V>,const T&,T&>{};
-    enum Workaround1 {dimension=d};
-    enum Workaround2 {m=d};
-    static const bool is_const=false;
+    static const int dimension = d;
+    static const int m = d;
+    static const bool is_const = false;
 
     T array[d];
 
@@ -129,8 +133,11 @@ public:
         for(int i=0;i<d;i++) array[i]=v.array[i];return *this;
     }
 
-    int size() const
+    constexpr int size() const
     {return m;}
+
+    constexpr bool empty() const
+    {return m>0;}
 
     const T& operator[](const int i) const
     {assert(unsigned(i)<d);return array[i];}
@@ -565,6 +572,7 @@ template<class T> static inline Vector<T,6> vec(const T& a0,const T& a1,const T&
 #endif
 //#####################################################################
 
+template<class T,int d> const int Vector<T,d>::dimension;
+template<class T,int d> const int Vector<T,d>::m;
+
 }
-
-

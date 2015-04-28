@@ -99,12 +99,34 @@ public:
     return Id(flat.append(x));
   }
 
-  template<class TField> void extend(const TField& append_field) {
-    flat.extend(append_field.flat);
+  Id append_assuming_enough_space(const T& x) GEODE_ALWAYS_INLINE {
+    return Id(flat.append_assuming_enough_space(x));
   }
 
-  void preallocate(const int m_new) {
+  Id append(Uninit) GEODE_ALWAYS_INLINE {
+    return Id(flat.append(uninit));
+  }
+
+  // A Field is extended with an array, not another field (A different field would use different ids)
+  template<class TArray> void extend(const TArray& append_array) {
+    flat.extend(append_array);
+  }
+
+  void extend(const int n, Uninit) GEODE_ALWAYS_INLINE {
+    flat.extend(n,uninit);
+  }
+
+  void preallocate(const int m_new) GEODE_ALWAYS_INLINE {
     flat.preallocate(m_new);
+  }
+
+  // Grow storage so that max_id will be be a valid index
+  void grow_until_valid(const Id max_id) {
+    assert(max_id.valid());
+    if(size() <= max_id.idx()) {
+      flat.resize(max_id.idx() + 1);
+    }
+    assert(valid(max_id));
   }
 
   Field<Element,Id> copy() const {
@@ -120,6 +142,11 @@ public:
   const Field<Element,Id>& const_cast_() const {
     return *(const Field<Element,Id>*)this;
   }
+
+  Element& front() { return flat.front(); }
+  const Element& front() const { return flat.front(); }
+  Element& back() { return flat.back(); }
+  const Element& back() const { return flat.back(); }
 };
 
 }

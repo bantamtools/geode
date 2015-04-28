@@ -20,6 +20,9 @@ namespace geode {
 
 using Log::cout;
 using std::endl;
+typedef real T;
+typedef Vector<T,2> TV2;
+typedef Vector<T,3> TV3;
 
 GEODE_DEFINE_TYPE(TriangleTopology)
 GEODE_DEFINE_TYPE(MutableTriangleTopology)
@@ -52,7 +55,7 @@ TriangleTopology::TriangleTopology(RawArray<const Vector<int,3>> faces)
   internal_collect_boundary_garbage();
 }
 
-TriangleTopology::TriangleTopology(TriangleSoup const &soup)
+TriangleTopology::TriangleTopology(const TriangleSoup& soup)
   : TriangleTopology() {
   internal_add_vertices(soup.nodes());
   internal_add_faces(soup.elements);
@@ -295,6 +298,7 @@ void TriangleTopology::assert_consistent(bool check_for_double_halfedges) const 
   // Check simple vertex properties
   int actual_vertices = 0;
   for (const auto v : vertices()) {
+    GEODE_ASSERT(valid(v));
     actual_vertices++;
     const auto e = halfedge(v);
     if (e.valid())
@@ -305,6 +309,7 @@ void TriangleTopology::assert_consistent(bool check_for_double_halfedges) const 
   // Check simple face properties
   int actual_faces = 0;
   for (const auto f : faces()) {
+    GEODE_ASSERT(valid(f));
     actual_faces++;
     const auto es = halfedges(f);
     GEODE_ASSERT(es.x==halfedge(f));
@@ -320,6 +325,7 @@ void TriangleTopology::assert_consistent(bool check_for_double_halfedges) const 
   // Check simple edge properties
   GEODE_ASSERT(!((3*n_faces()+n_boundary_edges())&1));
   for (const auto e : halfedges()) {
+    GEODE_ASSERT(valid(e));
     const auto f = face(e);
     const auto p = prev(e), n = next(e), r = reverse(e);
     GEODE_ASSERT(valid(p));
@@ -408,19 +414,14 @@ bool TriangleTopology::is_manifold() const {
 bool TriangleTopology::is_manifold_with_boundary() const {
   if (is_manifold()) // Finish in O(1) time if possible
     return true;
-  for (const auto v : vertices()) {
-    const auto start = halfedge(v);
-    if (is_boundary(start)) { // If the first halfedge is a boundary, we need to check for a second
-      auto e = start;
-      for (;;) {
-        e = left(e);
-        if (e==start)
-          break;
-        if (is_boundary(e)) // If there are two boundary halfedges, this vertex is bad
-          return false;
-      }
+  for (const auto start : boundary_edges())
+    for (auto e=start;;) {
+      e = left(e);
+      if (e==start)
+        break;
+      if (is_boundary(e)) // There are two boundary halfedges at the same vertex, which is bad.
+        return false;
     }
-  }
   return true;
 }
 
@@ -679,8 +680,8 @@ Vector<int,3> MutableTriangleTopology::add(const MutableTriangleTopology& other)
   const int base_boundary = boundaries_.size();
 
   // Add things from other to the end
-  mutable_vertex_to_edge_.extend(other.vertex_to_edge_);
-  mutable_faces_.extend(other.faces_);
+  mutable_vertex_to_edge_.extend(other.vertex_to_edge_.flat);
+  mutable_faces_.extend(other.faces_.flat);
   mutable_boundaries_.extend(other.boundaries_);
 
   // Renumber all new primitives
@@ -753,6 +754,66 @@ Vector<int,3> MutableTriangleTopology::add(const MutableTriangleTopology& other)
 
   // Return index offsets
   return vec(base_vertex,base_face,base_boundary);
+}
+
+
+void MutableTriangleTopology::flip() {
+
+  // boundary
+  for (auto he : boundary_edges()) {
+    // set src=dst (safely compute dst without using prev/next, which may be broken)
+    unsafe_set_src(he, src(reverse(he)));
+    // swap prev and next
+    std::swap(mutable_boundaries_[-1-he.id].next, mutable_boundaries_[-1-he.id].prev);
+  }
+
+  // interior
+  for (auto f : faces()) {
+    auto &fi = mutable_faces_[f];
+    // swap vertices 0 and 1 in each face, and swap neighors 1 and 2.
+    fi.vertices = fi.vertices.yxz();
+    fi.neighbors = fi.neighbors.xzy();
+    // adjust neighbors' neighbors to point back to the swapped neighbors
+    assert(reverse(fi.neighbors[1]) == halfedge(f,2));
+    assert(reverse(fi.neighbors[2]) == halfedge(f,1));
+    for (int i : vec(1,2)) {
+      auto he = fi.neighbors[i];
+      if (is_boundary(he)) {
+        mutable_boundaries_[-1-he.id].reverse = halfedge(f,i);
+      } else {
+        mutable_faces_[face(he)].neighbors[face_index(he)] = halfedge(f,i);
+      }
+    }
+    // swap halfedge fields
+    for (auto &field : halfedge_fields) {
+      field.swap(halfedge(f,1).id, halfedge(f,2).id);
+    }
+  }
+
+  // fix vertex outgoing halfedges
+  for (auto v : vertices()) {
+    if (halfedge(v).valid() && src(halfedge(v)) != v) {
+      if (is_boundary(halfedge(v))) {
+        // we should now be dst(halfedge(v))
+        assert(v == dst(halfedge(v)));
+        unsafe_set_halfedge(v, next(halfedge(v)));
+      } else {
+        // reconstruct which edge belongs to us from our position in the triangle
+        auto f = face(halfedge(v));
+        auto fi = faces_[f];
+        int i = fi.vertices.find(v);
+        assert(i != -1);
+        unsafe_set_halfedge(v, halfedge(f,i));
+      }
+      assert(src(halfedge(v))==v);
+    }
+  }
+}
+
+Ref<MutableTriangleTopology> MutableTriangleTopology::flipped() const {
+  auto mesh = copy();
+  mesh->flip();
+  return mesh;
 }
 
 Tuple<Ref<MutableTriangleTopology>,
@@ -841,6 +902,7 @@ Tuple<Ref<MutableTriangleTopology>,
 
   return tuple(result, new_to_old_vertices, new_to_old_faces);
 }
+
 
 Array<VertexId> MutableTriangleTopology::split_nonmanifold_vertex(VertexId vi) {
   auto components = surface_components(vi);
@@ -1060,6 +1122,189 @@ VertexId MutableTriangleTopology::split_edge(HalfedgeId e) {
   return c;
 }
 
+bool MutableTriangleTopology::is_collapse_safe(HalfedgeId h) const {
+  GEODE_ASSERT(valid(h));
+  const auto o = reverse(h);
+  const auto v0 = src(h),
+             v1 = dst(h);
+
+  // If v0 and v1 are on different boundaries, we can't do this
+  if (is_boundary(v0) && is_boundary(v1) &&
+      !is_boundary(h) && !is_boundary(o))
+    return false;
+
+  // Can't snip off an isolated vl or vr
+  if ((is_boundary(reverse(next(h))) && is_boundary(reverse(prev(h)))) ||
+      (is_boundary(reverse(next(o))) && is_boundary(reverse(prev(o)))))
+    return false;
+
+  // Look up left and right vertices
+  const auto vl = is_boundary(h) ? VertexId() : dst(next(h)),
+             vr = is_boundary(o) ? VertexId() : dst(next(o));
+
+  // This only happens in temporarily invalid situations, such as if
+  // split_along_edge is called and not cleaned up.  No good can come of it.
+  if (vl==vr)
+    return false;
+
+  // One-rings of v0 and v1 cannot intersect, otherwise we'll collapse a
+  // triangle-shaped tunnel
+  Hashtable<VertexId> covered;
+  for (auto oh: outgoing(v0)) {
+    auto v = dst(oh);
+    if (v != vl && v != vr)
+      covered.set(v);
+  }
+  for (auto oh: outgoing(v1)) {
+    auto v = dst(oh);
+    if (covered.contains(v))
+      return false;
+  }
+
+  return true;
+}
+
+void MutableTriangleTopology::unsafe_collapse(HalfedgeId h) {
+  GEODE_ASSERT(valid(h));
+
+  HalfedgeId o = reverse(h);
+
+  VertexId v0 = src(h);
+  VertexId v1 = dst(h);
+
+  VertexId vl;
+  if (!is_boundary(h))
+    vl = dst(next(h));
+
+  VertexId vr;
+  if (!is_boundary(o))
+    vr = dst(next(o));
+
+  // We need to choose a new outgoing halfedge for v1 if the current one is going to be erased or if v1 becomes a boundary halfedge
+  HalfedgeId new_v1_he; // If set, v1's halfedge will be changed to this after the collapse is finished
+  // Hitting an empty leaf in this conditional will cause v1's halfedge to remain unchanged since new_v1_he will remain invalid
+  if(is_boundary(o)) {
+    // In this case, o will be the only erased halfedge
+    // If v1 was using o we need to switch
+    if(halfedge(v1) == o) {
+      new_v1_he = next(o); // next(o) will be a boundary halfedge and after we collapse v0 into v1 it will start at v1
+    }
+    // else, we don't need to change anything so leave new_v1_he invalid
+  }
+  else if(is_boundary(h)) {
+    // halfedge(v1) must be a boundary edge (probably next(h) but possibly a different halfedge if there are disjoint boundary curves at v1)
+    assert(is_boundary(halfedge(v1)));
+    // We don't need to change v1's halfedge since it can't be h and h is the only erased boundary halfedge
+  }
+  else {
+    // If we get here, we aren't erasing any boundary halfedges
+    if(is_boundary(halfedge(v1))) {
+      // v1's halfedge is on the boundary so we aren't going to erase it
+    }
+    else if(is_boundary(halfedge(v0))) {
+      new_v1_he = halfedge(v0); // Combined vertex will now be on boundary so reuse halfedge(v0) to get a boundary halfedge with the right source
+    }
+    else {
+      if(halfedge(v1) == o || dst(halfedge(v1)) == vl) {
+        new_v1_he = left(o); // Can use v1vr which we must exist and isn't going to be erased
+      }
+    }
+  }
+
+  // if vl used vlv0 as outgoing halfedge, change it to something else
+  if (vl.valid() && dst(halfedge(vl)) == v0) {
+    unsafe_set_halfedge(vl, left(halfedge(vl)));
+  }
+
+  // if vr used vrv1 as outgoing halfedge, change it to something else
+  if (vr.valid() && dst(halfedge(vr)) == v1) {
+    unsafe_set_halfedge(vr, left(halfedge(vr)));
+  }
+
+  // replace v0 with v1 in all faces
+  for (auto f : incident_faces(v0))
+    unsafe_replace_vertex(f, v0, v1);
+
+  // replace v0 with v1 in all boundary edge src entries
+  // Since we might have pointers from multiple disjoint boundary curves we have to check all outgoing halfedges of v0
+  if (is_boundary(v0)) for(const auto he : outgoing(v0)) {
+    if(is_boundary(he))
+      unsafe_set_src(he, v1);
+  }
+
+  // connect reverses: v0vl -- vlv1, vrv0 -- v1vr
+  // (if v0vl and vlv1 or vrv0 and v1vr are boundaries, don't connect them,
+  // delete them. Patch up boundary, make vl or vr isolated vertices)
+  if (vl.valid()) {
+    auto v0vl = reverse(prev(h));
+    auto vlv1 = reverse(next(h));
+
+    if (is_boundary(v0vl) && is_boundary(vlv1)) {
+      unsafe_boundary_link(prev(v0vl), next(vlv1));
+      unsafe_set_erased(v0vl);
+      unsafe_set_erased(vlv1);
+      if (halfedge(vl) == vlv1)
+        unsafe_set_halfedge(vl,HalfedgeId());
+    } else {
+      unsafe_set_reverse(v0vl, vlv1);
+    }
+  }
+
+  if (vr.valid()) {
+    auto vrv0 = reverse(next(o));
+    auto v1vr = reverse(prev(o));
+
+    if (is_boundary(vrv0) && is_boundary(v1vr)) {
+      unsafe_boundary_link(prev(v1vr), next(vrv0));
+      unsafe_set_erased(v1vr);
+      unsafe_set_erased(vrv0);
+      if (halfedge(vr) == vrv0)
+        unsafe_set_halfedge(vr,HalfedgeId());
+    } else {
+      unsafe_set_reverse(vrv0, v1vr);
+    }
+  }
+
+  if (vl.valid())
+    // delete face incident to h
+    unsafe_set_erased(face(h));
+  else {
+    unsafe_boundary_link(prev(h), next(h));
+    unsafe_set_erased(h);
+  }
+
+  if (vr.valid())
+    // delete face incident to o
+    unsafe_set_erased(face(o));
+  else {
+    unsafe_set_src(next(o), v1);
+    unsafe_boundary_link(prev(o), next(o));
+    unsafe_set_erased(o);
+  }
+
+  // delete v0
+  unsafe_set_erased(v0);
+
+  // If we need to update halfedge for v1, do so here
+  if(new_v1_he.valid()) {
+    assert(erased(halfedge(v1)) || (is_boundary(new_v1_he) && !is_boundary(halfedge(v1))));
+    assert(!erased(new_v1_he));
+    unsafe_set_halfedge(v1, new_v1_he);
+    assert(src(new_v1_he) == v1);
+  }
+
+  assert(!erased(halfedge(v1)));
+
+  assert_consistent(true);
+}
+
+void MutableTriangleTopology::collapse(HalfedgeId h) {
+  if (!is_collapse_safe(h))
+    throw RuntimeError(format("TriangleTopology::collapse: halfedge collapse %d [%d,%d] is invalid",
+                              h.id,src(h).id,dst(h).id));
+  unsafe_collapse(h);
+}
+
 HalfedgeId MutableTriangleTopology::flip_edge(HalfedgeId e) {
   if (!is_flip_safe(e))
     throw RuntimeError(format("TriangleTopology::flip_edge: edge flip %d [%d,%d] is invalid",
@@ -1143,6 +1388,21 @@ void MutableTriangleTopology::erase_last_vertex_with_reordering() {
   // Take care of vertex storage
   for (auto& s : vertex_fields)
     s.extend(-1);
+}
+
+void MutableTriangleTopology::erase_isolated_vertices() {
+  auto marked = create_compatible_vertex_field<bool>();
+  for (auto f : faces()) {
+    for (auto v : vertices(f)) {
+      marked[v] = true;
+    }
+  }
+
+  for (auto v : vertices()) {
+    if (!marked[v]) {
+      erase(v);
+    }
+  }
 }
 
 void MutableTriangleTopology::erase_face_with_reordering(const FaceId f) {
@@ -1473,6 +1733,17 @@ Array<FaceId> TriangleTopology::incident_faces(VertexId v) const {
   return faces;
 }
 
+int TriangleTopology::valence(VertexId v) const {
+  GEODE_ASSERT(valid(v));
+  int count=0;
+  for (const auto h : outgoing(v)) {
+    const auto f = face(h);
+    if (f.valid())
+      count++;
+  }
+  return count;
+}
+
 void remove_field_helper(Hashtable<int,int>& id_to_field, vector<UntypedArray>& fields, const int id) {
   const int i = id_to_field.get_default(id,-1);
   if (i >= 0) {
@@ -1514,7 +1785,7 @@ void remove_field_helper(Hashtable<int,int>& id_to_field, vector<UntypedArray>& 
   ADD_FIELD(prim,d,float) \
   ADD_FIELD(prim,d,double)
 
-#define MAKE_PY_FIELD(prim) \
+#define MAKE_PY_FIELD(prim, Prim) \
   PyObject* MutableTriangleTopology::add_##prim##_field_py(PyObject* object, const int id) { \
     PyArray_Descr* dtype; \
     if (!PyArray_DescrConverter(object,&dtype)) \
@@ -1525,19 +1796,30 @@ void remove_field_helper(Hashtable<int,int>& id_to_field, vector<UntypedArray>& 
     else { \
       const int subtype = dtype->subarray->base->type_num; \
       const auto shape = from_python<Array<const int>>(dtype->subarray->shape); \
-      if (shape.size() == 1) \
+      if (shape.size() == 1) { \
         switch (shape[0]) { \
           case 2: switch (subtype) { ADD_FIELDS(prim,2) } break; \
           case 3: switch (subtype) { ADD_FIELDS(prim,3) } break; \
           case 4: switch (subtype) { ADD_FIELDS(prim,4) } break; \
         } \
+      } \
     } \
     const auto s = steal_ref_check(PyObject_Str((PyObject*)dtype)); \
     throw TypeError(format("Fields of type %s unavailable from Python",from_python<const char*>(s))); \
+  }\
+  bool MutableTriangleTopology::has_##prim##_field_py(int id) const {\
+    return has_field_py(new_<PyFieldId>(PyFieldId::Prim, id));\
+  }\
+  void MutableTriangleTopology::remove_##prim##_field_py(int id) {\
+    return remove_field_py(new_<PyFieldId>(PyFieldId::Prim, id));\
+  }\
+  PyObject *MutableTriangleTopology::prim##_field_py(int id) {\
+    return field_py(new_<PyFieldId>(PyFieldId::Prim, id));\
   }
-MAKE_PY_FIELD(vertex)
-MAKE_PY_FIELD(face)
-MAKE_PY_FIELD(halfedge)
+
+MAKE_PY_FIELD(vertex, Vertex)
+MAKE_PY_FIELD(face, Face)
+MAKE_PY_FIELD(halfedge, Halfedge)
 
 bool MutableTriangleTopology::has_field_py(const PyFieldId& id) const {
   // Check if the field id exists
@@ -1553,7 +1835,7 @@ bool MutableTriangleTopology::has_field_py(const PyFieldId& id) const {
                      : id.prim == PyFieldId::Face   ? face_fields
                                                     : halfedge_fields;
   const auto& field = fields[i];
-  return field.type() == id.type;
+  return &(field.type()) == id.type;
 }
 
 void MutableTriangleTopology::remove_field_py(const PyFieldId& id) {
@@ -1577,6 +1859,10 @@ PyObject* MutableTriangleTopology::field_py(const PyFieldId& id) {
   if (i < 0)
     throw KeyError("no such mesh field");
   const UntypedArray& field = fields[i];
+
+  if (id.type && &(field.type()) != id.type)
+    throw ValueError(format("Type mismatch: id: %s, field: %s", field.type().name(), id.type->name()));
+
   #define CASE(...) \
     if (field.type() == typeid(__VA_ARGS__)) \
       return to_python(field.get<__VA_ARGS__>());
@@ -1633,7 +1919,7 @@ PyObject* MutableTriangleTopology::field_py(const PyFieldId& id) {
   CASE(Vector<float,4>)
   CASE(Vector<double,4>)
   #undef CASE
-  throw TypeError(format("Can't handle python conversion of fields of type %s", id.type.name()));
+  throw TypeError(format("Can't handle python conversion of fields of type %s", id.type->name()));
 }
 
 #endif
@@ -1754,14 +2040,6 @@ static void corner_mesh_destruction_test(MutableTriangleTopology& mesh, const ui
   }
 }
 
-#ifdef GEODE_PYTHON
-template<> GEODE_DEFINE_TYPE(PyRange<TriangleTopologyIncoming>);
-template<> GEODE_DEFINE_TYPE(PyRange<TriangleTopologyOutgoing>);
-template<> GEODE_DEFINE_TYPE(PyRange<TriangleTopologyIter<VertexId>>);
-template<> GEODE_DEFINE_TYPE(PyRange<TriangleTopologyIter<FaceId>>);
-template<> GEODE_DEFINE_TYPE(PyRange<TriangleTopologyIter<HalfedgeId>>);
-#endif
-
 static string id_error(const TriangleTopology& mesh, const VertexId x) {
   return x.id==invalid_id              ? "invalid vertex id"
        : x.id==erased_id               ? "erased vertex id"
@@ -1818,7 +2096,7 @@ HalfedgeId TriangleTopology::safe_halfedge_between(VertexId v0, VertexId v1) con
   return halfedge(v0,v1);
 }
 
-Tuple<Ref<SegmentSoup>,Array<HalfedgeId>> TriangleTopology::edge_segment_soup() const {
+Tuple<Ref<SegmentSoup>,Array<HalfedgeId>> TriangleTopology::edge_soup() const {
   Array<Vector<int,2>> edges;
   Array<HalfedgeId> indices;
 
@@ -1832,10 +2110,10 @@ Tuple<Ref<SegmentSoup>,Array<HalfedgeId>> TriangleTopology::edge_segment_soup() 
     indices.append(i);
   }
 
-  return tuple(new_<SegmentSoup>(edges), indices);
+  return tuple(new_<SegmentSoup>(edges,allocated_vertices()), indices);
 }
 
-Tuple<Ref<TriangleSoup>,Array<FaceId>> TriangleTopology::face_triangle_soup() const {
+Tuple<Ref<TriangleSoup>,Array<FaceId>> TriangleTopology::face_soup() const {
   Array<Vector<int,3>> facets;
   Array<FaceId> indices;
 
@@ -1845,100 +2123,106 @@ Tuple<Ref<TriangleSoup>,Array<FaceId>> TriangleTopology::face_triangle_soup() co
     indices.append(i);
   }
 
-  return tuple(new_<TriangleSoup>(facets), indices);
+  return tuple(new_<TriangleSoup>(facets, allocated_vertices()), indices);
 }
 
-template<class TV>
-typename TV::value_type TriangleTopology::angle_at(HalfedgeId id, Field<TV, VertexId> const &pos) const {
-  auto p = prev(id);
-  auto v1 = (pos[dst(id)] - pos[src(id)]);
-  auto mag = v1.sqr_magnitude();
-  if (mag)
-    v1 *= 1/sqrt(mag);
-  else
-    v1 = TV();
-  auto v2 = (pos[src(p)] - pos[src(id)]);
-  mag = v2.sqr_magnitude();
-  if (mag)
-    v2 *= 1/sqrt(mag);
-  else
-    v2 = TV();
-  return atan2(cross(v1, v2).magnitude(), dot(v1, v2));
+real TriangleTopology::area(RawField<const TV3,VertexId> X, const FaceId f) const {
+  return triangle(X,f).area();
 }
 
-template GEODE_CORE_EXPORT real TriangleTopology::angle_at(HalfedgeId id, Field<Vector<real,3>, VertexId> const &pos) const;
-
-template<class TV>
-TV TriangleTopology::normal(FaceId id, Field<TV, VertexId> const &pos) const {
-  auto v = vertices(id);
-  auto N = cross(pos[v.y] - pos[v.x], pos[v.z] - pos[v.x]);
-  auto mag = N.sqr_magnitude();
-  if (mag)
-    return N/sqrt(mag);
-  else
-    return TV();
+TV3 TriangleTopology::normal(RawField<const TV3,VertexId> X, const FaceId f) const {
+  const auto v = vertices(f);
+  return normal_cross(X[v.y]-X[v.x],X[v.z]-X[v.x]);
 }
 
-template GEODE_CORE_EXPORT Vector<real,3> TriangleTopology::normal(FaceId id, Field<Vector<real,3>, VertexId> const &pos) const;
-
-template<class TV>
-TV TriangleTopology::normal(VertexId id, Field<TV, VertexId> const &pos) const {
-  real total_angle = 0;
-  TV N = TV();
-
-  for (auto he : outgoing(id)) {
-    auto f = face(he);
-    if (f.valid()) {
-      auto angle = angle_at(he, pos);
-      total_angle += angle;
-      N += normal(f, pos);
-    }
+TV3 TriangleTopology::normal(RawField<const TV3,VertexId> X, const VertexId v) const {
+  // Area weight normals
+  TV3 n;
+  for (const auto e : outgoing(v)) {
+    const auto f = face(e);
+    if (f.valid())
+      n += angle_at(X,e)*normal(X,f);
   }
 
-  if (total_angle)
-    N /= total_angle;
+  // We're nondegenerate, return immediately
+  const T nn = sqr_magnitude(n);
+  if (nn)
+    return n/sqrt(nn);
 
-  return N;
+  // If we're degenerate, return the normal of the least degenerate face
+  T max_angle = -inf;
+  for (const auto e : outgoing(v)) {
+    const auto f = face(e);
+    if (f.valid()) {
+      const T angle = angle_at(X,e);
+      if (!(max_angle >= angle)) { // Invert comparison so that nans mean yes
+        max_angle = angle;
+        n = normal(X,f);
+      }
+    }
+  }
+  return n;
 }
 
-template GEODE_CORE_EXPORT Vector<real,3> TriangleTopology::normal(VertexId id, Field<Vector<real,3>, VertexId> const &pos) const;
-
-
-template<class TV>
-Triangle<TV> TriangleTopology::triangle(FaceId id, Field<TV, VertexId> const &pos) const {
-  auto verts = vertices(id);
-  return Triangle<TV>(pos[verts.x], pos[verts.y], pos[verts.z]);
+T TriangleTopology::dihedral(RawField<const TV3,VertexId> X, const HalfedgeId e) const {
+  const auto t0 = triangle(X,face(e)),
+             t1 = triangle(X,face(reverse(e)));
+  const auto d = t1.center()-t0.center();
+  const T abs_theta = acos(min(1.,max(-1.,dot(t0.n,t1.n))));
+  return copysign(abs_theta,dot(t1.n-t0.n,d));
 }
 
-template GEODE_CORE_EXPORT Triangle<Vector<real,2>> TriangleTopology::triangle(FaceId id, Field<Vector<real,2>, VertexId> const &pos) const;
-template GEODE_CORE_EXPORT Triangle<Vector<real,3>> TriangleTopology::triangle(FaceId id, Field<Vector<real,3>, VertexId> const &pos) const;
-
-template<class TV>
-Segment<TV> TriangleTopology::segment(HalfedgeId id, Field<TV, VertexId> const &pos) const {
-  auto verts = vertices(id);
-  return Segment<TV>(pos[verts.x], pos[verts.y]);
+T TriangleTopology::cos_dihedral(RawField<const TV3,VertexId> X, const HalfedgeId e) const {
+  const auto x1 = X[src(e)],
+             x2 = X[dst(e)],
+             x0 = X[dst(next(e))],
+             x3 = X[dst(next(reverse(e)))],
+             n0 = cross(x2-x1,x0-x1),
+             n1 = cross(x3-x1,x0-x1);
+  // Assume really bad dihedrals for degenerate elements
+  const T denom = sqrt(sqr_magnitude(n0)*sqr_magnitude(n1));
+  return denom ? dot(n0,n1)/denom : 1;
 }
 
-template GEODE_CORE_EXPORT Segment<Vector<real,2>> TriangleTopology::segment(HalfedgeId id, Field<Vector<real,2>, VertexId> const &pos) const;
-template GEODE_CORE_EXPORT Segment<Vector<real,3>> TriangleTopology::segment(HalfedgeId id, Field<Vector<real,3>, VertexId> const &pos) const;
+#define PER_DIMENSION(TV) \
+  T TriangleTopology::angle_at(RawField<const TV,VertexId> X, const HalfedgeId e) const { \
+    const auto x0 = X[src(e)], \
+               x1 = X[dst(e)], \
+               x2 = X[src(prev(e))]; \
+    return angle_between(x1-x0,x2-x0); \
+  } \
+  Triangle<TV> TriangleTopology::triangle(RawField<const TV,VertexId> X, const FaceId f) const { \
+    const auto v = vertices(f); \
+    return Triangle<TV>(X[v.x],X[v.y],X[v.z]); \
+  } \
+  Segment<TV> TriangleTopology::segment(RawField<const TV,VertexId> X, const HalfedgeId e) const { \
+    const auto v = vertices(e); \
+    return Segment<TV>(X[v.x],X[v.y]); \
+  } \
+  Tuple<Ref<SimplexTree<TV,1>>,Array<HalfedgeId>> TriangleTopology::edge_tree(Field<const TV,VertexId> X, const int leaf_size) const { \
+    const auto soup = edge_soup(); \
+    return tuple(new_<SimplexTree<TV,1>>(soup.x,X.flat,leaf_size),soup.y); \
+  } \
+  Tuple<Ref<SimplexTree<TV,2>>,Array<FaceId>> TriangleTopology::face_tree(Field<const TV,VertexId> X, const int leaf_size) const { \
+    const auto soup = face_soup(); \
+    return tuple(new_<SimplexTree<TV,2>>(soup.x,X.flat,leaf_size),soup.y); \
+  }
+PER_DIMENSION(TV2)
+PER_DIMENSION(TV3)
 
-template<class TV>
-Tuple<Ref<SimplexTree<TV,1>>, Array<HalfedgeId>> TriangleTopology::edge_tree(Field<TV, VertexId> const &pos, int leaf_size) const {
-  auto soup = edge_segment_soup();
-  return tuple(new_<SimplexTree<TV,1>>(soup.x, pos.flat, leaf_size), soup.y);
+#ifdef GEODE_PYTHON
+Ref<> TriangleTopology::edge_tree_py(Array<const T,2> X) const {
+  if (X.n==2)      return to_python_ref(edge_tree(Field<const TV2,VertexId>(vector_view_own<2>(X.flat))));
+  else if (X.n==3) return to_python_ref(edge_tree(Field<const TV3,VertexId>(vector_view_own<3>(X.flat))));
+  throw ValueError(format("TriangleTopology::edge_tree: Expected 2D or 3D vectors, got shape %s",str(X.sizes())));
 }
 
-template GEODE_CORE_EXPORT Tuple<Ref<SimplexTree<Vector<real,2>,1>>, Array<HalfedgeId>> TriangleTopology::edge_tree(Field<Vector<real,2>, VertexId> const &pos, int) const;
-template GEODE_CORE_EXPORT Tuple<Ref<SimplexTree<Vector<real,3>,1>>, Array<HalfedgeId>> TriangleTopology::edge_tree(Field<Vector<real,3>, VertexId> const &pos, int) const;
-
-template<class TV>
-Tuple<Ref<SimplexTree<TV,2>>, Array<FaceId>> TriangleTopology::face_tree(Field<TV, VertexId> const &pos, int leaf_size) const {
-  auto soup = face_triangle_soup();
-  return tuple(new_<SimplexTree<TV,2>>(soup.x, pos.flat, leaf_size), soup.y);
+Ref<> TriangleTopology::face_tree_py(Array<const T,2> X) const {
+  if (X.n==2)      return to_python_ref(face_tree(Field<const TV2,VertexId>(vector_view_own<2>(X.flat))));
+  else if (X.n==3) return to_python_ref(face_tree(Field<const TV3,VertexId>(vector_view_own<3>(X.flat))));
+  throw ValueError(format("TriangleTopology::face_tree: Expected 2D or 3D vectors, got shape %s",str(X.sizes())));
 }
-
-template GEODE_CORE_EXPORT Tuple<Ref<SimplexTree<Vector<real,2>,2>>, Array<FaceId>> TriangleTopology::face_tree(Field<Vector<real,2>, VertexId> const &pos, int) const;
-template GEODE_CORE_EXPORT Tuple<Ref<SimplexTree<Vector<real,3>,2>>, Array<FaceId>> TriangleTopology::face_tree(Field<Vector<real,3>, VertexId> const &pos, int) const;
+#endif
 
 #define SAFE_ERASE(prim,Id) \
   void MutableTriangleTopology::safe_erase_##prim(Id x, bool erase_isolated) { \
@@ -1953,6 +2237,18 @@ SAFE_ERASE(halfedge,HalfedgeId)
 }
 using namespace geode;
 
+#include <geode/python/pyrange.h>
+
+#ifdef GEODE_PYTHON
+namespace geode {
+template<> GEODE_DEFINE_TYPE(PyRange<TriangleTopologyIncoming>);
+template<> GEODE_DEFINE_TYPE(PyRange<TriangleTopologyOutgoing>);
+template<> GEODE_DEFINE_TYPE(PyRange<TriangleTopologyIter<VertexId>>);
+template<> GEODE_DEFINE_TYPE(PyRange<TriangleTopologyIter<FaceId>>);
+template<> GEODE_DEFINE_TYPE(PyRange<TriangleTopologyIter<HalfedgeId>>);
+}
+#endif
+
 void wrap_corner_mesh() {
   #define SAFE_METHOD(name) GEODE_METHOD_2(#name,safe_##name)
   {
@@ -1965,6 +2261,9 @@ void wrap_corner_mesh() {
       .GEODE_GET(n_boundary_edges)
       .GEODE_GET(n_edges)
       .GEODE_GET(n_faces)
+      .GEODE_GET(allocated_vertices)
+      .GEODE_GET(allocated_faces)
+      .GEODE_GET(allocated_halfedges)
       .GEODE_GET(chi)
       .SAFE_METHOD(halfedge)
       .SAFE_METHOD(prev)
@@ -1983,6 +2282,7 @@ void wrap_corner_mesh() {
       .SAFE_METHOD(incoming)
       .GEODE_METHOD(vertex_one_ring)
       .GEODE_METHOD(incident_faces)
+      .GEODE_METHOD(face_soup)
       .GEODE_OVERLOADED_METHOD_2(HalfedgeId(Self::*)(VertexId, VertexId)const, "halfedge_between", halfedge)
       .GEODE_METHOD(common_halfedge)
       .GEODE_OVERLOADED_METHOD_2(VertexId(Self::*)(FaceId, FaceId)const, "common_vertex_between_faces", common_vertex)
@@ -2005,9 +2305,16 @@ void wrap_corner_mesh() {
       .GEODE_OVERLOADED_METHOD(Range<TriangleTopologyIter<VertexId>>(Self::*)() const, vertices)
       .GEODE_OVERLOADED_METHOD(Range<TriangleTopologyIter<FaceId>>(Self::*)() const, faces)
       .GEODE_OVERLOADED_METHOD(Range<TriangleTopologyIter<HalfedgeId>>(Self::*)() const, halfedges)
+      .GEODE_OVERLOADED_METHOD_2(bool(Self::*)(VertexId) const, "vertex_valid", valid)
+      .GEODE_OVERLOADED_METHOD_2(bool(Self::*)(FaceId) const, "face_valid", valid)
+      .GEODE_OVERLOADED_METHOD_2(bool(Self::*)(HalfedgeId) const, "halfedge_valid", valid)
       .GEODE_METHOD(boundary_edges)
       .GEODE_METHOD(interior_halfedges)
       .GEODE_METHOD(is_garbage_collected)
+#ifdef GEODE_PYTHON
+      .GEODE_METHOD_2("edge_tree",edge_tree_py)
+      .GEODE_METHOD_2("face_tree",face_tree_py)
+#endif
       ;
   }
   {
@@ -2016,6 +2323,8 @@ void wrap_corner_mesh() {
       .GEODE_INIT()
       .GEODE_METHOD(copy)
       .GEODE_METHOD(add)
+      .GEODE_METHOD(flip)
+      .GEODE_METHOD(flipped)
       .GEODE_METHOD(add_vertex)
       .GEODE_METHOD(add_vertices)
       .GEODE_METHOD(add_face)
@@ -2026,8 +2335,11 @@ void wrap_corner_mesh() {
       .GEODE_METHOD(split_nonmanifold_vertex)
       .GEODE_METHOD(split_nonmanifold_vertices)
       .GEODE_METHOD(split_along_edge)
+      .GEODE_METHOD(is_collapse_safe)
+      .GEODE_METHOD(collapse)
       .GEODE_OVERLOADED_METHOD_2(VertexId(Self::*)(HalfedgeId),"split_edge",split_edge)
       .GEODE_OVERLOADED_METHOD_2(void(Self::*)(HalfedgeId,VertexId),"split_edge_with_vertex",split_edge)
+      .GEODE_METHOD(erase_isolated_vertices)
       .GEODE_METHOD(collect_garbage)
       .GEODE_METHOD(collect_boundary_garbage)
       #ifdef GEODE_PYTHON
@@ -2035,8 +2347,17 @@ void wrap_corner_mesh() {
       .GEODE_METHOD_2("add_face_field",add_face_field_py)
       .GEODE_METHOD_2("add_halfedge_field",add_halfedge_field_py)
       .GEODE_METHOD_2("has_field",has_field_py)
+      .GEODE_METHOD_2("has_vertex_field",has_vertex_field_py)
+      .GEODE_METHOD_2("has_face_field",has_face_field_py)
+      .GEODE_METHOD_2("has_halfedge_field",has_halfedge_field_py)
       .GEODE_METHOD_2("remove_field",remove_field_py)
+      .GEODE_METHOD_2("remove_vertex_field",remove_vertex_field_py)
+      .GEODE_METHOD_2("remove_face_field",remove_face_field_py)
+      .GEODE_METHOD_2("remove_halfedge_field",remove_halfedge_field_py)
       .GEODE_METHOD_2("field",field_py)
+      .GEODE_METHOD_2("vertex_field",vertex_field_py)
+      .GEODE_METHOD_2("face_field",face_field_py)
+      .GEODE_METHOD_2("halfedge_field",halfedge_field_py)
       #endif
       .GEODE_METHOD(permute_vertices)
       ;

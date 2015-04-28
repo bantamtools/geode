@@ -43,7 +43,9 @@ const int halfedge_texcoord_id = 2;
   }; \
   template<GEODE_REMOVE_PARENS(template_args)> struct is_packed_pod<GEODE_REMOVE_PARENS(full_name)> : mpl::true_ {}; \
   GEODE_REMOVE_PARENS(templates) GEODE_UNUSED static inline ostream& \
-  operator<<(ostream& output, GEODE_REMOVE_PARENS(full_name) i) { return output<<i.id; }
+  operator<<(ostream& output, GEODE_REMOVE_PARENS(full_name) i) { return output<<((#Name)[0])<<i.id; }
+// When we print ids, we use first character of Name as a prefix to make it easier to differentiate ids
+// (i.g. V0 for VertexId(0), E0 for EdgeId(0), vs 0 for int(0))
 
 #define GEODE_DEFINE_ID_CONVERSIONS(Name, full_name, templates, template_args) \
   GEODE_REMOVE_PARENS(templates) GEODE_UNUSED static inline PyObject* \
@@ -63,6 +65,7 @@ GEODE_DEFINE_ID(HalfedgeId)
 GEODE_DEFINE_ID(EdgeId)
 GEODE_DEFINE_ID(FaceId)
 GEODE_DEFINE_ID(BorderId)
+GEODE_DEFINE_ID(ComponentId)
 GEODE_DECLARE_VECTOR_CONVERSIONS(GEODE_CORE_EXPORT,2,VertexId)
 GEODE_DECLARE_VECTOR_CONVERSIONS(GEODE_CORE_EXPORT,2,FaceId)
 GEODE_DECLARE_VECTOR_CONVERSIONS(GEODE_CORE_EXPORT,2,HalfedgeId)
@@ -79,13 +82,16 @@ public:
   typedef Object Base;
 
   const int id;
-  const type_info& type;
-  const enum {Vertex, Face, Halfedge} prim;
+  const type_info* type;
+  const enum Primitive {Vertex, Face, Halfedge} prim;
 
 protected:
-  template<class T> PyFieldId(FieldId<T,VertexId> id)   : id(id.id), type(typeid(T)), prim(Vertex) {}
-  template<class T> PyFieldId(FieldId<T,FaceId> id)     : id(id.id), type(typeid(T)), prim(Face) {}
-  template<class T> PyFieldId(FieldId<T,HalfedgeId> id) : id(id.id), type(typeid(T)), prim(Halfedge) {}
+  template<class T> PyFieldId(FieldId<T,VertexId> id)   : id(id.id), type(&typeid(T)), prim(Vertex) {}
+  template<class T> PyFieldId(FieldId<T,FaceId> id)     : id(id.id), type(&typeid(T)), prim(Face) {}
+  template<class T> PyFieldId(FieldId<T,HalfedgeId> id) : id(id.id), type(&typeid(T)), prim(Halfedge) {}
+
+  // making stuff from python without access to a type
+  PyFieldId(Primitive prim, int id): id(id), type(NULL), prim(prim) {}
 };
 
 template<class T, class Id> static inline PyObject* to_python(FieldId<T,Id> i) {
@@ -107,6 +113,13 @@ template<class Id> struct IdIter {
   IdIter operator-(int d) const { return Id(i.id-d);}
   int operator-(IdIter o) const { return i.id-o.i.id; }
 };
+
+template<class Id> Range<IdIter<Id>> id_range(const Id min, const Id end) {
+  assert(min == end || min.idx() <= end.idx()); // Catch unbounded ranges
+  return range(IdIter<Id>(min),IdIter<Id>(end));
+}
+template<class Id> Range<IdIter<Id>> id_range(const int n) { return id_range(Id(0),Id(n)); }
+template<class Id> Range<IdIter<Id>> id_range(const int lo, const int hi) { return id_range(Id(lo),Id(hi)); }
 
 #ifdef OTHER_PYTHON
 template<class Id> static inline PyObject* to_python(IdIter<Id> i) { return to_python(i.i); }

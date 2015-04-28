@@ -37,6 +37,18 @@ template<class TK,class T> struct HashtableEntry {
     state = EntryActive;
   }
 
+  void destroy() {
+    if (state == EntryActive) {
+      static_cast<const TK*>(static_cast<const void*>(&TKbuf))->~TK();
+      static_cast<const T*>(static_cast<const void*>(&Tbuf))->~T();
+    }
+    state = EntryDeleted;
+  }
+
+  ~HashtableEntry() {
+    destroy();
+  }
+
   const TK& key() const { return reinterpret_cast<const TK&>(TKbuf); };
   T& data() const { return reinterpret_cast<T&>(const_cast_(Tbuf)); };
   bool active() const { return state==EntryActive; }
@@ -48,6 +60,17 @@ template<class TK,class T> struct HashtableEntry {
 template<class TK> struct HashtableEntry<TK,Unit> : public Unit {
   typename aligned_storage<sizeof(TK), alignment_of<TK>::value>::type TKbuf;
   HashtableEntryState state;
+
+  void destroy() {
+    if (state == EntryActive) {
+      static_cast<const TK*>(static_cast<const void*>(&TKbuf))->~TK();
+    }
+    state = EntryDeleted;
+  }
+
+  ~HashtableEntry() {
+    destroy();
+  }
 
   void init(const TK& k, Unit) {
     new(&TKbuf) TK(k);
@@ -95,6 +118,10 @@ public:
 
   int size() const {
     return size_;
+  }
+
+  bool empty() const {
+    return size_ == 0;
   }
 
   int max_size() const {
@@ -239,7 +266,7 @@ public:
   bool erase(const TK& v) { // Erase an element if it exists, returning true if so
     for (int h=hash_index(v);table_[h].state!=EntryFree;h=next_index(h)) // reduce as still are using entries for deletions
       if (table_[h].active() && table_[h].key()==v) {
-        table_[h].state = EntryDeleted;
+        table_[h].destroy();
         size_--;
         next_resize_--;
         return true;
@@ -291,7 +318,10 @@ public:
 template<class TK,class T>
 struct HashtableIter {
   typedef typename CopyConst<HashtableEntry<TK,typename remove_const<T>::type>,T>::type Entry;
-
+  typedef decltype(declval<Entry>().value()) ValueReference;
+  typedef decltype(&(declval<ValueReference>())) ValuePointer;
+  // Try to make sure we don't inadvertently start returning copied values during iteration:
+  static_assert(is_reference<ValueReference>::value, "HashtableEntry::value() doesn't return a reference. This is likely a bug");
   const RawArray<Entry> table;
   int index;
 
@@ -314,16 +344,14 @@ struct HashtableIter {
     return index!=other.index; // Assume same table
   }
 
-  auto operator*() const
-    -> decltype(table[index].value()) {
+  ValueReference operator*() const {
     auto& entry = table[index];
     assert(entry.active());
     return entry.value();
   }
 
-  auto operator->() const
-    -> decltype(&operator*()) {
-    return &operator*();
+  ValuePointer operator->() const {
+    return &(*this);
   }
 
   void operator++() {

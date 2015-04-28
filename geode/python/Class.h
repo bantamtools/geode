@@ -31,7 +31,7 @@
 #include <geode/python/config.h>
 #include <geode/python/wrap.h>
 #include <geode/python/Object.h>
-#include <geode/utility/Enumerate.h>
+#include <geode/utility/enumerate.h>
 #include <geode/utility/format.h>
 #include <geode/utility/type_traits.h>
 #ifdef GEODE_PYTHON
@@ -177,11 +177,11 @@ public:
 
   template<class Method> Class&
   method(const char* name, Method method) {
-#ifndef _WIN32
-    add_descriptor(type,name,wrap_method<T,Method>(name,method));
+#ifdef GEODE_VARIADIC
+    add_descriptor(type,name,wrap_method<T,Method>(name, method));
 #else
-    typedef typename DerivedMethod<Self,Method>::type DM;
-    add_descriptor(type,name,wrap_method<T,Self>(name,(DM)method));
+    typedef typename geode::DerivedMethod<Self, Method>::type DM;
+    add_descriptor(type,name,wrap_method<T,  Self>(name, (DM)method));
 #endif
     return *this;
   }

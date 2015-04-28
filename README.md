@@ -42,6 +42,42 @@ So far the code has been tested on
 * [clang 3.4](http://clang.llvm.org)
 * [clang 3.5](http://clang.llvm.org)
 
+### Windows
+  This has been built and run successfully with the Visual Studio 2015 preview. We are working to make this more streamlined and robust (as well as fixing the hundreds of compiler warnings), but the following worked for me:
+
+  Install the following dependencies:
+   * WinPython 64bit version 2.7.9.2 (This includes numpy and scipy)
+   * SCons using scons-local-2.3.4
+   * MPIR (commit 3a9dd527a2f87e6eff8cab8b54b0b1f31e0826fa but tweaked for VS2015)
+   ** This will require installing vsyasm
+   ** Remove definition of snprintf from /build.vc12/cfg.h
+   ** You may need to set Tools->Options->Projects and Solutions->Build and Run->"Maximum number of parallel project builds" to 1 to avoid parallel builds clobbering config headers
+
+   Create a config.py and point gmp to installation of mpir:
+     gmp_libpath = '#/../mpir/build.vc12/x64/Debug'
+     gmp_include='#/../mpir'
+     gmp_publiclibs='mpir.lib'
+
+   Create a 'scons.bat' script and place in PATH (or otherwise make scons available):
+     python %~dp0..\scons-local-2.3.4\scons.py %*
+
+   Setup Command Prompt environment:
+     Python from:
+       ...\WinPython-64bit-2.7.9.2\scripts\env.bat
+     VS dev tools using:
+       "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\VsDevCmd.bat"
+     Select x64 tools using:
+       "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
+
+   Build with:
+     scons -j7 type=debug shared=0 Werror=0
+
+   SCons install targets weren't tested but copying geode_all.pyd into geode will make it usable:
+     cp build/native/release/lib/geode_all.pyd geode/geode_all.pyd
+
+   To use geode outside of project directory or for test_worker to pass you must add geode to your PYTHONPATH:
+     set PYTHONPATH=<path_to_dir_outside_repo>\geode;%PYTHONPATH%
+
 ### Installation
 
 If necessary, dependencies can be installed via one of
@@ -51,9 +87,9 @@ If necessary, dependencies can be installed via one of
     sudo apt-get install python-scipy python-pytest libpng-dev libjpeg-dev libopenexr-dev # optional
 
     # Homebrew (recommended)
-    brew install scons openexr gfortran python
+    brew install scons openexr gfortran python #Note: gfortran brew is now part of gcc, so although previous versions can still be accessed, brew install gcc is the preferred method
     brew install boost # Not needed for 10.9 or later
-    sudo pip install --upgrade pip setuptools numpy scipy pytest
+    sudo pip install --upgrade pip setuptools numpy scipy pytest #numpy and scipy can be
 
     # MacPorts (not recommended).  If you have python 2.7, replace py26 with py27.
     sudo port -v install python26 py26-numpy scons boost
@@ -67,10 +103,32 @@ Geode can then be installed from source via
 
     # Install c++ headers and libraries to /usr/local
     scons -j 5
+
+At this point, you have a choice of either developer mode or install mode
+### Install mode
     sudo scons install
 
     # Install python bindings
     sudo python setup.py install
+
+### Developer mode
+
+The libraries are built into `build/$arch/$type` (`build/native/release` by default) if you want to use them without installing.  To point python imports to your development tree, run one of
+
+    sudo python setup.py develop
+    python setup.py develop --prefix=$HOME
+
+To create symlinks in /usr/local/{include,lib} pointing into the development tree, run
+
+    sudo scons -j5 develop
+
+or
+
+    sudo scons -j5 develop type=debug
+
+which will allow you to develop with geode in C++ as if it was installed.
+
+
 
 ### Testing
 
@@ -106,22 +164,9 @@ The following flags can be used to disable optional components:
     use_libjpeg = 0
     use_openmesh = 0
 
-### Developer mode
-
-The libraries are built into `build/$arch/$type` (`build/native/release` by default) if you want to use them without installing.  To point python imports to your development tree, run one of
-
-    sudo python setup.py develop
-    python setup.py develop --prefix=$HOME
-
-To create symlinks in /usr/local/{include,lib} pointing into the development tree, run
-
-    sudo scons -j5 develop
-
-or
-
-    sudo scons -j5 develop type=debug
-
-which will allow you to develop with geode in C++ as if it was installed.
+### Common Issues
+On recent Linux machines, the boost libraries are already multithread-capable, and will not include the 'mt' suffix. As this is the default in the geode SConstruct, the following should be added in config.py:
+    boost_lib_suffix = ''
 
 
 

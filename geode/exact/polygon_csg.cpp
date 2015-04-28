@@ -1,7 +1,8 @@
 // Robust constructive solid geometry for polygons in the plane
-
+#include <geode/array/ConstantMap.h>
 #include <geode/exact/polygon_csg.h>
 #include <geode/exact/constructions.h>
+#include <geode/exact/ExactSegmentGraph.h>
 #include <geode/exact/predicates.h>
 #include <geode/exact/perturb.h>
 #include <geode/exact/quantize.h>
@@ -9,15 +10,27 @@
 #include <geode/array/amap.h>
 #include <geode/array/sort.h>
 #include <geode/geometry/BoxTree.h>
+#include <geode/geometry/polygon.h>
 #include <geode/geometry/traverse.h>
 #include <geode/python/wrap.h>
 #include <geode/structure/Hashtable.h>
 #include <geode/utility/Log.h>
 #include <geode/utility/str.h>
+#include <geode/utility/time.h>
+
 namespace geode {
 
+std::string str(const FillRule rule) {
+  switch (rule) {
+    case FillRule::Greater: return "Greater";
+    case FillRule::Parity: return "Parity";
+    case FillRule::NotEqual: return "NotEqual";
+  }
+  GEODE_UNREACHABLE("Bad enum value");
+}
+
 typedef exact::Vec2 EV;
-using exact::Point2;
+using exact::Perturbed2;
 using Log::cout;
 using std::endl;
 
@@ -30,7 +43,7 @@ static Array<Box<EV>> segment_boxes(RawArray<const int> next, RawArray<const EV>
 
 // Does x1 + t*dir head outwards from the local polygon portion x0,x1,x2?
 // A version of local_outwards specialized to dir = (1,0): does x1 + t*(1,0) head outwards from x0,x1,x2?
-static inline bool local_outwards_x_axis(const Point2 x0, const Point2 x1, const Point2 x2) {
+static inline bool local_outwards_x_axis(const Perturbed2 x0, const Perturbed2 x1, const Perturbed2 x2) {
   // If x1 is convex,  we're outwards if dir is to the right of *either* segment.
   // If x1 is concave, we're outwards if dir is to the right of *both* segments.
   const bool out0 = upwards(x0,x1),
@@ -68,8 +81,8 @@ Nested<EV> exact_split_polygons(Nested<const EV> polys, const int depth) {
       const int i0 = tree.prims(n0)[0], i1 = next[i0],
                 j0 = tree.prims(n1)[0], j1 = next[j0];
       if (!(i0==j0 || i0==j1 || i1==j0 || i1==j1)) {
-        const auto a0 = tuple(i0,X[i0]), a1 = tuple(i1,X[i1]),
-                   b0 = tuple(j0,X[j0]), b1 = tuple(j1,X[j1]);
+        const auto a0 = Perturbed2(i0,X[i0]), a1 = Perturbed2(i1,X[i1]),
+                   b0 = Perturbed2(j0,X[j0]), b1 = Perturbed2(j1,X[j1]);
         if (segments_intersect(a0,a1,b0,b1))
           pairs.append(vec(i0,j0));
       }
@@ -102,26 +115,26 @@ Nested<EV> exact_split_polygons(Nested<const EV> polys, const int depth) {
       const BoxTree<EV>& tree;
       RawArray<const int> next;
       RawArray<const EV> X;
-      const Point2 start;
+      const Perturbed2 start;
       int depth;
 
       Depth(const BoxTree<EV>& tree, RawArray<const int> next, RawArray<const EV> X, const int prev, const int i)
         : tree(tree), next(next), X(X)
         , start(i,X[i])
         // If we intersect no other segments, the depth depends on the orientation of direction = (1,0) relative to segments prev and i
-        , depth(-!local_outwards_x_axis(tuple(prev,X[prev]),start,tuple(next[i],X[next[i]]))) {}
+        , depth(-!local_outwards_x_axis(Perturbed2(prev,X[prev]),start,Perturbed2(next[i],X[next[i]]))) {}
 
       bool cull(const int n) const {
         const auto box = tree.boxes(n);
-        return box.max.x<start.y.x || box.max.y<start.y.y || box.min.y>start.y.y;
+        return box.max.x<start.value().x || box.max.y<start.value().y || box.min.y>start.value().y;
       }
 
       void leaf(const int n) {
         assert(tree.prims(n).size()==1);
         const int i0 = tree.prims(n)[0], i1 = next[i0];
-        if (start.x!=i0 && start.x!=i1) {
-          const auto a0 = tuple(i0,X[i0]),
-                     a1 = tuple(i1,X[i1]);
+        if (start.seed()!=i0 && start.seed()!=i1) {
+          const auto a0 = Perturbed2(i0,X[i0]),
+                     a1 = Perturbed2(i1,X[i1]);
           const bool above0 = upwards(start,a0),
                      above1 = upwards(start,a1);
           if (above0!=above1 && above1==triangle_oriented(a0,a1,start))
@@ -137,16 +150,16 @@ Nested<EV> exact_split_polygons(Nested<const EV> polys, const int depth) {
     int prev = poly.back();
     for (const int i : poly) {
       const int j = next[i];
-      const Vector<Point2,2> segment(tuple(i,X[i]),tuple(j,X[j]));
+      const Vector<Perturbed2,2> segment(Perturbed2(i,X[i]),Perturbed2(j,X[j]));
       const auto other = others[i];
       // Sort intersections along this segment
       if (other.size() > 1) {
         struct PairOrder {
           RawArray<const int> next;
           RawArray<const EV> X;
-          const Vector<Point2,2> segment;
+          const Vector<Perturbed2,2> segment;
 
-          PairOrder(RawArray<const int> next, RawArray<const EV> X, const Vector<Point2,2>& segment)
+          PairOrder(RawArray<const int> next, RawArray<const EV> X, const Vector<Perturbed2,2>& segment)
             : next(next), X(X), segment(segment) {}
 
           bool operator()(const int j, const int k) const {
@@ -155,8 +168,8 @@ Nested<EV> exact_split_polygons(Nested<const EV> polys, const int depth) {
             const int jn = next[j],
                       kn = next[k];
             return segment_intersections_ordered(segment.x,segment.y,
-                                                 tuple(j,X[j]),tuple(jn,X[jn]),
-                                                 tuple(k,X[k]),tuple(kn,X[kn]));
+                                                 Perturbed2(j,X[j]),Perturbed2(jn,X[jn]),
+                                                 Perturbed2(k,X[k]),Perturbed2(kn,X[kn]));
           }
         };
         sort(other,PairOrder(next,X,segment));
@@ -166,7 +179,7 @@ Nested<EV> exact_split_polygons(Nested<const EV> polys, const int depth) {
         if (!delta)
           graph.set(vec(prev,i),o);
         const int on = next[o];
-        delta += segment_directions_oriented(segment.x,segment.y,tuple(o,X[o]),tuple(on,X[on])) ? -1 : 1;
+        delta += segment_directions_oriented(segment.x,segment.y,Perturbed2(o,X[o]),Perturbed2(on,X[on])) ? -1 : 1;
         prev = o;
       }
       if (!delta)
@@ -184,7 +197,7 @@ Nested<EV> exact_split_polygons(Nested<const EV> polys, const int depth) {
       auto ij = start.x;
       for (;;) {
         const int i = ij.x, j = ij.y, in = next[i], jn = next[j];
-        output.flat.append(j==next[i] ? X[j] : segment_segment_intersection(tuple(i,X[i]),tuple(in,X[in]),tuple(j,X[j]),tuple(jn,X[jn])));
+        output.flat.append(j==next[i] ? X[j] : segment_segment_intersection(Perturbed2(i,X[i]),Perturbed2(in,X[in]),Perturbed2(j,X[j]),Perturbed2(jn,X[jn])));
         ij = vec(j,graph.get(ij));
         if (ij == start.x)
           break;
@@ -195,14 +208,93 @@ Nested<EV> exact_split_polygons(Nested<const EV> polys, const int depth) {
   return output;
 }
 
+static inline bool include_face(int delta, const FillRule rule) {
+  switch(rule) {
+    case FillRule::Greater: return delta > 0;
+    case FillRule::Parity: return !(delta & 1);
+    case FillRule::NotEqual: return !delta;
+  }
+  GEODE_UNREACHABLE("Bad enum value");
+}
+
 Nested<Vec2> split_polygons(Nested<const Vec2> polys, const int depth) {
   const auto quant = quantizer(bounding_box(polys));
   return amap(quant.inverse,exact_split_polygons(amap(quant,polys),depth));
 }
 
+Nested<Vec2> exact_split_polygons_with_rule(Nested<const Vec2> polys, const int depth, const FillRule rule) {
+  const auto g = ExactSegmentGraph(polys);
+  const auto edge_windings = Field<int, EdgeId>(constant_map(g.topology->n_edges(), 1).copy());
+  const auto face_winding_depths = compute_winding_numbers(g.topology, g.boundary_face(), edge_windings);
+  auto included_faces = Field<bool, FaceId>(g.topology->n_faces(), uninit);
+  for(const FaceId fid : included_faces.id_range())
+    included_faces[fid] = include_face(face_winding_depths[fid] - depth, rule);
+  const auto contours = extract_region(g.topology, included_faces);
+  auto result = Nested<Vec2>::empty_like(contours);
+  for(int i : range(contours.flat.size())) {
+    const auto he = contours.flat[i];
+    result.flat[i] = g.vertices[g.topology->src(he)].approx;
+  }
+  return result;
 }
+
+Nested<Vec2> split_polygons_with_rule(Nested<const Vec2> polys, const int depth, const FillRule rule) {
+  const auto quant = quantizer(bounding_box(polys));
+  return amap(quant.inverse,exact_split_polygons_with_rule(amap(quant,polys),depth,rule));
+}
+
+Nested<Vec2> split_polygons_greater(Nested<const Vec2> polys, const int depth) {
+ return split_polygons_with_rule(polys,depth,FillRule::Greater); }
+Nested<Vec2> split_polygons_parity(Nested<const Vec2> polys, const int depth) {
+ return split_polygons_with_rule(polys,depth,FillRule::Parity); }
+Nested<Vec2> split_polygons_neq(Nested<const Vec2> polys, const int depth) {
+ return split_polygons_with_rule(polys,depth,FillRule::NotEqual); }
+
+static bool segment_intersections_possibly_same(const Vec2 v0, const Vec2 v1) {
+  return (v0 - v1).maxabs() <= segment_segment_intersection_threshold;
+}
+static bool all_close(const Nested<const Vec2> p0, const Nested<const Vec2> p1) {
+  if(p0.offsets != p1.offsets)
+    return false;
+  assert(p0.flat.size() == p1.flat.size());
+  for(const int i : range(p0.flat.size())) {
+    if(!segment_intersections_possibly_same(p0.flat[i],p1.flat[i]))
+      return false;
+  }
+  return true;
+}
+
+Nested<Vec2> compare_splitting_algorithms(Nested<const Vec2> polys, const int depth) {
+  // Call into non-graph based implementation
+  const auto t0 = get_time();
+  const auto simple_result = canonicalize_polygons(split_polygons(polys, depth));
+  const auto simple_time = get_time() - t0;
+  // Call into graph based implementation
+  const auto t1 = get_time();
+  const auto graph_result = canonicalize_polygons(split_polygons_greater(polys,depth));
+  const auto graph_time = get_time() - t1;
+  std::cout << "Time using graph  : " << graph_time << ", Time without graph: " << simple_time << '\n'
+            << format("input N: %d, output N: %d, graph/without: %f\n", polys.total_size(), graph_result.total_size(), graph_time/simple_time);
+
+  // Orders of arguments to segment_segment_intersection can slightly alter constructed points
+  // If minimal points found in canonicalize_polygons are different this check could fail (current test cases don't trigger this)
+  // If this assert is only triggered when FORCE_CANONICAL_CONSTRUCTION_ARGUMENTS is false, it might be necessary to implement more robust matching
+  GEODE_ASSERT(all_close(graph_result,simple_result));
+  #if FORCE_CANONICAL_CONSTRUCTION_ARGUMENTS
+  // With FORCE_CANONICAL_CONSTRUCTION_ARGUMENTS, results should be bit-for-bit identical
+  GEODE_ASSERT(graph_result == simple_result);
+  #endif
+
+  return graph_result;
+}
+
+} // namespace geode
 using namespace geode;
 
 void wrap_polygon_csg() {
   GEODE_FUNCTION(split_polygons)
+  GEODE_FUNCTION(split_polygons_greater)
+  GEODE_FUNCTION(split_polygons_parity)
+  GEODE_FUNCTION(split_polygons_neq)
+  GEODE_FUNCTION(compare_splitting_algorithms)
 }
