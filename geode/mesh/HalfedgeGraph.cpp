@@ -5,6 +5,8 @@
 #include <geode/array/RawField.h>
 #include <geode/array/Nested.h>
 
+#include <climits>
+
 namespace geode {
 
 GEODE_DEFINE_TYPE(HalfedgeGraph)
