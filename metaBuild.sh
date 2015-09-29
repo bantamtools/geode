@@ -15,7 +15,7 @@ if [ "$1" = "clean" ] || [ "$1" = "build" ]; then
   SYSTEM_NAME=`uname -s`
   args+=(sse=0)
   args+=(arch=$ARCH)
-  if [ "$SYSTEM_NAME" = "Darwin" ]; then
+  if [ "$SYSTEM_NAME" = "Darwin" -o "$SYSTEM_NAME" = "Linux" ]; then
     # OSX specific config:
     args+=(use_openmesh=1 openmesh_libpath=#/../OpenMesh-2.0/build/Build/lib/OpenMesh openmesh_publiclibs='OpenMeshCore,OpenMeshTools' openmesh_include=#/../OpenMesh-2.0/src)
     echo "" # Can't have an empty if block
