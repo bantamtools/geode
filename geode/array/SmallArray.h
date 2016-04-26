@@ -37,6 +37,10 @@ public:
     return m_;
   }
 
+  bool empty() const {
+    return m_ == 0;
+  }
+
   T* data() const {
     return &buffer[0];
   }
@@ -96,5 +100,8 @@ public:
   }
 
 };
+
+// A number of other overloads for this are defined in Array.h. This is here to avoid needing to include or forward declare SmallArray there
+template<class T,int N>   static inline const RawArray<const T> asarray(const SmallArray<T,N>& v)  { return RawArray<const T>(v.size(),v.data()); }
 
 } // namespace geode
