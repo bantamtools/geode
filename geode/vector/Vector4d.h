@@ -117,10 +117,10 @@ public:
     IndirectArray<const Vector,TIndices&> subset(const TIndices& indices) const
     {return IndirectArray<const Vector,TIndices&>(*this,indices);}
 
-    bool operator==(const Vector& v) const
+    constexpr bool operator==(const Vector& v) const
     {return x==v.x && y==v.y && z==v.z && w==v.w;}
 
-    bool operator!=(const Vector& v) const
+    constexpr bool operator!=(const Vector& v) const
     {return x!=v.x || y!=v.y || z!=v.z || w!=v.w;}
 
   Vector operator-() const

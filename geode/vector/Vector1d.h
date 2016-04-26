@@ -103,10 +103,10 @@ public:
     IndirectArray<const Vector,TIndices&> subset(const TIndices& indices) const
     {return IndirectArray<const Vector,TIndices&>(*this,indices);}
 
-    bool operator==(const Vector& v) const
+    constexpr bool operator==(const Vector& v) const
     {return x==v.x;}
 
-    bool operator!=(const Vector& v) const
+    constexpr bool operator!=(const Vector& v) const
     {return x!=v.x;}
 
     Vector operator-() const

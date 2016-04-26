@@ -552,12 +552,12 @@ tuple_repr(const Vector<T,4>& v)
 //#####################################################################
 #ifdef GEODE_VARIADIC
 
-template<class T,class... Args> static inline auto vec(const Args&... args)
+template<class T,class... Args> static constexpr auto vec(const Args&... args)
   -> Vector<T,sizeof...(Args)> {
   return Vector<T,sizeof...(Args)>(args...);
 }
 
-template<class... Args> static inline auto vec(const Args&... args)
+template<class... Args> static constexpr auto vec(const Args&... args)
   -> Vector<typename common_type<Args...>::type,sizeof...(Args)> {
   return Vector<typename common_type<Args...>::type,sizeof...(Args)>(args...);
 }
