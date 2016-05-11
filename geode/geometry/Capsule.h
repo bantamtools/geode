@@ -2,8 +2,8 @@
 // Class Capsule
 //#####################################################################
 #pragma once
-
 #include <geode/geometry/Segment.h>
+#include <geode/math/constants.h>
 #include <geode/structure/Tuple.h>
 #include <geode/vector/magnitude.h>
 namespace geode {
