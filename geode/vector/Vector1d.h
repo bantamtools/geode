@@ -34,32 +34,32 @@ public:
     typedef T value_type; // for stl
     typedef T* iterator; // for stl
     typedef const T* const_iterator; // for stl
-    enum Workaround1 {dimension=1};
-    enum Workaround2 {m=1};
-    static const bool is_const=false;
+    static const int dimension = 1;
+    static const int m = 1;
+    static const bool is_const = false;
 
     T x;
 
-    Vector()
+    constexpr Vector()
         :x()
     {
         static_assert(sizeof(Vector)==sizeof(T),"");
     }
 
-    explicit Vector(const T& x)
+    explicit constexpr Vector(const T& x)
         :x(x)
     {}
 
-    template<class T2> explicit Vector(const Vector<T2,1>& vector)
+    template<class T2> explicit constexpr Vector(const Vector<T2,1>& vector)
         :x(T(vector.x))
     {}
 
-    Vector(const Vector& vector)
+    constexpr Vector(const Vector& vector)
         :x(vector.x)
     {}
 
     template<class TVector>
-    explicit Vector(const TVector& v,typename EnableForVectorLike<T,1,TVector,Unusable>::type unusable=Unusable())
+    explicit constexpr Vector(const TVector& v,typename EnableForVectorLike<T,1,TVector,Unusable>::type unusable=Unusable())
         :x(v[0])
     {}
 
@@ -75,13 +75,13 @@ public:
         x=v[0];return *this;
     }
 
-    Vector& operator=(const Vector& v)
-    {
-        x=v[0];return *this;
-    }
+    Vector& operator=(const Vector& v) = default;
 
-    int size() const
+    constexpr int size() const
     {return 1;}
+
+    constexpr bool empty() const
+    {return false;}
 
     const T& operator[](const int i) const
     {assert(i==0);return x;}
@@ -249,6 +249,9 @@ public:
 
     static Vector repeat(const T& constant)
     {return Vector(constant); }
+    
+    static Vector nans()
+    {return Vector::repeat(std::numeric_limits<T>::quiet_NaN());}
 
     void fill(const T& constant)
     {x=constant;}
@@ -299,7 +302,7 @@ public:
     Vector reversed() const
     {return *this;}
 
-    template<int d1,int d2> Vector<int,d2-d1> slice() const
+    template<int d1,int d2> Vector<T,d2-d1> slice() const
     {static_assert(0<=d1 && d1<=d2 && d2<=1,"");
     Vector<T,d2-d1> r;for(int i=d1;i<d2;i++) r[i-d1]=(*this)[i];return r;}
 
@@ -451,5 +454,8 @@ clamp_max(const Vector<T,1>& v,const T& max)
 template<class T> inline bool
 in_bounds(const Vector<T,1>& v,const Vector<T,1>& vmin,const Vector<T,1>& vmax)
 {return in_bounds(v.x,vmin.x,vmax.x);}
+
+template<class T> const int Vector<T,1>::dimension;
+template<class T> const int Vector<T,1>::m;
 
 }

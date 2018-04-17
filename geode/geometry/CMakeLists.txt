@@ -1,0 +1,70 @@
+set(module_SRCS
+  AnalyticImplicit.cpp
+  ArcSegment.cpp
+  arc_fitting.cpp
+  Bezier.cpp
+  Box.cpp
+  BoxScalar.cpp
+  BoxTree.cpp
+  BoxVector.cpp
+  clip_open_arcs.cpp
+  Cylinder.cpp
+  extract_contours.cpp
+  FrameImplicit.cpp
+  Implicit.cpp
+  join_fragments.cpp
+  mass_properties.cpp
+  offset_mesh.cpp
+  ParticleTree.cpp
+  Plane.cpp
+  platonic.cpp
+  polygon.cpp
+  Segment.cpp
+  SimplexTree.cpp
+  simplify_arcs.cpp
+  Sphere.cpp
+  surface_levelset.cpp
+  ThickShell.cpp
+  Triangle2d.cpp
+  Triangle3d.cpp
+)
+
+set(module_HEADERS
+  AnalyticImplicit.h
+  ArcSegment.h
+  arc_fitting.h
+  Bezier.h
+  Box.h
+  BoxScalar.h
+  BoxTree.h
+  BoxVector.h
+  Capsule.h
+  clip_open_arcs.h
+  Cylinder.h
+  extract_contours.h
+  FastRay.h
+  forward.h
+  FrameImplicit.h
+  Implicit.h
+  join_fragments.h
+  mass_properties.h
+  offset_mesh.h
+  ParticleTree.h
+  Plane.h
+  platonic.h
+  polygon.h
+  Ray.h
+  Segment.h
+  SimplexTree.h
+  simplify_arcs.h
+  Sphere.h
+  surface_levelset.h
+  ThickShell.h
+  traverse.h
+  Triangle2d.h
+  Triangle3d.h
+)
+
+install_geode_headers(geometry ${module_HEADERS})
+
+add_geode_module(geometry ${module_SRCS})

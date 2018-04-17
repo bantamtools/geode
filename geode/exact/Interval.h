@@ -28,7 +28,7 @@ template<> struct IsScalar<Interval> : public mpl::true_ {};
 template<> struct is_packed_pod<Interval> : public mpl::true_ {};
 
 // If possible, use SSE to speed up interval arithmetic.
-#if defined(__SSE__)
+#if defined(GEODE_SSE4_1)
 #define GEODE_INTERVAL_SSE 1
 #else
 #define GEODE_INTERVAL_SSE 0
@@ -558,7 +558,7 @@ template<int m> static inline bool small(const Vector<Interval,m>& xs, const dou
 template<int m> static inline Box<Vector<Quantized,m>> snap_box(const Vector<Interval,m>& xs) {
   Box<Vector<Quantized,m>> box;
   for (int i=0;i<m;i++) {
-#ifdef __SSE4_1__
+#ifdef GEODE_SSE4_1
     const auto b = ceil(xs[i].s);
     box.min[i] = b.min;
     box.max[i] = b.max;
@@ -584,6 +584,21 @@ static inline Interval abs(const Interval x) {
 
 #endif // GEODE_INTERVAL_SSE
 
+using ::std::atan; // We explicitly pull atan into the geode namespace
+// Without this calling atan on a double would implicitly convert argument and call atan(Interval) resulting in an Interval instead of a double
+
+static inline Interval atan(const Interval x) {
+  assert(fegetround() == FE_UPWARD);
+  // atan is monotonic so new bounds are just rounded atan of old bounds
+  // We can use atan on nlo directly since atan(-x) == -atan(x)
+#if !GEODE_INTERVAL_SSE
+  return Interval(std::atan(x.nlo),std::atan(x.hi));
+#else
+  const auto v = unpack(x.s);
+  return Interval(pack<double>(std::atan(v.x),std::atan(v.y)));
+#endif
+}
+
 // +-1 if the interval is definitely nonzero, otherwise zero
 static inline int weak_sign(const Interval x) {
   return certainly_positive(x) ?  1
@@ -606,9 +621,16 @@ template<int m> static inline Vector<double,m> center(const Vector<Interval,m>& 
 // Snap an interval vector to integers, rounding to the best integer guess
 template<int m> static inline Vector<Quantized,m> snap(const Vector<Interval,m>& xs) {
   Vector<Quantized,m> r;
-  for (int i=0;i<m;i++)
-    r[i] = Quantized(round(xs[i].center()));
+  for (int i=0;i<m;i++) {
+    r[i] = Quantized(std::round(xs[i].center()));
+    if(r[i] == 0.) r[i] = fabs(r[i]); // Make sure we snap to positive zero instead of negative zero (which causes problems with hashing)
+  }
   return r;
+}
+
+inline Box<Vec2> bounding_box(const Vector<Interval,2>& i) {
+  const auto bx = i.x.box(), by = i.y.box();
+  return Box<Vec2>(Vec2(bx.min,by.min),Vec2(bx.max,by.max));
 }
 
 } // namespace geode

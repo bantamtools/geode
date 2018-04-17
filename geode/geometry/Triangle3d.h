@@ -95,8 +95,10 @@ public:
     T minimum_altitude() const
     {return minimum_altitude(x0,x1,x2);}
 
-    static T minimum_altitude(const TV& x0,const TV& x1,const TV& x2)
-    {return 2*area(x0,x1,x2)/maximum_edge_length(x0,x1,x2);}
+    static T minimum_altitude(const TV& x0,const TV& x1,const TV& x2) {
+      const T length = maximum_edge_length(x0,x1,x2);
+      return length ? 2*area(x0,x1,x2)/length : 0;
+    }
 
     static TV barycentric_coordinates(const TV& location,const TV& x0,const TV& x1,const TV& x2) // clockwise vertices
     {TV u=x1-x0,v=x2-x0,w=location-x0;
@@ -203,9 +205,9 @@ public:
     GEODE_CORE_EXPORT void change_size(const T delta);
     GEODE_CORE_EXPORT bool intersection(Triangle<Vector<T,3>> const &t, Segment<Vector<T,3>> &result) const;
     GEODE_CORE_EXPORT bool intersection(Plane<T> const &plane, Segment<Vector<T,3>> &result) const;
-    GEODE_CORE_EXPORT bool intersection(Ray<Vector<T,3> >& ray,const T thickness_over_2=0) const;
-    GEODE_CORE_EXPORT bool lazy_intersection(Ray<Vector<T,3> >& ray) const;
-    GEODE_CORE_EXPORT bool closest_non_intersecting_point(Ray<Vector<T,3> >& ray,const T thickness_over_2=0) const;
+    GEODE_CORE_EXPORT bool intersection(RayIntersection<Vector<T,3> >& ray,const T thickness_over_2=0) const;
+    GEODE_CORE_EXPORT bool lazy_intersection(RayIntersection<Vector<T,3> >& ray) const;
+    GEODE_CORE_EXPORT bool closest_non_intersecting_point(RayIntersection<Vector<T,3> >& ray,const T thickness_over_2=0) const;
     GEODE_CORE_EXPORT bool point_inside_triangle(const TV& point,const T thickness_over_2=0) const;
     GEODE_CORE_EXPORT bool planar_point_inside_triangle(const TV& point,const T thickness_over_2=0) const;
     GEODE_CORE_EXPORT bool lazy_planar_point_inside_triangle(const TV& point) const;

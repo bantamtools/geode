@@ -5,6 +5,7 @@
 using namespace geode;
 
 void wrap_geometry() {
+  GEODE_WRAP(arc_fitting)
   GEODE_WRAP(box_vector)
   GEODE_WRAP(polygon)
   GEODE_WRAP(implicit)
@@ -18,4 +19,5 @@ void wrap_geometry() {
   GEODE_WRAP(bezier)
   GEODE_WRAP(segment)
   GEODE_WRAP(surface_levelset)
+  GEODE_WRAP(offset_mesh)
 }

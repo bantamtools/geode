@@ -522,8 +522,8 @@ inline void edge_edge_collision_function(const Vec3d &d_x0,    const Vec3d &d_x1
     }
     
     out[0] = Interval(-out_lower[0],out_upper[0]);
-    out[1] = Interval(-out_lower[0],out_upper[1]);
-    out[2] = Interval(-out_lower[0],out_upper[2]);
+    out[1] = Interval(-out_lower[1],out_upper[1]);
+    out[2] = Interval(-out_lower[2],out_upper[2]);
 }
 
 
@@ -2072,7 +2072,7 @@ bool RootParityCollisionTest::ray_prism_parity_test()
         // check if any hit was not good
         if ( !good_hit )
         {
-            double r = rand() / (double)RAND_MAX * 2.0 * M_PI;
+            double r = rand() / (double)RAND_MAX * 2.0 * pi;
             test_ray[0] = cos(r) * ray_len;
             test_ray[1] = -sin(r) * ray_len;
         }
@@ -2171,7 +2171,7 @@ bool RootParityCollisionTest::ray_hex_parity_test( )
         // check if any hit was not okay
         if ( !good_hit )
         {
-            double r = rand() / (double)RAND_MAX * 2.0 * M_PI;
+            double r = rand() / (double)RAND_MAX * 2.0 * pi;
             test_ray[0] =  cos(r) * ray_len;
             test_ray[1] = -sin(r) * ray_len;
         }
@@ -2542,7 +2542,7 @@ bool edge_edge_collision_parity(const TV& x0old, const TV& x1old, const TV& x2ol
 // True if the point x0 intersects the triangle x123 an odd or degenerate number of times during linear motion
 bool point_triangle_collision_parity(const TV& x0old, const TV& x1old, const TV& x2old, const TV& x3old,
                                      const TV& x0new, const TV& x1new, const TV& x2new, const TV& x3new) {
-  RootParityCollisionTest test(x0old,x1old,x2old,x3old,x0new,x1new,x2new,x3new,true);
+  RootParityCollisionTest test(x0old,x1old,x2old,x3old,x0new,x1new,x2new,x3new,false);
   return test.point_triangle_collision();
 }
 

@@ -11,11 +11,12 @@
 #include <vector>
 namespace geode {
 
-template<class TV,int d> class SimplexTree : public BoxTree<TV> {
+template<class TV,int d_> class SimplexTree : public BoxTree<TV> {
   typedef typename TV::Scalar T;
 public:
   GEODE_DECLARE_TYPE(GEODE_CORE_EXPORT)
   typedef BoxTree<TV> Base;
+  static const int d = d_;
   typedef typename mpl::if_c<d==1,SegmentSoup,TriangleSoup>::type Mesh;
   typedef typename mpl::if_c<d==1,Segment<TV>,Triangle<TV>>::type Simplex;
   typedef typename mpl::if_c<d==1,T,Vector<T,3>>::type Weights;
@@ -33,8 +34,8 @@ public:
   ~SimplexTree();
 
   GEODE_CORE_EXPORT void update(); // Call whenever X changes
-  GEODE_CORE_EXPORT bool intersection(Ray<TV>& ray, const T thickness_over_two) const;
-  GEODE_CORE_EXPORT Array<Ray<TV> > intersections(const Ray<TV>& ray, const T thickness_over_two) const;
+  GEODE_CORE_EXPORT bool intersection(RayIntersection<TV>& ray, const T thickness_over_two) const;
+  GEODE_CORE_EXPORT Array<RayIntersection<TV> > intersections(const RayIntersection<TV>& ray, const T thickness_over_two) const;
   GEODE_CORE_EXPORT void intersection(const Sphere<TV>& sphere, Array<int>& hits) const;
   GEODE_CORE_EXPORT void intersections(const Plane<T>& plane, Array<Segment<TV>>& result) const;
   GEODE_CORE_EXPORT bool inside(TV point) const;

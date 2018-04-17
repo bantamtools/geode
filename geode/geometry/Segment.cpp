@@ -1,7 +1,7 @@
 // Segments
 
 #include <geode/geometry/Segment.h>
-#include <geode/geometry/Ray.h>
+#include <geode/geometry/RayIntersection.h>
 #include <geode/array/Array.h>
 #include <geode/math/clamp.h>
 #include <geode/math/givens.h>
@@ -299,7 +299,7 @@ template<int d> Tuple<T,TV3,TV2> segment_segment_distance_and_normal(const Segme
   return best;
 }
 
-bool segment_ray_intersection(const Segment<TV2>& seg, Ray<TV2>& ray, const T half_thickness) {
+bool segment_ray_intersection(const Segment<TV2>& seg, RayIntersection<TV2>& ray, const T half_thickness) {
   const TV2 from_start_to_start = seg.x0-ray.start;
   TV2 segment_direction = seg.x1-seg.x0;
   const T segment_length = segment_direction.normalize();
@@ -437,7 +437,8 @@ template<int d> static void segment_tests(const int steps) {
   template GEODE_CORE_EXPORT T segment_point_sqr_distance(Segment<Vector<T,d>>,Vector<T,d>); \
   template GEODE_CORE_EXPORT T segment_segment_distance(Segment<Vector<T,d>>,Segment<Vector<T,d>>); \
   template GEODE_CORE_EXPORT Tuple<T,Vector<T,d>,T> segment_point_distance_and_normal(Segment<Vector<T,d>> s, Vector<T,d> p); \
-  template GEODE_CORE_EXPORT Tuple<T,TV3,TV2> segment_segment_distance_and_normal(const Segment<Vector<T,d>>,const Segment<Vector<T,d>>);
+  template GEODE_CORE_EXPORT Tuple<T,TV3,TV2> segment_segment_distance_and_normal(const Segment<Vector<T,d>>,const Segment<Vector<T,d>>); \
+  template GEODE_CORE_EXPORT T line_point_distance(Segment<Vector<T,d>>,Vector<T,d>);
 INSTANTIATE(2)
 INSTANTIATE(3)
 

@@ -13,7 +13,7 @@ namespace geode {
 
 template<class T,class Id> struct HasCheapCopy<Field<T,Id> >:public mpl::true_{};
 
-template<class T,class Id> static inline PyObject* to_python(const Field<T,Id>& field) {
+template<class T,class Id> static inline typename enable_if<has_to_python<Array<T>>, PyObject*>::type to_python(const Field<T,Id>& field) {
   return to_python(field.flat);
 }
 
@@ -21,11 +21,12 @@ template<class T,class Id> struct FromPython<Field<T,Id> >{static inline Field<T
   return Field<T,Id>(from_python<Array<T>>(object));
 }};
 
-template<class T,class Id>
+template<class T,class Id_>
 class Field {
 private:
   struct Unusable {};
 public:
+  using Id = Id_;
   typedef typename remove_const<T>::type Element;
   static const bool is_const = geode::is_const<T>::value;
   typedef T& result_type;
@@ -82,6 +83,14 @@ public:
     return flat[i.idx()];
   }
 
+  // Extract values of several ids at the same time as a Vector
+  Vector<T,2> vec(const Vector<Id,2> ids) const
+  { return {(*this)[ids[0]], (*this)[ids[1]]}; }
+  Vector<T,3> vec(const Vector<Id,3> ids) const
+  { return {(*this)[ids[0]], (*this)[ids[1]], (*this)[ids[2]]}; }
+  Vector<T,4> vec(const Vector<Id,4> ids) const
+  { return {(*this)[ids[0]], (*this)[ids[1]], (*this)[ids[2]], (*this)[ids[3]]}; }
+
   bool valid(Id i) const {
     return flat.valid(i.idx());
   }
@@ -99,12 +108,34 @@ public:
     return Id(flat.append(x));
   }
 
-  template<class TField> void extend(const TField& append_field) {
-    flat.extend(append_field.flat);
+  Id append_assuming_enough_space(const T& x) GEODE_ALWAYS_INLINE {
+    return Id(flat.append_assuming_enough_space(x));
   }
 
-  void preallocate(const int m_new) {
+  Id append(Uninit) GEODE_ALWAYS_INLINE {
+    return Id(flat.append(uninit));
+  }
+
+  // A Field is extended with an array, not another field (A different field would use different ids)
+  template<class TArray> void extend(const TArray& append_array) {
+    flat.extend(append_array);
+  }
+
+  void extend(const int n, Uninit) GEODE_ALWAYS_INLINE {
+    flat.extend(n,uninit);
+  }
+
+  void preallocate(const int m_new) GEODE_ALWAYS_INLINE {
     flat.preallocate(m_new);
+  }
+
+  // Grow storage so that max_id will be be a valid index
+  void grow_until_valid(const Id max_id) {
+    assert(max_id.valid());
+    if(size() <= max_id.idx()) {
+      flat.resize(max_id.idx() + 1);
+    }
+    assert(valid(max_id));
   }
 
   Field<Element,Id> copy() const {
@@ -120,6 +151,11 @@ public:
   const Field<Element,Id>& const_cast_() const {
     return *(const Field<Element,Id>*)this;
   }
+
+  Element& front() { return flat.front(); }
+  const Element& front() const { return flat.front(); }
+  Element& back() { return flat.back(); }
+  const Element& back() const { return flat.back(); }
 };
 
 }

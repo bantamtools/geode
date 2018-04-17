@@ -25,8 +25,10 @@
 #include <geode/vector/ScalarPolicy.h>
 #include <geode/utility/STATIC_ASSERT_SAME.h>
 #include <geode/utility/type_traits.h>
+#include <typeinfo>
 #include <iostream>
 #include <limits>
+#include <typeinfo>
 namespace geode {
 
 using std::type_info;

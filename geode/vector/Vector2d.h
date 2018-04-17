@@ -37,42 +37,40 @@ public:
     typedef T value_type; // for stl
     typedef T* iterator; // for stl
     typedef const T* const_iterator; // for stl
-    enum Workaround1 {dimension=2};
-    enum Workaround2 {m=2};
-    static const bool is_const=false;
+    static const int dimension = 2;
+    static const int m = 2;
+    static const bool is_const = false;
 
     T x,y;
 
-    Vector()
+    constexpr Vector()
         :x(),y()
     {
         static_assert(sizeof(Vector)==2*sizeof(T),"");
     }
 
-    Vector(const T& x,const T& y)
+    constexpr Vector(const T& x,const T& y)
         :x(x),y(y)
     {}
 
-    Vector(const Vector& vector)
-        :x(vector.x),y(vector.y)
-    {}
+    constexpr Vector(const Vector& vector) = default;
 
-    template<class T2> explicit Vector(const Vector<T2,2>& vector)
+    template<class T2> explicit constexpr Vector(const Vector<T2,2>& vector)
         :x(T(vector.x)),y(T(vector.y))
     {}
 
-    template<class T2> explicit Vector(const Vector<T2,1>& vector)
+    template<class T2> explicit constexpr Vector(const Vector<T2,1>& vector)
         :x(T(vector.x)),y()
     {}
 
     template<class TVector>
-    explicit Vector(const TVector& v)
+    explicit constexpr Vector(const TVector& v)
         :x(v[0]),y(v[1])
     {
         static_assert(is_same<T,typename TVector::Element>::value && TVector::m==2,"");
     }
 
-    explicit Vector(const complex<T>& c)
+    explicit constexpr Vector(const complex<T>& c)
       : x(c.real()), y(c.imag()) {}
 
     template<class TVector> typename EnableForVectorLike<T,2,TVector,Vector&>::type
@@ -81,13 +79,13 @@ public:
         x=v[0];y=v[1];return *this;
     }
 
-    Vector& operator=(const Vector& v)
-    {
-        x=v[0];y=v[1];return *this;
-    }
+    Vector& operator=(const Vector& v) = default;
 
-    int size() const
+    constexpr int size() const
     {return 2;}
+
+    constexpr bool empty() const
+    {return false;}
 
     const T& operator[](const int i) const
     {assert(unsigned(i)<2);return *((const T*)(this)+i);}
@@ -281,6 +279,9 @@ public:
 
     static Vector repeat(const T& constant)
     {return Vector(constant,constant); }
+    
+    static Vector nans()
+    {return Vector::repeat(std::numeric_limits<T>::quiet_NaN());}
 
     Vector xy() const
     {return *this;}
@@ -340,7 +341,7 @@ public:
     Vector reversed() const
     {return Vector(y,x);}
 
-    template<int d1,int d2> Vector<int,d2-d1> slice() const
+    template<int d1,int d2> Vector<T,d2-d1> slice() const
     {static_assert(0<=d1 && d1<=d2 && d2<=2,"");
     Vector<T,d2-d1> r;for(int i=d1;i<d2;i++) r[i-d1]=(*this)[i];return r;}
 
@@ -545,5 +546,8 @@ in_bounds(const Vector<T,2>& v,const Vector<T,2>& vmin,const Vector<T,2>& vmax)
 template<class T> inline Vector<T,2>
 wrap(const Vector<T,2>& v,const Vector<T,2>& vmin,const Vector<T,2>& vmax)
 {return Vector<T,2>(wrap(v.x,vmin.x,vmax.x),wrap(v.y,vmin.y,vmax.y));}
+
+template<class T> const int Vector<T,2>::dimension;
+template<class T> const int Vector<T,2>::m;
 
 }

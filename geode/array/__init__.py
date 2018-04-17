@@ -3,8 +3,8 @@ from __future__ import absolute_import
 import platform
 from numpy import *
 if platform.system()=='Windows':
-  from other_all import *
-  import other_all as geode_wrap
+  from .. import geode_all as geode_wrap
+  from ..geode_all import *
 else:
   from .. import geode_wrap
 
@@ -24,6 +24,9 @@ class Nested(object):
       assert x.ndim>=2
       offsets = x.shape[1]*arange(x.shape[0]+1,dtype=int32)
       flat = x.reshape(-1,*x.shape[2:])
+    elif len(x) == 0:
+      offsets = self.single_zero
+      flat = []
     else:
       offsets = hstack([self.single_zero,cumsum([len(y) for y in x],dtype=int32)])
       flat = concatenate(x)

@@ -54,7 +54,7 @@ template<class TM> PyObject* to_python_map(const TM& m) {
   Py_XDECREF(dict);
   return 0;
 }
-}
+} // geode namespace
 
 // to_python needs to go in the std namespace to make Koenig lookup work
 namespace std {
@@ -103,9 +103,6 @@ template<class T0,class T1> PyObject* to_python(const pair<T0,T1>& p) {
   return 0;
 }
 
-}
-namespace GEODE_UNORDERED_NAMESPACE {
-
 template<class T,class H> static inline PyObject* to_python(const unordered_set<T,H>& s) {
   return geode::to_python_set(s);
 }
@@ -114,7 +111,7 @@ template<class T,class V,class H> static inline PyObject* to_python(const unorde
   return geode::to_python_map(m);
 }
 
-}
+} // std namespace
 namespace geode {
 
 using std::vector;
@@ -149,9 +146,9 @@ template<class T,class V,class H> struct FromPython<unordered_map<T,V,H>>:public
 
 template<class T0,class T1> struct FromPython<pair<T0,T1> >{static pair<T0,T1> convert(PyObject* object) {
   Ref<PyObject> seq = steal_ref_check(PySequence_Fast(object,"expected pair"));
-  size_t len = PySequence_Length(&*seq);
+  Py_ssize_t len = PySequence_Length(&*seq);
   if (len!=2) {
-    PyErr_Format(PyExc_TypeError,"expected pair, got length %ld",len);
+    GEODE_CALL_PyErr_Format(PyExc_TypeError,"expected pair, got length %zd",len);
     throw_python_error();
   }
   return pair<T0,T1>(from_python<T0>(ref_check(PySequence_Fast_GET_ITEM(&*seq,0))),

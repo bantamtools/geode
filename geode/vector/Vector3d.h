@@ -39,42 +39,40 @@ public:
     typedef const T* const_iterator; // for stl
     template<class V> struct result;
     template<class V> struct result<V(int)>:mpl::if_<is_const<V>,const T&,T&>{};
-    enum Workaround1 {dimension=3};
-    enum Workaround2 {m=3};
-    static const bool is_const=false;
+    static const int dimension = 3;
+    static const int m = 3;
+    static const bool is_const = false;
 
     T x,y,z;
 
-    Vector()
+    constexpr Vector()
         :x(),y(),z()
     {
         static_assert(sizeof(Vector)==3*sizeof(T),"");
     }
 
-    Vector(const T& x,const T& y,const T& z)
+    constexpr Vector(const T& x,const T& y,const T& z)
         :x(x),y(y),z(z)
     {}
 
-    Vector(const Vector& vector)
-        :x(vector.x),y(vector.y),z(vector.z)
-    {}
+    constexpr Vector(const Vector& vector) = default;
 
     template<class T2> explicit Vector(const Vector<T2,3>& vector)
         :x(T(vector.x)),y(T(vector.y)),z(T(vector.z))
     {}
 
-    explicit Vector(const Vector<T,2>& vector)
+    explicit constexpr Vector(const Vector<T,2>& vector)
         :x(vector.x),y(vector.y),z()
     {}
 
     template<class TVector,class TIndices>
-    explicit Vector(const IndirectArray<TVector,TIndices>& v)
+    explicit constexpr Vector(const IndirectArray<TVector,TIndices>& v)
         :x(v[0]),y(v[1]),z(v[2])
     {
         static_assert(is_same<T,typename IndirectArray<TVector,TIndices>::Element>::value && IndirectArray<TVector,TIndices>::m==3,"");
     }
 
-    explicit Vector(const Vector<T,2>& vector, const T& z)
+    explicit constexpr Vector(const Vector<T,2>& vector, const T& z)
       :x(vector.x),y(vector.y),z(z)
     {}
 
@@ -90,13 +88,13 @@ public:
         x=v[0];y=v[1];z=v[2];return *this;
     }
 
-    Vector& operator=(const Vector& v)
-    {
-        x=v[0];y=v[1];z=v[2];return *this;
-    }
+    Vector& operator=(const Vector& v) = default;
 
-    int size() const
+    constexpr int size() const
     {return 3;}
+
+    constexpr bool empty() const
+    {return false;}
 
     const T& operator[](const int i) const
     {assert(unsigned(i)<3);return *((const T*)(this)+i);}
@@ -284,9 +282,12 @@ public:
 
     static Vector repeat(const T& constant)
     {return Vector(constant,constant,constant); }
+    
+    static Vector nans()
+    {return Vector::repeat(std::numeric_limits<T>::quiet_NaN());}
 
     // shifts vector (wrapped) such that element a is first
-    Vector<T,3> roll(const int a) {
+    Vector<T,3> roll(const int a) const {
       Vector<T,3> v;
       v.x = (*this)[(0+a) % 3];
       v.y = (*this)[(1+a) % 3];
@@ -308,6 +309,10 @@ public:
 
     Vector<T,2> zx() const {
       return Vector<T,2>(z,x);
+    }
+
+    Vector<T,3> yxz() const {
+        return Vector<T,3>(y,x,z);
     }
 
     Vector<T,3> xzy() const {
@@ -481,6 +486,14 @@ template<class T> inline Vector<T,3>
 cross(const Vector<T,3>& v1,const Vector<T,3>& v2) // 6 mults, 3 adds
 {return Vector<T,3>(v1.y*v2.z-v1.z*v2.y,v1.z*v2.x-v1.x*v2.z,v1.x*v2.y-v1.y*v2.x);}
 
+// Safer normalized cross product.  Guaranteed orthogonal to both inputs even in degenerate situations.
+template<class T> inline Vector<T,3> normal_cross(const Vector<T,3> u, const Vector<T,3> v) {
+  const auto n = cross(u,v);
+  const auto nn = sqr_magnitude(n);
+  return nn ? n/sqrt(nn)
+            : (sqr_magnitude(u) >= sqr_magnitude(v) ? u : v).unit_orthogonal_vector();
+}
+
 template<class T> inline T angle_between(const Vector<T,3>& u, const Vector<T,3>& v) { // 0 .. pi
   return atan2(magnitude(cross(u,v)),dot(u,v));
 }
@@ -547,5 +560,8 @@ in_bounds(const Vector<T,3>& v,const Vector<T,3>& vmin,const Vector<T,3>& vmax)
 template<class T> inline Vector<T,3>
 wrap(const Vector<T,3>& v,const Vector<T,3>& vmin,const Vector<T,3>& vmax)
 {return Vector<T,3>(wrap(v.x,vmin.x,vmax.x),wrap(v.y,vmin.y,vmax.y),wrap(v.z,vmin.z,vmax.z));}
+
+template<class T> const int Vector<T,3>::dimension;
+template<class T> const int Vector<T,3>::m;
 
 }

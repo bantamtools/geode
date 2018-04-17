@@ -30,6 +30,10 @@
 #include <geode/vector/Vector.h>
 #include <geode/utility/const_cast.h>
 #include <vector>
+#include <array>
+#include <initializer_list>
+#include <climits>
+
 namespace geode {
 
 using std::swap;
@@ -262,9 +266,9 @@ private:
   void grow_buffer(const int max_size_new) {
     if (max_size_>=max_size_new) return;
     Buffer* new_owner = Buffer::new_<T>(max_size_new);
-    const int m_ = this->m_; // teach compiler that m_ is constant
+    const int m_ = this->m_; // Teach compiler that m_ is constant
     for (int i=0;i<m_;i++)
-      ((typename remove_const<T>::type*)new_owner->data)[i] = data_[i];
+      ((Element*)new_owner->data)[i] = data_[i];
     GEODE_XDECREF(owner_);
     max_size_ = max_size_new;
     data_ = (T*)new_owner->data;
@@ -298,8 +302,7 @@ public:
     int m_end = geode::min(m_,m_new);
     if (max_size_!=m_new) {
       Buffer* new_owner = Buffer::new_<T>(m_new);
-      for (int i=0;i<m_end;i++)
-        new_owner->data[i] = data_[i];
+      std::copy(data_,data_+m_end,(Element*)new_owner->data);
       GEODE_XDECREF(owner_);
       max_size_ = m_new;
       data_ = (T*)new_owner->data;
@@ -320,8 +323,7 @@ public:
     int m_end = geode::min(m_,m_new);
     if (max_size_!=m_new) {
       Buffer* new_owner = Buffer::new_<T>(m_new);
-      for (int i=0;i<m_end;i++)
-        new_owner->data[i] = data_[i];
+      std::copy(data_,data_+m_end,(Element*)new_owner->data);
       GEODE_XDECREF(owner_);
       max_size_ = m_new;
       data_ = (T*)new_owner->data;
@@ -395,13 +397,38 @@ public:
     return m_-1;
   }
 
-  template<class TArray> void extend(const TArray& append_array) {
-    STATIC_ASSERT_SAME(typename remove_const<T>::type,typename remove_const<typename TArray::value_type>::type);
-    int append_m = append_array.size(),
-        m_new = m_+append_m;
+  template<class TA> void extend(const TA& extra) {
+    STATIC_ASSERT_SAME(Element,typename remove_const<typename TA::value_type>::type);
+    const int append_m = extra.size(),
+              m_new = m_+append_m;
     preallocate(m_new);
     for (int i=0;i<append_m;i++)
-      geode::const_cast_(data_[m_+i]) = append_array[i];
+      geode::const_cast_(data_[m_+i]) = extra[i];
+    m_ = m_new;
+  }
+
+  template<class U> void extend(const std::initializer_list<U>& extra) {
+    // Perhaps this should be combined with the implementation above, but ConstantMap (and maybe others) don't support begin/end
+    STATIC_ASSERT_SAME(Element,typename remove_const<U>::type);
+    const int append_m = extra.size(),
+              m_new = m_+append_m;
+    preallocate(m_new);
+    auto* out = data_ + m_;
+    for(const auto& e : extra) {
+      assert(out < this->end());
+      geode::const_cast_(*out) = e;
+      ++out;
+    }
+    m_ = m_new;
+  }
+
+  template<class TA> void extend_assuming_enough_space(const TA& extra) {
+    STATIC_ASSERT_SAME(Element,typename remove_const<typename TA::value_type>::type);
+    const int append_m = extra.size(),
+              m_new = m_+append_m;
+    assert(m_new <= max_size_);
+    for (int i=0;i<append_m;i++)
+      geode::const_cast_(data_[m_+i]) = extra[i];
     m_ = m_new;
   }
 
@@ -411,6 +438,12 @@ public:
     preallocate(m_new);
     m_ = m_new;
     return m_old;
+  }
+
+  void extend_assuming_enough_space(const int n, Uninit) GEODE_ALWAYS_INLINE {
+    assert(n >= 0);
+    m_ += n;
+    assert(m_ <= max_size_);
   }
 
   bool is_unique() const {
@@ -463,7 +496,7 @@ public:
   }
 
   Array<const T> pop_elements(const int count) { // Return value shares ownership with original
-    static_assert(has_trivial_destructor<T>::value,"");
+    static_assert(is_trivially_destructible<T>::value,"");
     assert(m_-count>=0);
     m_ -= count;
     return Array<const T>(count,data_+m_,owner_);
@@ -515,6 +548,14 @@ public:
   }
 };
 
+template<class T> static inline Array<T> make_array( std::initializer_list<T> list ) {
+  Array<T> result;
+  result.preallocate(list.size());
+  for( const auto ref : list)
+     result.append_assuming_enough_space(ref);
+  return result;
+}
+
 template<class T,int d>   static inline const RawArray<T>       asarray(T (&v)[d])                 { return RawArray<T>(d,v); }
 template<class T,int d>   static inline const RawArray<T>       asarray(Vector<T,d>& v)            { return RawArray<T>(d,v.begin()); }
 template<class T,int d>   static inline const RawArray<const T> asarray(const Vector<T,d>& v)      { return RawArray<const T>(d,v.begin()); }
@@ -529,6 +570,7 @@ template<class T,int d>   static inline const RawArray<const T> asconstarray(con
 template<class T>         static inline const RawArray<const T> asconstarray(const RawArray<T>& v)      { return v; }
 template<class T>         static inline const RawArray<const T> asconstarray(const Array<T>& v)         { return v; }
 template<class T,class A> static inline const RawArray<const T> asconstarray(const std::vector<T,A>& v) { return RawArray<const T>(v.size(),&v[0]); }
+template<class T,size_t N> static inline const RawArray<const T> asconstarray(const std::array<T,N>& a) { static_assert(N <= std::numeric_limits<int>::max(), "Size too big"); return RawArray<const T>(int(N),a.data()); }
 template<class T,class A> static inline const A&                asconstarray(const ArrayBase<T,A>& v)   { return v.derived(); }
 
 template<class T,int d> static inline       Array<T>& flat(      Array<T,d>& A) { return A.flat; }

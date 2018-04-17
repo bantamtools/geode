@@ -18,8 +18,4 @@ build
 dist
 *.egg-info
 *.so
-xcuserdata
-.sconsign.dblite
-SConstruct
-config.py
-setup.cfg
+*.swp

@@ -12,6 +12,12 @@ namespace geode {
 
 #ifdef GEODE_PYTHON
 
+// Verify that Python macros agree with sizeof operator
+static_assert(SIZEOF_SIZE_T == sizeof(size_t), "Error: Bad value for SIZEOF_SIZE_T");
+static_assert(SIZEOF_INT == sizeof(int), "Error: Bad value for SIZEOF_INT");
+
+extern bool numpy_imported;
+
 #define ASSERT_NUMPY_TYPE_CONSISTENT(type)\
   static_assert((int)::type == (int)type, "Numpy's and our definition of " #type " doesn't match. Look at numpy-types.h for the problem.")
 
@@ -130,7 +136,9 @@ void wrap_python() {
   GEODE_ENUM_VALUE(EnumTestB)
 
   // import numpy
-  if (_import_array()<0){
+  if (_import_array() >= 0)
+    numpy_imported = true;
+  else {
     PyErr_Print();
     PyErr_SetString(PyExc_ImportError,"numpy.core.multiarray failed to import");
     throw_python_error();

@@ -48,20 +48,20 @@ namespace geode {
 typedef exact::Vec3 EV;
 typedef Vector<double,3> TV;
 typedef Vector<Interval,3> IV;
-typedef exact::Point3 P;
+typedef exact::Perturbed3 P;
 using std::cout;
 using std::endl;
 
 // For interface simplicity, we use a single fixed random number as the seed.
 // This is safe unless the points are chosen maliciously.  We've reused the key
 // from delaunay.cpp.
-static const uint128_t key = 9975794406056834021u+(uint128_t(920519151720167868u)<<64);
+static const uint128_t key = uint128_t(9975794406056834021u)+(uint128_t(920519151720167868u)<<64);
 
 // Some variables in the code can refer to either original vertices (possibly loop vertices),
 // edge-face intersection vertices, or face-face-face intersection vertices.  For this purpose,
 // we concatenate the ranges for the three types of vertices in order.  The same numbering is
 // used for vertices in the split output mesh before pruning.
-#define Xi(i) tuple(i,X[i])
+#define Xi(i) P(i,X[i])
 #define Xi2(i) (i < X.size() ? IV(X[i]) \
                              : ef_vertices.flat[i-X.size()].p())
 #define Xi3(i) (  i < X.size()                    ? IV(X[i]) \
@@ -76,6 +76,7 @@ static const uint128_t key = 9975794406056834021u+(uint128_t(920519151720167868u
 #define FX(f) Xi(f.x),Xi(f.y),Xi(f.z)
 #define FX0(f) f.x,f.y,f.z
 
+static inline IV iv(const P& p) { return IV(p.value()); }
 // Constructed points are guaranteed to be within this tolerance
 const Quantized tolerance = 1;
 
@@ -185,15 +186,20 @@ struct State {
   const RawArray<const Vector<int,3>> faces;
   const RawArray<const Vector<int,2>> edges;
 
+  // depth weights for faces
+  const RawArray<const int> depth_weight;
+
   State(RawArray<const EV> X, Nested<const EdgeFaceVertex> ef_vertices,
         Array<FaceFaceFaceVertex>& fff_vertices, Hashtable<Vector<int,3>,int>& faces_to_fff,
-        RawArray<const Vector<int,3>> faces, RawArray<const Vector<int,2>> edges)
+        RawArray<const Vector<int,3>> faces, RawArray<const Vector<int,2>> edges, RawArray<const int> depth_weight)
     : X(X)
     , ef_vertices(ef_vertices)
     , fff_vertices(fff_vertices)
     , faces_to_fff(faces_to_fff)
     , faces(faces)
-    , edges(edges) {}
+    , edges(edges)
+    , depth_weight(depth_weight)
+    {}
 
   // Is vertex v above face f?
   bool face_vertex_oriented(const int f, const int v) const {
@@ -202,9 +208,9 @@ struct State {
             f1 = Xi(fv.y),
             f2 = Xi(fv.z);
     const auto q = Xi3(v),
-               i0 = IV(f0.y),
-               i1 = IV(f1.y),
-               i2 = IV(f2.y);
+               i0 = iv(f0),
+               i1 = iv(f1),
+               i2 = iv(f2);
     return FILTER(edet(i1-i0,i2-i0,q-i0),
                   face_vertex_oriented_helper(f0,f1,f2,v));
   }
@@ -277,8 +283,8 @@ struct Policy : public State, public Noncopyable {
         Xi(faces[face].y),
         Xi(faces[face].z))
     , face_edges(face_edges)
-    , normal(cross(IV(f.y.y)-IV(f.x.y),IV(f.z.y)-IV(f.x.y))) {
-    assert(edges[face_edges.z].contains_all(vec(f.x.x,f.y.x)));
+    , normal(cross(iv(f.y)-iv(f.x),iv(f.z)-iv(f.x))) {
+    assert(edges[face_edges.z].contains_all(vec(f.x.seed(),f.y.seed())));
   }
 
   Line reverse_line(const Line L) const {
@@ -401,7 +407,7 @@ struct Policy : public State, public Noncopyable {
     // This routine is a huge case analysis on the different kinds of vertex patterns.
     // The types are V (input), B (boundary edge-face), EF (interior edge-face), and FFF (face-face-face).
     static const int V = 0, B = 1, EF = 2, FFF = 3;
-    const auto fv = vec(f.x.x,f.y.x,f.z.x);
+    const auto fv = vec(f.x.seed(),f.y.seed(),f.z.seed());
 
     // Classify vertices
     const int n = X.size(),
@@ -430,14 +436,14 @@ struct Policy : public State, public Noncopyable {
     #define C(t0,t1,t2) (9*(t0)+3*(t1)+(t2))
     switch (C(t0,t1,t2)) {
       case C(V,V,V):
-        return flip ^ flipped_in(vec(v0,v1),fv) ^ 1;
+        return flip ^ flipped_in(vec(v0,v1),fv) ^ true;
       case C(V,V,B):
       case C(V,V,EF):
       case C(V,V,FFF): {
         // If we're not colinear, we're unconditionally positively oriented as long
         // as v0,v1 is oriented within the triangle.  If we're colinear, pretend we're
         // positively oriented as well to avoid sliver triangles.
-        return flip ^ flipped_in(vec(v0,v1),fv) ^ 1; }
+        return flip ^ flipped_in(vec(v0,v1),fv) ^ true; }
       case C(V,B,B): {
         const auto &ef1 = ef_vertices.flat[v1-n],
                    &ef2 = ef_vertices.flat[v2-n];
@@ -450,7 +456,7 @@ struct Policy : public State, public Noncopyable {
           auto e2 = edges[ef2.edge];
           if (flipped_in(e1,fv)) swap(e1.x,e1.y);
           if (flipped_in(e2,fv)) swap(e2.x,e2.y);
-          return flip ^ (e1.contains(v0) && e2.contains(v0)) ^ e1.y==e2.x;
+          return flip ^ (e1.contains(v0) && e2.contains(v0)) ^ (e1.y==e2.x);
         }}
       case C(B,B,B): {
         const auto &ef0 = ef_vertices.flat[v0-n],
@@ -458,11 +464,10 @@ struct Policy : public State, public Noncopyable {
                    &ef2 = ef_vertices.flat[v2-n];
         const auto e0 = edges[ef0.edge],
                    e1 = edges[ef1.edge];
-        return flip ^ (  ef0.edge==ef1.edge ?   flipped_in(e0,fv) ^ (v0<v1)
-                                              ^ (ef0.edge==ef2.edge ? (v0>v2) ^ (v1<v2) : 0)
-                       : ef0.edge==ef2.edge ? flipped_in(e0,fv) ^ (v2<v0)
-                       : ef1.edge==ef2.edge ? flipped_in(e1,fv) ^ (v1<v2)
-                                            : flipped_in(vec(ef1.edge,ef0.edge),face_edges)); }
+        return flip ^ (  (ef0.edge==ef1.edge) ? flipped_in(e0,fv) ^ (v0<v1) ^ (ef0.edge==ef2.edge ? (v0>v2) ^ (v1<v2) : false)
+                       : (ef0.edge==ef2.edge) ? flipped_in(e0,fv) ^ (v2<v0)
+                       : (ef1.edge==ef2.edge) ? flipped_in(e1,fv) ^ (v1<v2)
+                                              : flipped_in(vec(ef1.edge,ef0.edge),face_edges) ^ false); }
       case C(V,B,EF):
       case C(V,B,FFF): {
         const auto& ef1 = ef_vertices.flat[v1-n];
@@ -470,7 +475,7 @@ struct Policy : public State, public Noncopyable {
         if (e1.contains(v0)) {
           // v1 is on an edge which touches v0, so we're the same as above.
           const int v1p = e1.sum()-v0;
-          return flip ^ flipped_in(vec(v0,v1p),fv) ^ 1;
+          return flip ^ flipped_in(vec(v0,v1p),fv) ^ true;
         } else if (t2==EF) {
           const auto& ef2 = ef_vertices.flat[v2-n];
           const auto e2 = edges[ef2.edge];
@@ -731,8 +736,16 @@ intersection_simplices(const SimplexTree<EV,2>& face_tree) {
 
   // Find edge-face intersections
   Nested<EdgeFaceVertex> ef_vertices; // Edge-face intersection vertices
+
   {
     // Find ef_vertices
+
+    // In my MSVC version (19.00.22310.1 for x64) using new_ in the initializer list below results in edge_tree not pointing to a valid object
+    // My guess is that the destructor for the temporary is getting being called before the edge_tree Ref is initialized
+    // Perhaps copy elision of a temporary passed via an initializer list to construct an anonymous struct hits a compiler bug?
+    // Or perhaps I misunderstand something about lifetime of temporaries in this context?
+    // Adding a seperate reference is a clean enough workaround
+    const auto helper_edge_tree = new_<SimplexTree<EV, 1>>(edges, X, 1);
     struct {
       const Ref<const SimplexTree<EV,1>> edge_tree;
       const SimplexTree<EV,2>& face_tree;
@@ -755,7 +768,7 @@ intersection_simplices(const SimplexTree<EV,2>& face_tree) {
           }
         }
       }
-    } helper({new_<SimplexTree<EV,1>>(edges,X,1),face_tree,X});
+    } helper({helper_edge_tree,face_tree,X});
     double_traverse(*helper.edge_tree,face_tree,helper);
 
     // Bucket edge face vertices by edge
@@ -783,9 +796,17 @@ intersection_simplices(const SimplexTree<EV,2>& face_tree) {
         const auto &f0 = faces[i0.face],
                    &f1 = faces[i1.face];
         return FILTER(dot(de,i1.p()-i0.p()),
-                      segment_triangle_intersections_ordered(e0,e1,FX(f0),FX(f1)));
+                      helper(i0.face,f0,i1.face,f1));
       }
-    } less({faces.elements,X,e0,e1,IV(e1.y)-IV(e0.y)});
+
+      bool helper(const int i0, const Vector<int,3> f0,
+                  const int i1, const Vector<int,3> f1) const {
+        if (f0.sorted() == f1.sorted())
+          throw ValueError(format("mesh_csg: Duplicate faces found: face %d (%d,%d,%d) = %d (%d,%d,%d)",
+                                  i0,f0.x,f0.y,f0.z,i1,f1.x,f1.y,f1.z));
+        return segment_triangle_intersections_ordered(e0,e1,FX(f0),FX(f1));
+      }
+    } less({faces.elements,X,e0,e1,iv(e1)-iv(e0)});
     sort(ef_vertices[e],less);
   }
 
@@ -939,7 +960,7 @@ struct DepthUnionFind {
 }
 
 template<int up> static void
-retriangulate_face(State& S, Array<Vector<int,3>>& cut_faces, DepthUnionFind* const union_find,
+retriangulate_face(State& S, Array<Vector<int,3>>& cut_faces, Array<int> &original_face_index, DepthUnionFind* const union_find,
                    const int face, Vector<int,3> e, RawArray<int> interior,
                    RawArray<const FaceFaceEdge> ff_edges, RawArray<const int> ffs) {
   // Sort vertices in upwards order, keeping track of permutation parity.
@@ -1038,6 +1059,7 @@ retriangulate_face(State& S, Array<Vector<int,3>>& cut_faces, DepthUnionFind* co
   // Copy mesh into cut_faces
   for (const auto f : mesh->faces()) {
     const auto v = mesh->vertices(f);
+    original_face_index.append(face);
     cut_faces.append(vec(vertices[v.x],
                          vertices[v.y],
                          vertices[v.z]));
@@ -1065,13 +1087,18 @@ retriangulate_face(State& S, Array<Vector<int,3>>& cut_faces, DepthUnionFind* co
         if (f1.valid()) {
           const auto f0 = mesh->face(e);
           const Line* L = P.constrained.get_pointer(v);
-          union_find->merge(base+f0.id,base+f1.id,L?L->ff<0?-1:1:0);
           if (L) {
-            const int ff = L->ff<0 ? -L->ff-1 : L->ff,
-                      start = ff_edges[ff].nodes.x;
+            const bool flip = L->ff < 0;
+            const int ff = flip ? -L->ff-1 : L->ff,
+                      start = ff_edges[ff].nodes.x,
+                      face2 = ff_edges[ff].faces.x == face ? ff_edges[ff].faces.y : ff_edges[ff].faces.x;
+            const int ddepth = S.depth_weight[face2];
+            union_find->merge(base+f0.id,base+f1.id,flip?-ddepth:ddepth);
             if (   start==P.vertices[mesh->src(e)]
                 || start==P.vertices[mesh->dst(e)])
-              union_find->merge(ff_base+ff,base+f0.id,L->ff<0);
+              union_find->merge(ff_base+ff,base+f0.id,flip?ddepth:0);
+          } else {
+            union_find->merge(base+f0.id,base+f1.id,0);
           }
         }
       }
@@ -1090,8 +1117,8 @@ static inline bool oriented_with_x(const P p0, const P p1, const P p2) {
 }}
 
 // Retriangulate each face w.r.t. the other faces which cut it
-static Tuple<Array<const FaceFaceFaceVertex>,Array<Vector<int,3>>>
-retriangulate_soup(const SimplexTree<EV,2>& face_tree, DepthUnionFind* const union_find,
+static Tuple<Array<const FaceFaceFaceVertex>,Array<Vector<int,3>>,Array<int>>
+retriangulate_soup(const SimplexTree<EV,2>& face_tree, Array<const int> depth_weight, DepthUnionFind* const union_find,
                    Nested<const EdgeFaceVertex> ef_vertices, RawArray<const FaceFaceEdge> ff_edges) {
   GEODE_ASSERT(face_tree.leaf_size==1);
   const auto X = face_tree.X;
@@ -1132,6 +1159,7 @@ retriangulate_soup(const SimplexTree<EV,2>& face_tree, DepthUnionFind* const uni
 
   // Newly created faces
   Array<Vector<int,3>> cut_faces;
+  Array<int> original_face_index;
 
   // Depth and connectivity information for (1) original edges, (2) ff edges, and (3) cut faces, indexed back to back.
   // The depth of an edge is defined as the depth of its infinitesimal starting section in the cut mesh.
@@ -1147,7 +1175,7 @@ retriangulate_soup(const SimplexTree<EV,2>& face_tree, DepthUnionFind* const uni
   // Retriangulate each face
   Array<FaceFaceFaceVertex> fff_vertices;
   Hashtable<Vector<int,3>,int> faces_to_fff;
-  State S(X,ef_vertices,fff_vertices,faces_to_fff,faces.elements,edges.elements);
+  State S(X,ef_vertices,fff_vertices,faces_to_fff,faces.elements,edges.elements,depth_weight);
   for (const int f : range(faces.elements.size())) {
     const auto v = faces.elements[f];
 
@@ -1160,6 +1188,7 @@ retriangulate_soup(const SimplexTree<EV,2>& face_tree, DepthUnionFind* const uni
     if (!interior.size() && !ef_vertices.size(e.x)
                          && !ef_vertices.size(e.y)
                          && !ef_vertices.size(e.z)) {
+      original_face_index.append(f);
       cut_faces.append(v);
       if (union_find) {
         const int i = union_find->append();
@@ -1174,9 +1203,9 @@ retriangulate_soup(const SimplexTree<EV,2>& face_tree, DepthUnionFind* const uni
     // since it does not affect correctness.
     const int up = bounding_box(X[v.x],X[v.y],X[v.z]).sizes().dominant_axis();
     const auto ffs = face_to_ff[f];
-    if (up==0)      retriangulate_face<0>(S,cut_faces,union_find,f,e,interior,ff_edges,ffs);
-    else if (up==1) retriangulate_face<1>(S,cut_faces,union_find,f,e,interior,ff_edges,ffs);
-    else            retriangulate_face<2>(S,cut_faces,union_find,f,e,interior,ff_edges,ffs);
+    if (up==0)      retriangulate_face<0>(S,cut_faces,original_face_index,union_find,f,e,interior,ff_edges,ffs);
+    else if (up==1) retriangulate_face<1>(S,cut_faces,original_face_index,union_find,f,e,interior,ff_edges,ffs);
+    else            retriangulate_face<2>(S,cut_faces,original_face_index,union_find,f,e,interior,ff_edges,ffs);
   }
 
   // Add one union-find node at infinity, and fire rays until everything is connected to it
@@ -1206,13 +1235,15 @@ retriangulate_soup(const SimplexTree<EV,2>& face_tree, DepthUnionFind* const uni
       struct Visitor {
         const SimplexTree<EV,2>& face_tree;
         RawArray<const EV> X;
+        const RawArray<const int> depth_weight;
         const P v0,v1,v2;
         const bool orient_v012; // orient_with_x(v0,v1,v2)
         int depth;
 
-        Visitor(const SimplexTree<EV,2>& face_tree, const int face, const Vector<int,3> v)
+        Visitor(const SimplexTree<EV,2>& face_tree, const int face, const Vector<int,3> v, const RawArray<const int> depth_weight)
           : face_tree(face_tree)
           , X(face_tree.X)
+          , depth_weight(depth_weight)
           , v0(Xi(v.x))
           , v1(Xi(v.y))
           , v2(Xi(v.z))
@@ -1221,39 +1252,40 @@ retriangulate_soup(const SimplexTree<EV,2>& face_tree, DepthUnionFind* const uni
 
         bool cull(const int n) const {
           const auto box = face_tree.boxes[n];
-          return                        box.max.x<v0.y.x
-                 || v0.y.y<box.min.y || box.max.y<v0.y.y
-                 || v0.y.z<box.min.z || box.max.z<v0.y.z;
+          return                        box.max.x<v0.value().x
+                 || v0.value().y<box.min.y || box.max.y<v0.value().y
+                 || v0.value().z<box.min.z || box.max.z<v0.value().z;
         }
 
         void leaf(const int n) {
-          const auto f = face_tree.mesh->elements[face_tree.prims(n)[0]];
+          const int face_idx = face_tree.prims(n)[0];
+          const auto f = face_tree.mesh->elements[face_idx];
           const P p0 = Xi(f.x),
                   p1 = Xi(f.y),
                   p2 = Xi(f.z);
           const bool with_x = oriented_with_x(p0,p1,p2);
-          if (!f.contains(v0.x)) {
+          if (!f.contains(v0.seed())) {
             // Triangle doesn't touch v0, so computation is infinitesimal free
             if (   with_x != tetrahedron_oriented(p0,p1,p2,v0)
                 && with_x == oriented_with_x(v0,p0,p1)
                 && with_x == oriented_with_x(v0,p1,p2)
                 && with_x == oriented_with_x(v0,p2,p0))
               goto hit;
-          } else if (!f.contains(v1.x)) {
+          } else if (!f.contains(v1.seed())) {
             // Triangle shares v0 but not v1.  It suffices to consider q = v0+e1*(v1-v0).  The
             // computation is equivalent to firing a ray from v1 -> v1+inf*x against the partially
             // infinite triangle p0+a(p1-p0)+b(p2-p0), {a,b}>=0, as can be seen by scaling around
             // v0 by 1/e1.  This is the same as the no v0 case above except that we do not check
             // against the edge p12, which is now infinitely far away.
             if (   with_x != tetrahedron_oriented(p0,p1,p2,v1)
-                && (f.z==v0.x || with_x==oriented_with_x(v1,p0,p1))
-                && (f.x==v0.x || with_x==oriented_with_x(v1,p1,p2))
-                && (f.y==v0.x || with_x==oriented_with_x(v1,p2,p0)))
+                && (f.z==v0.seed() || with_x==oriented_with_x(v1,p0,p1))
+                && (f.x==v0.seed() || with_x==oriented_with_x(v1,p1,p2))
+                && (f.y==v0.seed() || with_x==oriented_with_x(v1,p2,p0)))
               goto hit;
-          } else if (!f.contains(v2.x)) {
+          } else if (!f.contains(v2.seed())) {
             // Triangle shares v0,v1 but not v2.  We must consider the full q = v0+e1*(v1-v0)+e2*(v2-v0).
             // Shift v0 to 0, so that q = e1*v1+e2*v2.
-            if (   with_x == (orient_v012 ^ flipped_in(vec(v0.x,v1.x),f))
+            if (   with_x == (orient_v012 ^ flipped_in(vec(v0.seed(),v1.seed()),f))
                 && with_x != tetrahedron_oriented(p0,p1,p2,v2))
               goto hit;
           } else {
@@ -1263,16 +1295,16 @@ retriangulate_soup(const SimplexTree<EV,2>& face_tree, DepthUnionFind* const uni
           }
           return;
           hit:
-          depth += with_x ? 1 : -1;
+          depth += depth_weight[face_idx] * (with_x ? 1 : -1);
         }
-      } visitor(face_tree,f,v);
+      } visitor(face_tree,f,v,depth_weight);
       single_traverse(face_tree,visitor);
       union_find->merge(infinity,e.x,visitor.depth);
     }
   }
 
   // Done!
-  return tuple(fff_vertices.const_(),cut_faces);
+  return tuple(fff_vertices.const_(),cut_faces,original_face_index);
 }
 
 // The result of split_soup is always "almost" nonmanifold given closed input, but may be slightly
@@ -1338,6 +1370,13 @@ static void fix_loops(RawArray<Vector<int,3>> faces, Array<EV>& X, const int n,
 
 Tuple<Ref<const TriangleSoup>,Array<EV>>
 exact_split_soup(const TriangleSoup& faces, Array<const EV> X, const int depth) {
+  Array<int> depth_weight(faces.elements.size(), uninit);
+  depth_weight.fill(1);
+  return exact_split_soup(faces, X, depth_weight, depth);
+}
+
+Tuple<Ref<const TriangleSoup>,Array<EV>>
+exact_split_soup(const TriangleSoup& faces, Array<const EV> X, Array<const int> depth_weight, const int depth) {
   IntervalScope scope;
 
   // Find ef_vertices and ff_halfedges
@@ -1352,18 +1391,23 @@ exact_split_soup(const TriangleSoup& faces, Array<const EV> X, const int depth) 
     union_find.reset(new DepthUnionFind);
 
   // Retriangulate mesh and compute depths
-  const auto B = retriangulate_soup(face_tree,union_find.get(),ef_vertices,ff_edges);
+  const auto B = retriangulate_soup(face_tree,depth_weight,union_find.get(),ef_vertices,ff_edges);
   const auto fff_vertices = B.x;
   const auto cut_faces = B.y;
+  const auto original_face_index = B.z;
 
   // If desired, extract cut faces at the right depth
   Array<Vector<int,3>> pruned_faces;
   if (union_find) {
     const int infinity = union_find->info.size()-1;
     const int base = faces.segment_soup()->elements.size()+ff_edges.size();
-    for (const int f : range(cut_faces.size()))
-      if (union_find->delta(infinity,base+f)==depth)
+    for (const int f : range(cut_faces.size())) {
+      int fdepth = union_find->delta(infinity,base+f);
+      int weight = depth_weight[original_face_index[f]];
+      if (depth-weight < fdepth && fdepth <= depth) {
         pruned_faces.append(cut_faces[f]);
+      }
+    }
   } else
     pruned_faces = cut_faces;
 
@@ -1384,10 +1428,16 @@ exact_split_soup(const TriangleSoup& faces, Array<const EV> X, const int depth) 
   return tuple(new_<const TriangleSoup>(pruned_faces),Xs);
 }
 
-Tuple<Ref<const TriangleSoup>,Array<TV>> split_soup(const TriangleSoup& faces, Array<const TV> X, const int depth) {
+Tuple<Ref<const TriangleSoup>,Array<TV>> split_soup(const TriangleSoup& faces, Array<const TV> X, Array<const int> depth_weight, const int depth) {
   const auto quant = quantizer(bounding_box(X));
-  const auto S = exact_split_soup(faces,amap(quant,X).copy(),depth);
+  const auto S = exact_split_soup(faces,amap(quant,X).copy(),depth_weight,depth);
   return tuple(S.x,amap(quant.inverse,S.y).copy());
+}
+
+Tuple<Ref<const TriangleSoup>,Array<TV>> split_soup(const TriangleSoup& faces, Array<const TV> X, const int depth) {
+  Array<int> depth_weight(faces.elements.size(), uninit);
+  depth_weight.fill(1);
+  return split_soup(faces, X, depth_weight, depth);
 }
 
 // A random looking polynomial vector field for testing purposes.  Doing this in numpy was terribly slow.
@@ -1433,7 +1483,15 @@ static double mesh_signature(const TriangleSoup& mesh, RawArray<const TV> X) {
 using namespace geode;
 
 void wrap_mesh_csg() {
-  GEODE_FUNCTION(split_soup)
-  GEODE_FUNCTION(exact_split_soup)
+  typedef Tuple<Ref<const TriangleSoup>,Array<Vec3>> (*split_fn)(const TriangleSoup&, Array<const Vector<double,3>>, const int);
+  GEODE_OVERLOADED_FUNCTION(split_fn,split_soup)
+  typedef Tuple<Ref<const TriangleSoup>,Array<exact::Vec3>> (*exact_split_fn)(const TriangleSoup&, Array<const exact::Vec3>, const int);
+  GEODE_OVERLOADED_FUNCTION(exact_split_fn,exact_split_soup)
+
+  typedef Tuple<Ref<const TriangleSoup>,Array<Vec3>> (*split_depth_fn)(const TriangleSoup&, Array<const Vector<double,3>>, Array<const int>, const int);
+  GEODE_OVERLOADED_FUNCTION_2(split_depth_fn,"split_soup_with_weight",split_soup)
+  typedef Tuple<Ref<const TriangleSoup>,Array<exact::Vec3>> (*exact_split_depth_fn)(const TriangleSoup&, Array<const exact::Vec3>, Array<const int>, const int);
+  GEODE_OVERLOADED_FUNCTION_2(exact_split_depth_fn,"exact_split_soup_with_weight",exact_split_soup)
+
   GEODE_FUNCTION(mesh_signature)
 }

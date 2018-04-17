@@ -14,7 +14,7 @@
 #include <geode/array/IndirectArray.h>
 #include <geode/array/NdArray.h>
 #include <geode/array/Nested.h>
-#include <geode/geometry/Ray.h>
+#include <geode/geometry/RayIntersection.h>
 #include <geode/array/RawArray.h>
 #include <geode/array/sort.h>
 namespace geode {
@@ -30,7 +30,7 @@ bool polygon_outlines_intersect(RawArray<const Vec2> p1, RawArray<const Vec2> p2
   // walk p1, check for each segment's intersection
   for (int i = 0, j = p1.size()-1; i < (int)p1.size(); j = i++) {
     Vec2 dir = p1[i] - p1[j];
-    Ray<Vec2> ray(p1[j], dir);
+    RayIntersection<Vec2> ray(p1[j], dir);
     ray.t_max = dir.magnitude();
     if (p2_tree->intersection(ray, 1e-10))
       return true;
@@ -535,13 +535,28 @@ Nested<const Vec2> polygons_from_python(PyObject* object) {
 #endif
 }
 
+// Compare two rotated views of a polygon checking for repeated points
+static bool rotation_less(const int start0, const int start1, const RawArray<const Vec2>& poly) {
+  assert(start0 != start1);
+  const int n = poly.size();
+  for(const int d : range(n)) {
+    const auto p0 = poly[wrap(start0 + d, n)];
+    const auto p1 = poly[wrap(start1 + d, n)];
+    if(lex_less(p0, p1))
+      return true;
+    if(lex_less(p1, p0))
+      return false;
+  }
+  return false;
+}
+
 Nested<Vec2> canonicalize_polygons(Nested<const Vec2> polys) {
   // Find the minimal point in each polygon under lexicographic order
   Array<int> mins(polys.size());
   for (int p=0;p<polys.size();p++) {
     const auto poly = polys[p];
     for (int i=1;i<poly.size();i++)
-      if (lex_less(poly[i],poly[mins[p]]))
+      if (rotation_less(i,mins[p],poly))
         mins[p] = i;
   }
 
@@ -597,5 +612,7 @@ using namespace geode;
 void wrap_polygon() {
   GEODE_FUNCTION_2(polygon_area,polygon_area_py)
   GEODE_FUNCTION(polygons_from_index_list)
+  GEODE_FUNCTION(resample_polygon)
   GEODE_FUNCTION(canonicalize_polygons)
+  GEODE_FUNCTION(offset_polygon_with_correspondence)
 }

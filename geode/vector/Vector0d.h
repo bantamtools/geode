@@ -17,17 +17,22 @@ class Vector<T,0>
 {
     struct Unusable{};
 public:
-    enum Workaround1 {dimension=0};
-    enum Workaround2 {m=0};
+    static const int dimension = 0;
+    static const int m = 0;
     typedef typename mpl::if_<IsScalar<T>,T,Unusable>::type Scalar;
     typedef T Element;
 
-    Vector()
-    {}
+    constexpr Vector() = default;
 
-    template<class T2> explicit
+    template<class T2> explicit constexpr
     Vector(const Vector<T2,0>& vector_input)
     {}
+
+    constexpr int size() const
+    {return 0;}
+
+    constexpr bool empty() const
+    {return true;}
 
     const T& operator[](const int) const
     {GEODE_FATAL_ERROR();}
@@ -122,7 +127,10 @@ public:
     {return Vector();}
 
     static Vector repeat(const T& constant)
-    {return Vector(); }
+    {return Vector();}
+    
+    static Vector nans()
+    {return Vector();}
 
     // For stl
     T* begin() { return 0; }
@@ -157,5 +165,8 @@ dot(const Vector<T,0>&,const Vector<T,0>&)
 template<class T> inline Hash
 hash_reduce(const Vector<T,0>& key)
 {return Hash();}
+
+template<class T> const int Vector<T,0>::dimension;
+template<class T> const int Vector<T,0>::m;
 
 }

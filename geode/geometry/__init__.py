@@ -11,12 +11,12 @@ def BoxTree(X,leaf_size):
   return BoxTrees[X.shape[1]](X,leaf_size)
 
 ParticleTrees = {2:ParticleTree2d,3:ParticleTree3d}
-def ParticleTree(X,leaf_size):
+def ParticleTree(X,leaf_size=1):
   X = asarray(X)
   return ParticleTrees[X.shape[1]](X,leaf_size)
 
 SimplexTrees = {(2,1):SegmentTree2d,(3,1):SegmentTree3d,(2,2):TriangleTree2d,(3,2):TriangleTree3d}
-def SimplexTree(mesh,X,leaf_size):
+def SimplexTree(mesh,X,leaf_size=1):
   X = asarray(X)
   return SimplexTrees[X.shape[1],mesh.d](mesh,X,leaf_size)
 
@@ -48,3 +48,7 @@ def empty_box(d):
 FrameImplicits = {2:FrameImplicit2d,3:FrameImplicit3d}
 def FrameImplicit(frame,object):
   return FrameImplicits[object.d](frame,object)
+
+surface_levelsets = {1:surface_levelset_c3d,2:surface_levelset_s3d}
+def surface_levelset(particles,surface,max_distance=inf,compute_signs=True):
+  return surface_levelsets[surface.d](particles,surface,max_distance,compute_signs)

@@ -3,6 +3,7 @@
 from __future__ import division
 from geode import *
 from geode.geometry.platonic import *
+import logging
 
 def test_basic():
   a = TriangleTopology([(0,1,2)])
@@ -31,11 +32,40 @@ def test_collect_boundary_garbage():
   mesh.assert_consistent(True)
   assert mesh.is_garbage_collected()
 
+def test_collapse():
+  random.seed(131313)
+  soup = torus_topology(8,10)
+  tris = torus_topology(8,10).elements.copy()
+  random.shuffle(tris)
+  mesh = MutableTriangleTopology()
+  mesh.add_vertices(soup.nodes())
+  mesh.add_faces(tris)
+  # first round, just collapse stuff. Try 10k times.
+  m = mesh.copy()
+  for i in range(10000):
+    he = int(random.uniform(0, m.allocated_halfedges))
+    if m.halfedge_valid(he) and m.is_collapse_safe(he):
+      logging.debug("collapsing he %s", he)
+      m.collapse(he)
+      m.assert_consistent(True)
+
+  # second round, delete 10% of triangles, then collapse stuff.
+  m = mesh
+  for i in range(m.n_faces//10):
+    logging.debug("deleting face %s", i)
+    m.erase_face(i, True)
+  m.assert_consistent(True)
+  for i in range(10000):
+    he = int(random.uniform(0, m.allocated_halfedges))
+    if m.halfedge_valid(he) and m.is_collapse_safe(he):
+      logging.debug("collapsing he %s", he)
+      m.collapse(he)
+      m.assert_consistent(True)
+
 def construction_test(Mesh,random_edge_flips=random_edge_flips,random_face_splits=random_face_splits,mesh_destruction_test=mesh_destruction_test):
   random.seed(813177)
   nanosphere = TriangleSoup([(0,1,2),(0,2,1)])
-  print
-  print Mesh.__name__
+  logging.debug(Mesh.__name__)
   for soup in nanosphere,icosahedron_mesh()[0],torus_topology(4,5),double_torus_mesh(),cylinder_topology(6,5):
     # Learn about triangle soup
     n_vertices = soup.nodes()
@@ -45,7 +75,7 @@ def construction_test(Mesh,random_edge_flips=random_edge_flips,random_face_split
     open = len(soup.boundary_mesh().elements)!=0
     def sort_tris(tris):
       return tris[lexsort(tris.T[::-1])]
-    print 'chi = v%d - e%d + f%d = %d'%(n_vertices,n_edges,n_faces,chi)
+    logging.debug('chi = v%d - e%d + f%d = %d', n_vertices,n_edges,n_faces,chi)
 
     def check_counts(mesh):
       assert mesh.n_vertices==n_vertices
@@ -105,7 +135,7 @@ def construction_test(Mesh,random_edge_flips=random_edge_flips,random_face_split
       # Mangle the clean mesh using a bunch of edge flips
       mesh = base.copy()
       flips = random_edge_flips(mesh,1000,key)
-      print 'flips = %d'%flips
+      logging.debug('flips = %d', flips)
       if soup is not nanosphere:
         assert flips>484
       mesh.assert_consistent(True)
@@ -127,6 +157,22 @@ def test_halfedge_construction():
 
 def test_corner_construction():
   construction_test(MutableTriangleTopology,corner_random_edge_flips,corner_random_face_splits,corner_mesh_destruction_test)
+
+def test_flip():
+  soup = icosahedron_mesh()[0]
+  mesh = MutableTriangleTopology()
+  mesh.add_vertices(soup.nodes())
+  mesh.add_faces(soup.elements)
+  mesh.assert_consistent(True)
+
+  # make sure we can flip a closed mesh
+  mesh.flip()
+  mesh.assert_consistent(True)
+
+  # make sure we can flip a mesh with boundaries
+  mesh.erase_face(0, False)
+  mesh.flip()
+  mesh.assert_consistent(True)
 
 def test_nonmanifold_vertices():
   soup = icosahedron_mesh()[0]
@@ -187,7 +233,7 @@ def test_fields():
     mesh.remove_field(Vi)
 
     # Randomly remove some faces (but no vertices) and collect garbage and check invariants
-    print 'garbage collection test for faces...'
+    logging.debug('garbage collection test for faces...')
 
     # Make another (vector) field, which is stored as face colors
     Fi = mesh.add_face_field('3i',face_color_id)
@@ -222,3 +268,4 @@ if __name__=='__main__':
   test_fields()
   test_corner_construction()
   test_halfedge_construction()
+  test_collapse()

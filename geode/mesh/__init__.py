@@ -3,6 +3,14 @@ from __future__ import absolute_import
 from numpy import *
 from geode import *
 import struct
+import platform
+
+# this is getting seriously ugly, but we do need to be able to test isinstance on
+# these somehow.
+if platform.system()=='Windows':
+  from geode.geode_all import TriangleTopology as CTriangleTopology
+else:
+  from geode.geode_wrap import TriangleTopology as CTriangleTopology
 
 def TriangleTopology(soup=TriangleSoup(empty((0,3),int32))):
   if isinstance(soup,geode_wrap.TriangleTopology):
@@ -91,7 +99,14 @@ def read_obj(file):
   # done
   return mesh,props
 
-def write_obj(file,mesh,X):
+def write_obj(file,mesh,X=None):
+
+  assert X is not None or isinstance(mesh, MutableTriangleTopology)
+
+  if X is None:
+    X = mesh.vertex_field(vertex_position_id)
+    mesh = mesh.face_soup()[0]
+
   """Write a simple obj file.
   For now, only mesh and positions are supported
   """
@@ -139,3 +154,35 @@ def merge_meshes(surfaces):
     X.append(x)
     total += len(x)
   return TriangleSoup(concatenate(tris).astype(int32)),concatenate(X)
+
+# convenience functions operating directly on MutableTriangleTopology, assuming
+# vertex positions are stored in the default location.
+
+# make a MutableTriangleTopology from a soupy or meshy thing and a position array
+def meshify(mesh,X):
+  if isinstance(mesh, TriangleSoup):
+    mesh = TriangleTopology(mesh)
+  if isinstance(mesh, CTriangleTopology):
+    mesh = mesh.mutate()
+
+  # it is possible that a mesh does not reference the last few vertices. Add as
+  # many isolated vertices to the end as necessary (to store all of X)
+  n_isolated_vertices = len(X) - mesh.all_vertices().__len__()
+  if n_isolated_vertices > 0:
+    mesh.add_vertices(n_isolated_vertices);
+
+  mesh.add_vertex_field('3d', vertex_position_id)
+  copyto(mesh.vertex_field(vertex_position_id), X)
+  return mesh
+
+def mesh_lower_hull(mesh, up, offset, draft_angle = 0., division_angle = 30./180.*pi):
+  return meshify(*lower_hull(mesh.face_soup()[0], mesh.vertex_field(vertex_position_id), up, offset, draft_angle, division_angle))
+
+def mesh_offset(mesh, offset):
+  return meshify(*rough_offset_mesh(mesh, mesh.vertex_field(vertex_position_id), offset))
+
+def decimate(mesh,X,distance,max_angle=pi/2,min_vertices=-1,boundary_distance=0):
+  return geode_wrap.decimate(mesh,X,distance,max_angle,min_vertices,boundary_distance)
+
+def simplify(mesh,X,distance,max_angle=pi/2,min_vertices=-1,boundary_distance=0):
+  return geode_wrap.simplify(mesh,X,distance,max_angle,min_vertices,boundary_distance)

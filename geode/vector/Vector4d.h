@@ -38,44 +38,42 @@ public:
     typedef const T* const_iterator; // for stl
     template<class V> struct result;
     template<class V> struct result<V(int)>:mpl::if_<is_const<V>,const T&,T&>{};
-    enum Workaround1 {dimension=4};
-    enum Workaround2 {m=4};
-    static const bool is_const=false;
+    static const int dimension = 4;
+    static const int m = 4;
+    static const bool is_const = false;
 
-  T x,y,z,w;
+    T x,y,z,w;
 
-    Vector()
+    constexpr Vector()
       :x(),y(),z(),w()
     {
         static_assert(sizeof(Vector)==4*sizeof(T),"");
     }
 
-  Vector(const T& x,const T& y,const T& z,const T& w)
+    constexpr Vector(const T& x,const T& y,const T& z,const T& w)
     :x(x),y(y),z(z),w(w)
     {}
 
-    Vector(const Vector& vector)
-      :x(vector.x),y(vector.y),z(vector.z),w(vector.w)
-    {}
+    constexpr Vector(const Vector& vector) = default;
 
-    template<class T2> explicit Vector(const Vector<T2,4>& vector)
+    template<class T2> explicit constexpr Vector(const Vector<T2,4>& vector)
       :x(T(vector.x)),y(T(vector.y)),z(T(vector.z)),w(T(vector.w))
     {}
 
-    explicit Vector(const Vector<T,2>& vector)
+    explicit constexpr Vector(const Vector<T,2>& vector)
       :x(vector.x),y(vector.y),z(),w()
     {}
 
-    explicit Vector(const Vector<T,3>& vector)
+    explicit constexpr Vector(const Vector<T,3>& vector)
       :x(vector.x),y(vector.y),z(vector.z),w()
     {}
 
-    explicit Vector(const Vector<T,3>& vector, const T& w)
+    explicit constexpr Vector(const Vector<T,3>& vector, const T& w)
       :x(vector.x),y(vector.y),z(vector.z),w(w)
     {}
 
     template<class TVector>
-    explicit Vector(const TVector& v, typename EnableForVectorLike<T,4,TVector,Unusable>::type=Unusable())
+    explicit constexpr Vector(const TVector& v, typename EnableForVectorLike<T,4,TVector,Unusable>::type=Unusable())
       :x(v[0]),y(v[1]),z(v[2]),w(v[3])
     {}
 
@@ -91,13 +89,13 @@ public:
       x=v[0];y=v[1];z=v[2];w=v[3];return *this;
     }
 
-    Vector& operator=(const Vector& v)
-    {
-      x=v[0];y=v[1];z=v[2];w=v[3];return *this;
-    }
+    Vector& operator=(const Vector& v) = default;
 
-    int size() const
+    constexpr int size() const
     {return 4;}
+
+    constexpr bool empty() const
+    {return false;}
 
     const T& operator[](const int i) const
     {assert(unsigned(i)<4);return *((const T*)(this)+i);}
@@ -271,9 +269,12 @@ public:
 
     static Vector repeat(const T& constant)
     {return Vector(constant,constant,constant,constant); }
+    
+    static Vector nans()
+    {return Vector::repeat(std::numeric_limits<T>::quiet_NaN());}
 
     // shifts vector (wrapped) such that element a is first
-    Vector<T,4> roll(const int a) {
+    Vector<T,4> roll(const int a) const {
       Vector<T,4> v;
       for(int i = 0; i < 4; ++i)
         v[i] = (*this)[(i+a) & 3];
@@ -334,6 +335,9 @@ public:
 
     Vector<T,4> sorted() const
     {Vector<T,4> r(*this);small_sort(r.x,r.y,r.z,r.w);return r;}
+
+    template<class Fn> Vector<T,4> sorted(const Fn& pred) const
+    {Vector<T,4> r(*this);small_sort(r.x,r.y,r.z,r.w,pred);return r;}
 
     Vector reversed() const
     {return Vector(w,z,y,x);}
@@ -503,5 +507,8 @@ in_bounds(const Vector<T,4>& v,const Vector<T,4>& vmin,const Vector<T,4>& vmax)
 template<class T> inline Vector<T,4>
 wrap(const Vector<T,4>& v,const Vector<T,4>& vmin,const Vector<T,4>& vmax)
   {return Vector<T,4>(wrap(v.x,vmin.x,vmax.x),wrap(v.y,vmin.y,vmax.y),wrap(v.z,vmin.z,vmax.z),wrap(v.w,vmin.w,vmax.w));}
+
+template<class T> const int Vector<T,4>::dimension;
+template<class T> const int Vector<T,4>::m;
 
 }

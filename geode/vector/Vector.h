@@ -33,14 +33,18 @@ using ::std::pow;
 template<class TArray,class TIndices> class IndirectArray;
 
 #ifdef GEODE_PYTHON
-// Declare blanket to_python for numpy-incompatible vectors
-template<class T,int d> PyObject* to_python(const Vector<T,d>& vector);
+// Declare blanket to_python for numpy-incompatible vectors with inner types that can be converted
+template<class T,int d> typename enable_if<has_to_python<T>, PyObject*>::type to_python(const Vector<T,d>& v);
 #endif
 
 // Declare the base set of numpy compatible vector conversions
 GEODE_DECLARE_VECTOR_CONVERSIONS(GEODE_CORE_EXPORT,2,int)
 GEODE_DECLARE_VECTOR_CONVERSIONS(GEODE_CORE_EXPORT,3,int)
 GEODE_DECLARE_VECTOR_CONVERSIONS(GEODE_CORE_EXPORT,4,int)
+GEODE_DECLARE_VECTOR_CONVERSIONS(GEODE_CORE_EXPORT,2,long)
+GEODE_DECLARE_VECTOR_CONVERSIONS(GEODE_CORE_EXPORT,3,long)
+GEODE_DECLARE_VECTOR_CONVERSIONS(GEODE_CORE_EXPORT,4,long)
+
 GEODE_DECLARE_VECTOR_CONVERSIONS(GEODE_CORE_EXPORT,2,short int)
 GEODE_DECLARE_VECTOR_CONVERSIONS(GEODE_CORE_EXPORT,3,short int)
 GEODE_DECLARE_VECTOR_CONVERSIONS(GEODE_CORE_EXPORT,4,short int)
@@ -66,9 +70,9 @@ public:
     typedef const T* const_iterator; // for stl
     template<class> class result;
     template<class V> class result<V(int)>:public mpl::if_<is_const<V>,const T&,T&>{};
-    enum Workaround1 {dimension=d};
-    enum Workaround2 {m=d};
-    static const bool is_const=false;
+    static const int dimension = d;
+    static const int m = d;
+    static const bool is_const = false;
 
     T array[d];
 
@@ -129,8 +133,11 @@ public:
         for(int i=0;i<d;i++) array[i]=v.array[i];return *this;
     }
 
-    int size() const
+    constexpr int size() const
     {return m;}
+
+    constexpr bool empty() const
+    {return m>0;}
 
     const T& operator[](const int i) const
     {assert(unsigned(i)<d);return array[i];}
@@ -282,13 +289,16 @@ public:
     {STATIC_ASSERT_SAME(T,bool);int count=0;for(int i=0;i<d;i++)if(array[i]) count++;return count;}
 
     static Vector axis_vector(const int axis)
-    {Vector r;r(axis)=(T)1;return r;}
+    {Vector r;r[axis]=(T)1;return r;}
 
     static Vector ones()
     {Vector r;for(int i=0;i<d;i++) r.array[i]=(T)1;return r;}
 
     static Vector repeat(const T& constant)
     {Vector r;for(int i=0;i<d;i++) r.array[i]=constant;return r;}
+    
+    static Vector nans()
+    {return Vector::repeat(std::numeric_limits<T>::quiet_NaN());}
 
     // shifts vector (wrapped) such that element a is first
     Vector<T,d> roll(int a) const {
@@ -565,6 +575,7 @@ template<class T> static inline Vector<T,6> vec(const T& a0,const T& a1,const T&
 #endif
 //#####################################################################
 
+template<class T,int d> const int Vector<T,d>::dimension;
+template<class T,int d> const int Vector<T,d>::m;
+
 }
-
-

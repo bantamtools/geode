@@ -3,7 +3,6 @@
 //#####################################################################
 #include <geode/geometry/Box.h>
 #include <geode/geometry/AnalyticImplicit.h>
-#include <geode/geometry/Ray.h>
 #include <geode/array/NdArray.h>
 #include <geode/array/Nested.h>
 #include <geode/array/view.h>
@@ -126,7 +125,7 @@ static void bounding_box_py_helper(const int depth, Array<Box<real>>& box, PyObj
     if (!box.size())
       box.resize(int(d));
     if (box.size() != d)
-      throw TypeError(format("bounding_box: vectors of different sizes found, including %d and %d",box.size(),d));
+      throw TypeError(format("bounding_box: vectors of different sizes found, including %d and %d",box.size(),static_cast<int>(d)));
     const ssize_t count = PyArray_SIZE((PyArrayObject*)array.get())/d;
     GEODE_ASSERT(0<=count && count<=numeric_limits<int>::max());
     const real* data = (const real*)PyArray_DATA((PyArrayObject*)array.get());
@@ -145,14 +144,14 @@ static void bounding_box_py_helper(const int depth, Array<Box<real>>& box, PyObj
   }
 }
 
-static PyObject* bounding_box_py(PyObject* object) {
+static Ref<> bounding_box_py(PyObject* object) {
   if (is_numpy_array(object)) {
     const auto array = from_python<NdArray<const real>>(object);
     GEODE_ASSERT(array.rank()>=2);
     if (array.shape.back()==2)
-      return to_python(bounding_box(vector_view<2>(array.flat)));
+      return to_python_ref(bounding_box(vector_view<2>(array.flat)));
     else if (array.shape.back()==3)
-      return to_python(bounding_box(vector_view<3>(array.flat)));
+      return to_python_ref(bounding_box(vector_view<3>(array.flat)));
     else
       throw TypeError(format("bounding_box: 2D or 3D vectors expected, got %dD",array.shape.back()));
   } else if (is_nested_array(object))
@@ -162,9 +161,9 @@ static PyObject* bounding_box_py(PyObject* object) {
   Array<Box<real>> box;
   bounding_box_py_helper(0,box,object);
   if (box.size()==2)
-    return to_python(Box<Vector<real,2>>(vec(box[0].min,box[1].min),           vec(box[0].max,box[1].max)));
+    return to_python_ref(Box<Vector<real,2>>(vec(box[0].min,box[1].min),           vec(box[0].max,box[1].max)));
   else if (box.size()==3)
-    return to_python(Box<Vector<real,3>>(vec(box[0].min,box[1].min,box[2].min),vec(box[0].max,box[1].max,box[2].max)));
+    return to_python_ref(Box<Vector<real,3>>(vec(box[0].min,box[1].min,box[2].min),vec(box[0].max,box[1].max,box[2].max)));
   else
     throw TypeError(format("bounding_box: 2D or 3D vectors expected, got %dD",box.size()));
 }

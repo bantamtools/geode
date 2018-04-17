@@ -9,6 +9,7 @@
 #include <iomanip>
 #include <stdio.h>
 #include <cstring>
+#include <unistd.h>
 #ifndef _WIN32
 #include <sys/time.h>
 #include <sys/resource.h>
@@ -22,9 +23,12 @@
 #ifdef __APPLE__
 #include <mach/task.h>
 #include <mach/mach_init.h>
-#ifdef __SSE__
+#ifdef GEODE_SSE
 #include <xmmintrin.h>
 #endif
+#endif
+#if defined(__linux__)
+#include <unistd.h> // for getpagesize()
 #endif
 namespace geode {
 namespace process {
@@ -123,7 +127,7 @@ static void float_exception_handler(int sig_number, siginfo_t* info, void *data)
 }
 
 #ifdef __APPLE__
-#ifdef __SSE__
+#ifdef GEODE_SSE
 
 // feenableexcept and fedisableexcept are not defined, so define them
 
