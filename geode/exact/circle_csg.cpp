@@ -311,7 +311,7 @@ static real circle_arc_quantization_unit(const Nested<const CircleArc>& arcs) {
   return quant.inverse.unquantize_length(1.);
 }
 
-// Theoretical worst case error for any point on polyarc after round trip quantization and back assuming maximum abs(q)<=1
+// Theoretical worst case error for any point on polyarc after round trip quantization and back assuming maximum abs(q)<=1 
 // Result is in multiples of circle_arc_quantization_unit
 // This ignores floating point rounding errors (which should be small by comparison).
 // WARNING: This is not a guarantee, only an educated guess (though it seems to hold up in testing)
