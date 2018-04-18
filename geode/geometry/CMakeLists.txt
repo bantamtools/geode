@@ -27,6 +27,7 @@ set(module_SRCS
   ThickShell.cpp
   Triangle2d.cpp
   Triangle3d.cpp
+  surface_of_revolution.cpp
 )
 
 set(module_HEADERS
@@ -63,6 +64,7 @@ set(module_HEADERS
   traverse.h
   Triangle2d.h
   Triangle3d.h
+  surface_of_revolution.h
 )
 
 install_geode_headers(geometry ${module_HEADERS})

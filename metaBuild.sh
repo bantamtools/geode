@@ -8,7 +8,7 @@ if [ "${ARG1}" = "clean" ]; then
   exit 0
 fi
 
-if [ "${ARG2}" = "release" ]; then
+if [ "${ARG1}" = "release" ]; then
   CMAKE_ARGS+=" -DCMAKE_BUILD_TYPE=Release "
 else
   CMAKE_ARGS+=" -DCMAKE_BUILD_TYPE=Debug "
