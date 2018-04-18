@@ -3,15 +3,16 @@ ARG1="$1"
 shift
 CMAKE_ARGS=$@
 echo "CMAKE_ARGS: ${CMAKE_ARGS}"
-if [ "${ARG1}" = "clean" ]; then
+if [ "${ARG1}" = "debug" ]; then
+  CMAKE_ARGS+=" -DCMAKE_BUILD_TYPE=Debug "
+elif [ "${ARG1}" = "release" ]; then
+  CMAKE_ARGS+=" -DCMAKE_BUILD_TYPE=Release "
+elif [ "${ARG1}" = "clean" ]; then
   (cd "${DIR}/build" && make clean)
   exit 0
-fi
-
-if [ "${ARG2}" = "release" ]; then
-  CMAKE_ARGS+=" -DCMAKE_BUILD_TYPE=Release "
 else
-  CMAKE_ARGS+=" -DCMAKE_BUILD_TYPE=Debug "
+  echo "Missing or unrecognized metabuild argument \"${ARG1}\""
+  exit 1
 fi
 
 DIR_3RD_PARTY="${DIR}/../"
