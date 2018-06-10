@@ -3,10 +3,10 @@
 # TODO: Determine appropriate architecture (i.g. "args+=(arch=nocona)")
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-if [ -z "$3" ]; then
+if [ -z "$2" ]; then
   ARCH=x86-64
 else
-  ARCH=$3
+  ARCH=$2
 fi
 echo Architecture is set to $ARCH
 
@@ -48,8 +48,12 @@ if [ "$1" = "clean" ] || [ "$1" = "debug" ] || [ "$1" = "release" ]; then
     types="debug release"
   fi
 
+  if [ "$ARCH" = "arm" ]; then
+    cxx="cxx=/usr/bin/arm-linux-gnueabihf-g++"
+  fi
+
   for t in $types; do
-    scons_args="--config=force -j7 prefix=#build/\$arch/\$type type=$t ${args[@]}"
+    scons_args="--config=force -j7 prefix=#build/\$arch/\$type type=$t $cxx ${args[@]}"
     if [ "$1" = "clean" ]; then
       echo "Cleaning $t with: $scons_args"
       (cd $DIR && scons -c $scons_args) || exit 1

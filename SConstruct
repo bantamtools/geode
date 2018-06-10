@@ -295,7 +295,7 @@ else:
       if   env['arch']=='pentium4': optimizations = '-O2 -fexpensive-optimizations -falign-functions=4 -funroll-loops -fprefetch-loop-arrays'
       elif env['arch']=='pentium3': optimizations = '-O2 -fexpensive-optimizations -falign-functions=4 -funroll-loops -fprefetch-loop-arrays'
       elif env['arch']=='opteron':  optimizations = '-O2'
-      elif env['arch'] in ('nocona','native','powerpc', 'corei7', 'x86-64'): optimizations = '-O3 -funroll-loops'
+      elif env['arch'] in ('nocona','native','powerpc', 'corei7', 'x86-64', 'arm'): optimizations = '-O3 -funroll-loops'
     env.Append(CXXFLAGS=optimizations)
     if not clang:
       env.Append(LINKFLAGS=' -dead_strip')

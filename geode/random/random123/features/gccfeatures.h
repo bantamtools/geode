@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define GNUC_VERSION (__GNUC__*10000 + __GNUC_MINOR__*100 + __GNUC_PATCHLEVEL__)
 
-#if !defined(__x86_64__) && !defined(__i386__) && !defined(__powerpc__)
+#if !defined(__x86_64__) && !defined(__i386__) && !defined(__powerpc__) && !defined(__arm__)
 #  error "This code has only been tested on x86 and powerpc platforms."
 #include <including_a_nonexistent_file_will_stop_some_compilers_from_continuing_with_a_hopeless_task>
 { /* maybe an unbalanced brace will terminate the compilation */
@@ -171,7 +171,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #ifndef R123_USE_EMMINTRIN_H
-/* gcc -m64 on Solaris 10 defines __SSE2__ but doesn't have 
+/* gcc -m64 on Solaris 10 defines __SSE2__ but doesn't have
    emmintrin.h in the include search path.  This is
    so broken that I refuse to try to work around it.  If this
    affects you, figure out where your emmintrin.h lives and
