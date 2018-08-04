@@ -336,10 +336,10 @@ namespace {
 
 template<class T> class Class {
 public:
-  Class(const char* name, bool visible=true) {}
+  Class(const char* /*name*/, bool /*visible*/ = true) {}
   template<class Args> Class& init(Args) { return *this; }
-  template<class Field> Class& field(const char* name, Field field) { return *this; }
-  template<class Method> Class& method(const char* name, Method method) { return *this; }
+  template<class Field> Class& field(const char* /*name*/, Field /*field*/) { return *this; }
+  template<class Method> Class& method(const char* /*name*/, Method /*method*/) { return *this; }
   template<class A> Class& property(const char* name, A (T::*get)() const) { return *this; }
   template<class A,class B,class R> Class& property(const char* name, A (T::*get)() const, R (T::*set)(B)) { return *this; }
   Class& str() { return *this; }

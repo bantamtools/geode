@@ -16,34 +16,34 @@ namespace geode {
 template<>
 class Tuple<> {
 public:
-  bool operator==(const Tuple p) const {
+  bool operator==(const Tuple /*p*/) const {
     return true;
   }
 
-  bool operator!=(const Tuple p) const {
+  bool operator!=(const Tuple /*p*/) const {
     return false;
   }
 
-  bool operator<(const Tuple p) const {
+  bool operator<(const Tuple /*p*/) const {
     return false;
   }
 
-  bool operator>(const Tuple p) const {
+  bool operator>(const Tuple /*p*/) const {
     return false;
   }
 
   void get() const {}
 };
 
-static inline std::istream& operator>>(std::istream& input,Tuple<> p) {
+static inline std::istream& operator>>(std::istream& input,Tuple<> /*p*/) {
   return input>>expect('(')>>expect(')');
 }
 
-static inline std::ostream& operator<<(std::ostream& output,Tuple<> p) {
+static inline std::ostream& operator<<(std::ostream& output,Tuple<> /*p*/) {
   return output<<"()";
 }
 
-static inline int hash_reduce(Tuple<> key) {
+static inline int hash_reduce(Tuple<> /*key*/) {
   return 0;
 }
 

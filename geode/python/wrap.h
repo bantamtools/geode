@@ -19,7 +19,7 @@ template<class T> static inline void add_object(const char* name, const T& objec
 #endif
 }
 
-template<class Function> static inline void function(const char* name, Function function) {
+template<class Function> static inline void function(const char* /*name*/, Function /*function*/) {
 #ifdef GEODE_PYTHON
   add_object(name,wrap_function(name,function));
 #endif

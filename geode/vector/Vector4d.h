@@ -80,7 +80,7 @@ public:
     template<int n>
     Vector(const Vector<T,n>& v1,const Vector<T,4-n>& v2)
     {
-        for(int i=0;i<n;i++) (*this)[i]=v1[i];for(int i=n;i<4;i++) (*this)[i]=v2[i-n];
+        for(int i=0;i<n;i++) {(*this)[i]=v1[i];} for(int i=n;i<4;i++) {(*this)[i]=v2[i-n];}
     }
 
     template<class TVector> typename EnableForVectorLike<T,4,TVector,Vector&>::type
@@ -260,7 +260,7 @@ public:
 
     int number_true() const
     {STATIC_ASSERT_SAME(T,bool);return x+y+z+w;}
-  
+
     static Vector axis_vector(const int axis)
     {Vector vec;vec[axis]=(T)1;return vec;}
 
@@ -269,7 +269,7 @@ public:
 
     static Vector repeat(const T& constant)
     {return Vector(constant,constant,constant,constant); }
-    
+
     static Vector nans()
     {return Vector::repeat(std::numeric_limits<T>::quiet_NaN());}
 
