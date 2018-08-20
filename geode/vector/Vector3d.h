@@ -79,7 +79,7 @@ public:
     template<int n>
     Vector(const Vector<T,n>& v1,const Vector<T,3-n>& v2)
     {
-        for(int i=0;i<n;i++) (*this)(i)=v1(i);for(int i=n;i<3;i++) (*this)(i)=v2(i-n);
+        for(int i=0;i<n;i++) {(*this)(i)=v1(i);} for(int i=n;i<3;i++) {(*this)(i)=v2(i-n);}
     }
 
     template<class TVector> typename EnableForVectorLike<T,3,TVector,Vector&>::type
@@ -282,7 +282,7 @@ public:
 
     static Vector repeat(const T& constant)
     {return Vector(constant,constant,constant); }
-    
+
     static Vector nans()
     {return Vector::repeat(std::numeric_limits<T>::quiet_NaN());}
 

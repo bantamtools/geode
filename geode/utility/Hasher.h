@@ -9,11 +9,11 @@ struct Hasher {
     return hash(x);
   }
 
-  bool operator==(Hasher h) const {
+  bool operator==(Hasher /*h*/) const {
     return true;
   }
 
-  bool operator!=(Hasher h) const {
+  bool operator!=(Hasher /*h*/) const {
     return false;
   }
 };
