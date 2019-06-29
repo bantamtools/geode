@@ -113,6 +113,8 @@ default_cxx = env['CXX']
 posix = env['PLATFORM']=='posix'
 darwin = env['PLATFORM']=='darwin'
 windows = env['PLATFORM']=='win32'
+msys = env['PLATFORM']=='msys'
+
 verbose = True
 
 # Default base directory
@@ -665,10 +667,10 @@ def library(env,name,libs=(),skip=(),extra=(),skip_all=False,no_exports=False,py
       install_name = quote('%s/${SHLIBPREFIX}%s${SHLIBSUFFIX}'%(Dir(env.subst(env['prefix_lib'])).abspath,name))
       linkflags = '-install_name %s '%install_name+linkflags
     # On Windows, this will create two files: a .lib (for other builds), and a .dll for the runtime.
-    if windows:
-      lib = env.SharedLibrary(path,source=sources,LINKFLAGS=linkflags, SHLIBVERSION='1', SHLIBVERSIONFLAGS='')
-    else:
+    if msys:
       lib = env.SharedLibrary(path,source=sources,LINKFLAGS=linkflags)
+    else:
+      lib = env.SharedLibrary(path,source=sources,LINKFLAGS=linkflags, SHLIBVERSION='1', SHLIBVERSIONFLAGS='')
   else:
     lib = env.StaticLibrary(path,source=sources)
   env.Depends('.',lib)
