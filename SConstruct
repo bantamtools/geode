@@ -153,7 +153,8 @@ options(env,
   ('syntax','check syntax only',0),
   ('use_latex','Use latex (mostly for internal technical documents)',0),
   ('thread_safe','use thread safe reference counting in pure C++ code',1),
-  ('optimizations','override default optimization settings','<default>'),
+  #  ('optimizations','override default optimization settings','<default>'),
+  ('optimizations','override default optimization settings','-mtune=cortex-a72'),
   ('sse','Use SSE if available',1),
   ('skip','list of modules to skip',[]),
   ('skip_libs', 'list of libraries to skip', []),
@@ -297,6 +298,7 @@ else:
       if   env['arch']=='pentium4': optimizations = '-O2 -fexpensive-optimizations -falign-functions=4 -funroll-loops -fprefetch-loop-arrays'
       elif env['arch']=='pentium3': optimizations = '-O2 -fexpensive-optimizations -falign-functions=4 -funroll-loops -fprefetch-loop-arrays'
       elif env['arch']=='opteron':  optimizations = '-O2'
+      elif env['arch']=='aarch64':  optimizations = '-mtune=cortex-a72'
       elif env['arch'] in ('nocona','native','powerpc', 'corei7', 'x86-64', 'arm'): optimizations = '-O3 -funroll-loops'
     env.Append(CXXFLAGS=optimizations)
     if not clang:
