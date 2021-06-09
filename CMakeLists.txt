@@ -11,9 +11,12 @@ endif()
 include(GeodeSupport.cmake)
 
 find_package(PkgConfig)
-find_package(JPEG)
-find_package(PNG)
+#find_package(JPEG REQUIRED)
+#find_package(PNG REQUIRED)
 
+#set(JPEG_LIBRARY 
+set(JPEG_INCLUDE_DIRS "/usr/local/include/" CACHE PATH "Path to jpeglib.h")
+set(PNG_INCLUDE_DIRS "/usr/local/include/" CACHE PATH "Path to png.h")
 set(GMP_LIB_DIR "/usr/lib/" CACHE PATH "Path to libgmp.so")
 set(GMP_INCLUDE_DIR "/usr/local/Cellar/ /usr/include/" CACHE PATH "Path to gmp.h")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
