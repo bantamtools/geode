@@ -28,7 +28,7 @@ void Listen::input_changed() const {
 BatchListen::BatchListen(const vector<Ref<const ValueBase>>& vv, const function<void()>& f)
   : values(vv)
   , f(f) {
-  for(const auto v : values)
+  for(const auto& v : values)
     depend_on(v);
 }
 
@@ -41,7 +41,7 @@ void BatchListen::input_changed() const {
   } catch (const exception& e) {
     print_and_clear_exception("Listen: exception in listener callback",e);
   }
-  for(const auto v : values)
+  for(const auto& v : values)
     depend_on(*v);
 }
 

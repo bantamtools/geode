@@ -1351,7 +1351,7 @@ static void fix_loops(RawArray<Vector<int,3>> faces, Array<EV>& X, const int n,
   // Map each component to an old or new vertex
   Hashtable<int> seen; // Have we used the old vertex yet?
   Hashtable<int,int> edge_to_copy; // Map from edges (which are roots) to the appropriate loop vertex copy
-  for (const auto i : edges)
+  for (const auto& i : edges) //changed from auto to auto&
     if (union_find.is_root(i.y)) {
       const int v = i.x.x;
       edge_to_copy.set(i.y,seen.set(v) ? v : X.append(X[v]));
