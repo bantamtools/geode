@@ -16,6 +16,8 @@ find_package(PNG)
 
 set(GMP_LIB_DIR "/usr/lib/" CACHE PATH "Path to libgmp.so")
 set(GMP_INCLUDE_DIR "/usr/local/Cellar/ /usr/include/" CACHE PATH "Path to gmp.h")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
 
 find_library(
   GMP_LIBRARIES gmp
