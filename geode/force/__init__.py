@@ -1,4 +1,4 @@
-from __future__ import division,absolute_import
+
 from geode import *
 
 def edge_springs(mesh,mass,X,stiffness,damping_ratio):

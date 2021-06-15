@@ -98,7 +98,7 @@ __all__ = 'read write pack unpack Atom'.split()
 import sys
 import zlib
 import struct
-from cStringIO import StringIO
+from io import StringIO
 
 signature = '\003TRY'
 current_version = 2
@@ -147,7 +147,7 @@ def warn_unknown(type):
     elif type in leaf_parsers:
       raise IOError("Nonleaf atom has leaf type '%s'"%type)
     else:
-      print>>sys.stderr, "warning: unknown atom type '%s'"%type
+      print("warning: unknown atom type '%s'"%type, file=sys.stderr)
       already_warned.add(type)
 
 def read_uint(file):
@@ -379,7 +379,7 @@ register_nonleaf('dict',dict,dict.iteritems,parse_dict)
 import numpy
 
 # Start dtype map off with platform independent dtypes only
-int_to_dtype = map(numpy.dtype,'bool int8 uint8 int16 uint16 int32 uint32 int64 uint64 float32 float64'.split())
+int_to_dtype = list(map(numpy.dtype,'bool int8 uint8 int16 uint16 int32 uint32 int64 uint64 float32 float64'.split()))
 dtype_num_to_int = dict((d.num,i) for i,d in enumerate(int_to_dtype))
 
 def make_array(a):
@@ -401,7 +401,7 @@ def parse_array(data,version):
   file = StringIO(data)
   dtype = int_to_dtype[read_uint(file)]
   rank = read_uint(file)
-  shape = [read_uint(file) for _ in xrange(rank)]
+  shape = [read_uint(file) for _ in range(rank)]
   # Convert little endian buffer to a numpy array, flipping endianness if necessary
   array = (numpy.frombuffer(data,dtype=dtype.newbyteorder('<'),offset=file.tell()).astype(dtype) if numpy.product(shape) else numpy.empty(0,dtype)).reshape(shape)
   return numpy.require(array,requirements='a')

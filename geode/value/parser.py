@@ -19,14 +19,14 @@ def try_autocomplete(props):
     exit(0)
   if len(sys.argv) != 4 or sys.argv[1] != "--autocomplete": return
 
-  print "Autocomplete requested for %s" % sys.argv
+  print("Autocomplete requested for %s" % sys.argv)
   prev = sys.argv[2]
   curr = sys.argv[3]
 
   if len(prev) > 2 and prev[:2] == "--": prev = prev[2:]
   prev = prev.replace('-','_')
 
-  print "prev: %s" % prev
+  print("prev: %s" % prev)
   items = props.items
   if prev in items:
     prop = items[prev]
@@ -40,7 +40,7 @@ def try_autocomplete(props):
     else:
       return_options("", include_files=False)
 
-  return_options(" ".join(["--"+fix_name(n) for n in items.keys()]), include_files=True)
+  return_options(" ".join(["--"+fix_name(n) for n in list(items.keys())]), include_files=True)
 
 trailing_pattern = re.compile(r'0000.*')
 
@@ -103,7 +103,7 @@ def parse(props,description,positional=[]):
           prop.set(values)
         except ValueError:
           if prop.allowed:
-            raise ValueError("property '%s' expects one of %s, got '%s'"%(self.dest,', '.join(map(lambda s: "'%s'" % s,prop.allowed)),values))
+            raise ValueError("property '%s' expects one of %s, got '%s'"%(self.dest,', '.join(["'%s'" % s for s in prop.allowed]),values))
           raise
         props_set.add(name)
 
@@ -115,13 +115,13 @@ def parse(props,description,positional=[]):
     return ''.join(s)
 
   def convert_rotation3d(s):
-    sv = map(float,s.split(','))
+    sv = list(map(float,s.split(',')))
     assert len(sv)==4
     sv = normalized(sv)
     return Rotation.from_sv(sv[0],sv[1:])
 
   def convert_frame3d(s):
-    f = map(float,s.split(','))
+    f = list(map(float,s.split(',')))
     assert len(f)==7
     sv = normalized(f[3:])
     return Frames(f[:3],Rotation.from_sv(sv[0],sv[1:]))
@@ -133,7 +133,7 @@ def parse(props,description,positional=[]):
   def converter(prop):
     try:
       v = prop()
-    except Exception,e:
+    except Exception as e:
       def fail(x):
         raise e
       return fail
@@ -161,7 +161,7 @@ def parse(props,description,positional=[]):
     return help
 
   # Add keyword arguments
-  for name,prop in props.items.items():
+  for name,prop in list(props.items.items()):
     # good arguments to consider adding to properties:
     # help
 
@@ -213,7 +213,7 @@ def command(props,drop_defaults=True):
         else:
           args.extend(['--'+fix_name(name),v])
     except NotImplementedError:
-      print 'Warning: Could not convert property %s, command line may be incomplete.' % name.replace('_','-')
+      print('Warning: Could not convert property %s, command line may be incomplete.' % name.replace('_','-'))
 
   def escape(s):
     if ' ' in s or s=='':

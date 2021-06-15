@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from __future__ import division
+
 from geode import *
 import sys
 
@@ -19,7 +19,7 @@ def test_constructions():
 def test_delaunay(benchmark=False,cgal=False,origin=True,circle=False,constrain=True):
   def simple(ns):
     return ((n,i,0) for i,n in enumerate(ns))
-  cases = [simple(range(3,10)),
+  cases = [simple(list(range(3,10))),
            [(12,11781,2),(13,19797,1),(14,41832,2),(15,22242,1),(50,27007,2+2*1024)], # Hit Chew fan cases
            simple([50,100,563,1025,2000,-2000]+benchmark*[1<<20,-1<<20])]
   for case in cases:
@@ -59,10 +59,10 @@ def test_delaunay(benchmark=False,cgal=False,origin=True,circle=False,constrain=
 def draw_polygons(polys):
   import pylab
   for p,points in enumerate(polys):
-    print points
-    print points.shape
-    print points[0,:]
-    print points[0,:].shape
+    print(points)
+    print(points.shape)
+    print(points[0,:])
+    print(points[0,:].shape)
     points = concatenate([points,[points[0,:]]])
     pylab.plot(points[:,0],points[:,1])
   pylab.show()
@@ -83,10 +83,10 @@ def test_polygon():
     random.seed(71349271+1000*k+n)
     polys = random.randn(n,1,2)+polar(sort(random.uniform(2*pi,size=n*k).reshape(n,k),axis=1))*abs(random.randn(n,k,1))/2
     if verbose:
-      print '\nn = %d\npolys = %s'%(n,compact_str(polys))
+      print('\nn = %d\npolys = %s'%(n,compact_str(polys)))
     new = canonicalize_polygons(polygon_union_cmp(polys))
     if verbose:
-      print 'union = %s'%compact_str(new)
+      print('union = %s'%compact_str(new))
     # Check that degeneracies are fine
     area = polygon_area(new)
     assert allclose(area,polygon_area(polygon_union_cmp(new,new)))
@@ -96,9 +96,9 @@ def test_polygon():
     assert all(new.offsets==old.offsets)
     error = relative_error(new.flat,old.flat)
     if error>1e-6:
-      print 'old =\n%s\n'%compact_str(old)
-      print 'new =\n%s\n'%compact_str(new)
-      print 'error = %g'%error
+      print('old =\n%s\n'%compact_str(old))
+      print('new =\n%s\n'%compact_str(new))
+      print('error = %g'%error)
       assert False
 
 if __name__=='__main__':

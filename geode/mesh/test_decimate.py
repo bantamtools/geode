@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from __future__ import division,print_function
+
 from geode import *
 from geode.geometry.platonic import *
 
@@ -9,8 +9,8 @@ def hausdorff(A,B,boundary=False):
   X = A[1],B[1]
   def f(i,j):
     if boundary:
-      Y = X[i][map(m[i].src,m[i].boundary_loops().flat)]
-      surface = SimplexTree(SegmentSoup(map(m[j].halfedge_vertices,m[j].boundary_loops().flat)),X[j])
+      Y = X[i][list(map(m[i].src,m[i].boundary_loops().flat))]
+      surface = SimplexTree(SegmentSoup(list(map(m[j].halfedge_vertices,m[j].boundary_loops().flat))),X[j])
     else:
       Y = X[i]
       surface = m[j].face_tree(X[j])[0]

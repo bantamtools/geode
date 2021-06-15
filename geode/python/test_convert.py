@@ -26,7 +26,7 @@ def test_enum():
   assert str(a)=='EnumTestA'
 
 def test_str_repr():
-  for i in xrange(256):
+  for i in range(256):
     c = chr(i)
     r = str_repr_test(c)
     assert ast.literal_eval(r)==c

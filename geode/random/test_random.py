@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from __future__ import division
+
 from numpy import *
 from geode.random import *
 from geode import *
@@ -11,7 +11,7 @@ def test_sobol(filename=None):
   m,n = 128,128
   box = Box(0,(m,n,m))
   sobol = Sobol(box)
-  print box
+  print(box)
 
   im = tile(1,(m,n,3)).astype(uint8)
   count = m*n//100*10
@@ -59,10 +59,10 @@ def test_threefry():
            243f6a8885a308d3 13198a2e03707344   0000000000000000 8000000000000000   58af89abe6d07cab 12e1901ad854ba14
            a4093822299f31d0 082efa98ec4e6c89   0000000000000000 8000000000000000   469ded4657b380b5 4e18d924d1d191f4
            452821e638d01377 be5466cf34e90c6c   0000000000000000 8000000000000000   89983220cc01af30 756813c51f68660f'''
-  kat = map(lambda s:int(s,16),kat.split())
+  kat = [int(s,16) for s in kat.split()]
   def combine(lo,hi):
     return (hi<<64)+lo
-  for i in xrange(len(kat)//6):
+  for i in range(len(kat)//6):
     ctr = combine(kat[6*i+0],kat[6*i+1])
     key = combine(kat[6*i+2],kat[6*i+3])
     val = combine(kat[6*i+4],kat[6*i+5])
@@ -82,7 +82,7 @@ def test_bits():
   gamma = 0.5772156649015328606065120900824024310421
   expected = sqrt(2*log(m)-log(4*pi*log(m)-2*pi*log(2*pi)))*(1+gamma/log(m))
   min,max = X.min(),X.max()
-  print 'n = %d, m = %d, expected extreme = %g, error range = %g %g'%(n,m,expected,min,max)
+  print('n = %d, m = %d, expected extreme = %g, error range = %g %g'%(n,m,expected,min,max))
   for e in -min,max:
     assert relative_error(expected,e)<.1
 
@@ -97,13 +97,13 @@ def test_distributions():
     cdf = dist.cdf(cuts)
     expected = n*(cdf[1:]-cdf[:-1])
     chi2,p = scipy.stats.chisquare(observed,expected)
-    print '%s: chi^2 = %g, p = %g'%(name,chi2,p)
+    print('%s: chi^2 = %g, p = %g'%(name,chi2,p))
     assert p>.4
     # Check independence of adjacent entries
     if 'chi2_contingency' in dir(scipy.stats):
       observed = histogram2d(X[:-1],X[1:],cuts)[0]
       chi2,p,_,_ = scipy.stats.chi2_contingency(observed)
-      print '%s independence: chi^2 = %g, p = %g'%(name,chi2,p)
+      print('%s independence: chi^2 = %g, p = %g'%(name,chi2,p))
       assert p>.4
   # Test normal
   test('normal',scipy.stats.norm,arange(-3,3.001,.03),random.normal(n))
@@ -132,8 +132,8 @@ def test_permute():
   for n in 1,2,3,4,5:
     fac *= n
     perms = set()
-    for key in xrange(int(1+10*fac*log(fac))):
-      perm = tuple(random_permute(n,key,i) for i in xrange(n))
+    for key in range(int(1+10*fac*log(fac))):
+      perm = tuple(random_permute(n,key,i) for i in range(n))
       for i,pi in enumerate(perm):
         assert i==random_unpermute(n,key,pi)
       perms.add(perm)

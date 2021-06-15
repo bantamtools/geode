@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-from __future__ import absolute_import
+
 
 from numpy import *
 from geode import *
-import cPickle as pickle
+import pickle as pickle
 import sys
 import py
 
@@ -13,12 +13,12 @@ def test_basic():
   assert a.base is None
   assert all(a==array([]))
   assert a.base is None
-  b = array_test(array(xrange(5),dtype=int32),-1)
+  b = array_test(array(range(5),dtype=int32),-1)
   assert len(b)==5
 
 def test_resize():
   a = array_test(empty_array(),20)
-  print type(a.base)
+  print(type(a.base))
   assert len(a)==20
   assert base_refcnt(a)==1 # Can't use sys.getrefcount(a.base) since it's version dependent
   a = array_test(a,10)
@@ -46,9 +46,9 @@ def test_const():
 
 def test_refcount():
   a = array([],dtype=int32)
-  print a.dtype.name
+  print(a.dtype.name)
   base = a
-  for i in xrange(100):
+  for i in range(100):
     a = array_test(a,-1)
     assert a.base is base
     assert sys.getrefcount(a)==2
@@ -77,7 +77,7 @@ def test_nested():
   assert a==nested_convert_test(a)==nested_convert_test(l)
   n = asarray([[1,2,3],[4,5,6]],dtype=int32)
   na = Nested(n)
-  print na,nested_convert_test(na),nested_convert_test(n)
+  print(na,nested_convert_test(na),nested_convert_test(n))
   assert na==nested_convert_test(na)==nested_convert_test(n)
   assert a==pickle.loads(pickle.dumps(a))
 

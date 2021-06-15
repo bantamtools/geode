@@ -37,20 +37,20 @@ class ChangeTracker:
     self._listeners = {}
 
   def tracked_items(self):
-    return self._refs.keys()
+    return list(self._refs.keys())
 
   def pull(self):
     result = {}
-    for name, ref in self._refs.iteritems():
+    for name, ref in self._refs.items():
       if name in self._up_to_date:
         continue
       result[name] = ref()
       self._up_to_date.add(name)
-    for name, d in self._groups.iteritems():
+    for name, d in self._groups.items():
       dpull = d.pull()
       if len(dpull): result[name] = dpull
 
-    deleted = [name for name in self._up_to_date if name not in self._refs.keys() and name not in self._groups.keys()]
+    deleted = [name for name in self._up_to_date if name not in list(self._refs.keys()) and name not in list(self._groups.keys())]
     for name in deleted:
       result[name] = None
 
@@ -59,7 +59,7 @@ class ChangeTracker:
 
   def refresh(self):
     self._up_to_date.clear()
-    for name, d in self._groups.iteritems():
+    for name, d in self._groups.items():
       d.refresh()
 
   def _on_change(self, name):
@@ -119,7 +119,7 @@ class SyncedDict(Synced):
 
   def refresh(self):
     self._deleted.clear()
-    for v in self._values.itervalues(): v.refresh()
+    for v in self._values.values(): v.refresh()
     return self
 
   def keys(self):
@@ -127,7 +127,7 @@ class SyncedDict(Synced):
 
   def up_to_date(self):
     return len(self._deleted) == 0 and \
-           all(v.up_to_date() for v in self._values.itervalues())
+           all(v.up_to_date() for v in self._values.values())
 
   def get(self, key):
     return self._values.get(key)
@@ -136,7 +136,7 @@ class SyncedDict(Synced):
     result = {}
     for k in self._deleted: result[k] = None
     self._deleted.clear()
-    for k, v in self._values.items():
+    for k, v in list(self._values.items()):
       if not v.up_to_date():
         result[k] = v.pull_changes()
     return result
@@ -231,12 +231,12 @@ if __name__ == "__main__":
   ct.track('b', var_b)
   ct.track('sum', var_sum)
 
-  print "updates: %s" % str(ct.pull())
-  print "setting 'a' to 5"
+  print("updates: %s" % str(ct.pull()))
+  print("setting 'a' to 5")
   var_a.set(5)
-  print "updates: %s" % str(ct.pull())
-  print "setting 'b' to 12"
+  print("updates: %s" % str(ct.pull()))
+  print("setting 'b' to 12")
   var_b.set(12)
-  print "updates: %s" % str(ct.pull())
+  print("updates: %s" % str(ct.pull()))
   ct.refresh()
-  print "refresh: %s" % str(ct.pull())
+  print("refresh: %s" % str(ct.pull()))

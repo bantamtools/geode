@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import division
+
 from geode import *
 import sys
 
@@ -167,9 +167,9 @@ arcs02 = ('''\
 def svg_test(name,svg,known):
   beziers = svgstring_to_beziers(svg)
   sig = [rint(b.evaluate(4)).astype(int) for b in beziers]
-  sig,known = map(compact_str,(sig,known))
+  sig,known = list(map(compact_str,(sig,known)))
   if sig!=known or '-dd' in sys.argv:
-    print 'sig = %s'%sig
+    print('sig = %s'%sig)
     if '-d' in sys.argv or '-dd' in sys.argv:
       import pylab
       for bezier in beziers:

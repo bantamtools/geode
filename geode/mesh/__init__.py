@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 from numpy import *
 from geode import *
@@ -20,14 +20,14 @@ def TriangleTopology(soup=TriangleSoup(empty((0,3),int32))):
   return geode_wrap.TriangleTopology(soup)
 
 def linear_subdivide(mesh,X,steps=1):
-  for _ in xrange(steps):
+  for _ in range(steps):
     subdivide = TriangleSubdivision(mesh)
     mesh = subdivide.fine_mesh
     X = subdivide.linear_subdivide(X)
   return mesh,X
 
 def loop_subdivide(mesh,X,steps=1,corners=zeros(0,dtype=int32)):
-  for _ in xrange(steps):
+  for _ in range(steps):
     subdivide = TriangleSubdivision(mesh)
     subdivide.corners = corners
     mesh = subdivide.fine_mesh
@@ -114,14 +114,14 @@ def write_obj(file,mesh,X=None):
   output=open(file,"w")
 
   # write format
-  print>>output,'''\
+  print('''\
 # simple obj file format:
 #   # vertex at coordinates (x,y,z)
 #   v x y z
 #   # triangle [quad] with vertices a,b,c[,d]
 #   f a b c [d]
 #   # vertices are indexed starting from 1
-'''
+''', file=output)
 
   # write vertices
   for x in X:
@@ -131,12 +131,12 @@ def write_obj(file,mesh,X=None):
   if isinstance(mesh,TriangleSoup):
     triangles=mesh.elements+1
     for t in triangles:
-      print>>output,'f',' '.join(map(str,t))
+      print('f',' '.join(map(str,t)), file=output)
   elif isinstance(mesh,PolygonSoup):
     vertices=mesh.vertices+1
     offset=0
     for c in mesh.counts:
-      print>>output,'f',' '.join(map(str,vertices[offset:offset+c]))
+      print('f',' '.join(map(str,vertices[offset:offset+c])), file=output)
       offset+=c
   else:
     raise TypeError('unknown mesh type %s'%type(mesh))

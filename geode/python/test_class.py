@@ -49,7 +49,7 @@ def test_ptr():
   o = Object()
   assert c.ptr is None
   c.ptr = o
-  print c.ptr
+  print(c.ptr)
   assert c.ptr is o
   c.ptr = None
   assert c.ptr is None

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from __future__ import division
+
 from geode import *
 
 if MovWriter.enabled():
@@ -14,7 +14,7 @@ if MovWriter.enabled():
     assert x.shape==y.shape==(w,h)
     x = (x-(w-1)/2)/h
     y = (y-(h-1)/2)/h
-    for f in xrange(100):
+    for f in range(100):
       t = 3*f/100
       if t<1:
         c = (t,0,0)

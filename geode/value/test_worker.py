@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from __future__ import with_statement
+
 from geode import Prop,PropManager,cache
 from geode.value import Worker
 import sys
@@ -18,7 +18,7 @@ def remote(conn):
   done = Prop('done',False)
   conn.add_output('n',n)
   conn.add_output('done',done)
-  for i in xrange(10):
+  for i in range(10):
     n.set(i)
   done.set(True)
 
@@ -51,7 +51,7 @@ def test_worker():
       while not done():
         worker.process(timeout=None,count=1)
         seen.append(n())
-      assert seen==range(10)+[9]
+      assert seen==list(range(10))+[9]
 
 if __name__=='__main__':
   if len(sys.argv)==3 and sys.argv[1]=='--worker':

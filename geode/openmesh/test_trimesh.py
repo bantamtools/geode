@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from __future__ import division
+
 from geode.vector import *
 from geode.openmesh import *
 from geode.geometry.platonic import *
@@ -24,18 +24,18 @@ if openmesh_enabled():
             ,('cylinder',     open_cylinder_mesh(x0=0,x1=(1,0,0),radius= r,na=1000,nz=10), .5/r,0)]
     for name,(mesh,X),H,K in known:
       for scale in 1,-1:
-        print '\n%s %g'%(name,scale)
+        print('\n%s %g'%(name,scale))
         H *= scale
         tm = TriMesh()
         tm.add_vertices(scale*X)
         tm.add_faces(mesh.elements)
         Ha = mean_curvatures(tm)
         He = relative_error(H,Ha)
-        print 'H error = %g (range %g %g, correct %g)'%(He,Ha.min(),Ha.max(),H)
+        print('H error = %g (range %g %g, correct %g)'%(He,Ha.min(),Ha.max(),H))
         assert He<1e-5
         Ka = gaussian_curvatures(tm)
         Ke = relative_error(K,Ka,absolute=1e-6)
-        print 'K error = %g (range %g %g, correct %g)'%(Ke,Ka.min(),Ka.max(),K)
+        print('K error = %g (range %g %g, correct %g)'%(Ke,Ka.min(),Ka.max(),K))
         assert Ke<2e-3
   
   # Ensure readers and writers in OpenMesh were installed

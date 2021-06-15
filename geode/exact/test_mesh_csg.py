@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
-from __future__ import division,print_function
+
 from geode import *
 from geode.geometry.platonic import *
 
 def test_simple_triangulate():
   for n in 0,1,2,3,4,5,10,50:
-    for k in xrange(10):
+    for k in range(10):
       simple_triangulate_test(n+1000*k,n,n+1,n,n)
 
 def test_csg():
@@ -21,7 +21,7 @@ def test_csg():
   X0 *= tet.volume(X0)**(-1/3)
   I0 = mesh_signature(tet,X0)
   ico,_ = icosahedron_mesh()
-  for i in xrange(100):
+  for i in range(100):
     random.seed(i)
     X1 = random.randn(4,3)
     X1 *= abs(tet.volume(X1))**(-1/3)
@@ -57,7 +57,7 @@ def test_depth_weight():
   tet,X0 = tetrahedron_mesh()
   X0 *= tet.volume(X0)**(-1/3)
   itet,_ = tetrahedron_mesh()
-  itet.elements = map(lambda x: (x[1], x[0], x[2]), itet.elements)
+  itet.elements = [(x[1], x[0], x[2]) for x in itet.elements]
 
   for n in [2, 3, 4]:
     # make a merged mesh of n copies of X0 and one copy with depth n.

@@ -140,7 +140,7 @@ def test_exception():
   for i in 0,1:
     try:
       y()
-    except RuntimeError,e:
+    except RuntimeError as e:
       assert count[0]==2
       if i:
         assert error is e

@@ -16,7 +16,7 @@ real = geode_wrap.real
 
 class Frames(ndarray):
     dtypes = dict((d,dtype([('t','%df%d'%(d,real.itemsize)),('r',Rotations[d].dtype)])) for d in (2,3))
-    inv_dtypes = dict((v,k) for k,v in dtypes.items())
+    inv_dtypes = dict((v,k) for k,v in list(dtypes.items()))
     __array_priority__ = -1.
 
     def __new__(cls,tr,r=None,d=None):
@@ -87,7 +87,7 @@ def interpolation(f1,f2,s):
   interp = frame_interpolation_2d if f1.d==2 else frame_interpolation_3d
   if f1.shape!=f2.shape:
     b = broadcast(f1,f2)
-    new_f = [empty(b.shape,dtype=f1.dtype).view(Frames) for _ in xrange(2)]
+    new_f = [empty(b.shape,dtype=f1.dtype).view(Frames) for _ in range(2)]
     new_f[0][:] = f1
     new_f[1][:] = f2
     f1,f2 = new_f

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from __future__ import absolute_import
+
 
 from numpy import *
 from geode import real
@@ -55,7 +55,7 @@ def test_fvm_3d():
 
 def test_simple_shell():
   for i in 0,1,3,4,7:
-    print '\ni = %d'%i
+    print('\ni = %d'%i)
     random.seed(12872+i)
     X = random.randn(3,2)
     X2 = .1*random.randn(3,3)
@@ -73,7 +73,7 @@ def test_bending():
     X = random.randn(d+1,d)
     dX = .1*random.randn(d+1,d)
     for bend in linear_bending_elements(mesh,X,stiffness,damping),cubic_hinges(mesh,X,stiffness,damping):
-      print '\n',type(bend).__name__
+      print('\n',type(bend).__name__)
       if 'CubicHinges' in type(bend).__name__: # Compare energy with slow_energy
         angles = bend.angles(mesh.bending_tuples(),X)
         for theta in random.randn(20):
@@ -82,7 +82,7 @@ def test_bending():
           energy = bend.elastic_energy()
           slow_energy = bend.slow_elastic_energy(angles,X,iX)
           error = relative_error(energy,slow_energy)
-          print 'slow energy error = %g (slow %g vs. %g, theta = %g)'%(error,slow_energy,energy,theta)
+          print('slow energy error = %g (slow %g vs. %g, theta = %g)'%(error,slow_energy,energy,theta))
           assert error<1e-8
       force_test(bend,X+dX,verbose=1)
   # Test against exact sphere energies.  We don't actually compute the correct answers in 3D, since hinge based energies are fundamentally mesh dependent.
@@ -95,7 +95,7 @@ def test_bending():
     bend = cubic_hinges(mesh,X,stiffness,damping,angles=flat)
     energy = bend.slow_elastic_energy(flat,X,X)/stiffness/fudge
     error = relative_error(energy,known)
-    print '%s: known %g, energy %g, ratio %r, error %g'%(name,known,energy,energy/known,error)
+    print('%s: known %g, energy %g, ratio %r, error %g'%(name,known,energy,energy/known,error))
     assert error<tolerance
 
 def test_linear_fvm_2d():
@@ -135,7 +135,7 @@ def test_air_pressure():
   X2 = X + random.randn(*X.shape)/10
   for closed in 0,1:
     for side in 1,-1:
-      print '\nclosed %d, side %d'%(closed,side)
+      print('\nclosed %d, side %d'%(closed,side))
       air = AirPressure(mesh,X,closed,side)
       force_test(air,X2,verbose=1)
 

@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 from geode.utility import tryfile
 from numpy import *
@@ -7,7 +7,7 @@ import py.test
 def check(a,b):
   if isinstance(a,dict) and isinstance(b,dict):
     assert len(a)==len(b)
-    for n,av in a.iteritems():
+    for n,av in a.items():
       check(av,b[n])
   elif isinstance(a,tuple) and isinstance(b,tuple):
     assert len(a)==len(b)
@@ -49,7 +49,7 @@ def test_version_2():
   def bad(s):
     open(file,'w').write(s)
     py.test.raises(Exception,tryfile.read,file)
-  for i in xrange(len(raw)):
+  for i in range(len(raw)):
     bad(raw[:i]+raw[i+1:])
-    for j in xrange(8):
+    for j in range(8):
       bad(raw[:i]+chr(ord(raw[i])^(1<<j))+raw[i+1:])

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from __future__ import division
+
 from geode.geometry.platonic import *
 from geode.vector import *
 
@@ -21,7 +21,7 @@ def test_tetrahedron():
   mesh,X = tetrahedron_mesh()
   a = sqrt(8) # see http://en.wikipedia.org/wiki/Tetrahedron
   assert relative_error(mesh.surface_area(X),sqrt(3)*a**2) < 1e-5
-  print mesh.volume(X),sqrt(2)/12*a**3
+  print(mesh.volume(X),sqrt(2)/12*a**3)
   assert relative_error(mesh.volume(X),sqrt(2)/12*a**3) < 1e-5
 
 def test_sphere():
@@ -37,15 +37,15 @@ def test_revolution():
   height = sin(alpha)
   for c0 in 0,1:
     for c1 in 0,1:
-      print '\nclosed = %d %d'%(c0,c1)
+      print('\nclosed = %d %d'%(c0,c1))
       r = radius[c0:len(radius)-c1]
       mesh,X = surface_of_revolution(base=0,axis=(0,0,1),radius=r,height=height,resolution=n,closed=(c0,c1))
       assert mesh.nodes()==len(X)==n*n+(c0+c1)*(1-n)
       ae = relative_error(mesh.surface_area(X),4*pi)
-      print 'area error = %g'%ae
+      print('area error = %g'%ae)
       assert ae<5e-3
       ve = relative_error(mesh.volume(X),4*pi/3)
-      print 'volume error = %g'%ve
+      print('volume error = %g'%ve)
       assert ve<1e-2
       assert len(mesh.nonmanifold_nodes(True))==0
       assert len(mesh.nonmanifold_nodes(False))==n*(2-c0-c1)

@@ -1,4 +1,4 @@
-from __future__ import absolute_import,division
+
 from geode import *
 
 def force_test(force,X,dx_scale=1e-5,tolerance=1e-5,iterations=10,verbose=False,ignore_hessian=False,single_input=None,definite=True):
@@ -59,15 +59,15 @@ def force_test(force,X,dx_scale=1e-5,tolerance=1e-5,iterations=10,verbose=False,
   Fe0 = elastic_force(X)
   K0 = damping_energy(X,V)
   Fd0 = damping_force(X,V)
-  for _ in xrange(iterations):
+  for _ in range(iterations):
     # Test elastic force
     dX = rand(dx_scale)
     U2 = elastic_energy(X+dX)
     Fe1 = elastic_force(X+dX/2)
     e = relative_error(tensordot(Fe1,dX,axes=2),U0-U2)
     if verbose:
-      print '|Fe1| %r, U0 %r, U2 %r'%(maxabs(Fe1),U0,U2)
-      print 'elastic force error =',e
+      print('|Fe1| %r, U0 %r, U2 %r'%(maxabs(Fe1),U0,U2))
+      print('elastic force error =',e)
     assert e < tolerance
 
     # Test elastic differentials
@@ -76,8 +76,8 @@ def force_test(force,X,dx_scale=1e-5,tolerance=1e-5,iterations=10,verbose=False,
       dFe = elastic_differential(X+dX/2,dX)
       e = relative_error(dFe,Fe2-Fe0)
       if verbose:
-        print '|dFe| %r, |Fe2| %r, |Fe0| %r, |Fe2-Fe0| %r'%(maxabs(dFe),maxabs(Fe2),maxabs(Fe0),maxabs(Fe2-Fe0))
-        print 'elastic differential error =',e
+        print('|dFe| %r, |Fe2| %r, |Fe0| %r, |Fe2-Fe0| %r'%(maxabs(dFe),maxabs(Fe2),maxabs(Fe0),maxabs(Fe2-Fe0)))
+        print('elastic differential error =',e)
       assert e < tolerance
 
     # Test elastic gradient
@@ -87,8 +87,8 @@ def force_test(force,X,dx_scale=1e-5,tolerance=1e-5,iterations=10,verbose=False,
       e = relative_error(dF,dF2)
       if verbose:
         if len(dF)<10:
-          print 'elastic gradient force errors = %s'%magnitudes(dF-dF2)
-        print 'elastic gradient error =',e
+          print('elastic gradient force errors = %s'%magnitudes(dF-dF2))
+        print('elastic gradient error =',e)
       assert e < tolerance
       # Test definiteness
       if definite:
@@ -99,8 +99,8 @@ def force_test(force,X,dx_scale=1e-5,tolerance=1e-5,iterations=10,verbose=False,
           if verbose:
             set_printoptions(linewidth=250)
             if 0:
-              print 'A =\n%s'%A
-            print 'eigenvalues = %s'%sort(w)
+              print('A =\n%s'%A)
+            print('eigenvalues = %s'%sort(w))
           assert w.max()<=tolerance*maxabs(w)
         except NotImplementedError:
           pass
@@ -114,7 +114,7 @@ def force_test(force,X,dx_scale=1e-5,tolerance=1e-5,iterations=10,verbose=False,
       dFi2 = elastic_gradient_block_diagonal_times(X,dXi)
       e = relative_error(dFi[i],dFi2[i])
       if verbose:
-        print 'elastic gradient block diagonal error =',e
+        print('elastic gradient block diagonal error =',e)
       assert e < tolerance
     except NotImplementedError:
       pass
@@ -125,7 +125,7 @@ def force_test(force,X,dx_scale=1e-5,tolerance=1e-5,iterations=10,verbose=False,
     Fd1 = damping_force(X,V+dV/2)
     e = relative_error(tensordot(Fd1,dV,axes=2),K0-K2)
     if verbose:
-      print 'damping force error =',e
+      print('damping force error =',e)
     assert e < tolerance
 
     # Test damping linearity
@@ -134,7 +134,7 @@ def force_test(force,X,dx_scale=1e-5,tolerance=1e-5,iterations=10,verbose=False,
     Fd3 = damping_force(X,V+V2)
     e = relative_error(Fd0+Fd2,Fd3)
     if verbose:
-      print 'damping linearity error =',e
+      print('damping linearity error =',e)
     assert e < tolerance
 
     # Test damping gradient
@@ -142,5 +142,5 @@ def force_test(force,X,dx_scale=1e-5,tolerance=1e-5,iterations=10,verbose=False,
       Fd2 = damping_gradient_times(X,V)
       e = relative_error(Fd0,Fd2)
       if verbose:
-        print 'damping gradient error =',e
+        print('damping gradient error =',e)
       assert e < tolerance

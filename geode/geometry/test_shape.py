@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from __future__ import division
+
 from geode import *
 from geode.random import Sobol
 
@@ -16,7 +16,7 @@ def test_bounding_box():
       assert all(box.min==min)
       assert all(box.max==max)
     except:
-      print 'check failed: X %s, box %s, expected %s %s'%(X,box,min,max)
+      print('check failed: X %s, box %s, expected %s %s'%(X,box,min,max))
       raise
   check([[4,-2],[-1,5]],[-1,-2],[4,5])
   check(asarray([[4.,-2],[-1,5]]),[-1,-2],[4,5])
@@ -39,7 +39,7 @@ def test_consistency():
   def sv(x):
     return '[%s]'%','.join(map(str,x))
   for shape in shapes:
-    print shape
+    print(shape)
     box = shape.bounding_box()
     scale = max(box.sizes())
     sobol = Sobol(box.thickened(scale/pi))
@@ -55,7 +55,7 @@ def test_consistency():
       phi2 = shape.phi(project)
       #print 'shape %r, X %s, phi %g, normal %s'%(shape,sv(X),phi,sv(normal))
       if abs(phi2)>=small:
-        print 'project = %s, X = %s, phi = %g, normal = %s, phi2 = %g, small = %g'%(sv(project),sv(X),phi,sv(normal),phi2,small)
+        print('project = %s, X = %s, phi = %g, normal = %s, phi2 = %g, small = %g'%(sv(project),sv(X),phi,sv(normal),phi2,small))
         assert abs(phi2)<small,'%s = %s - %g * %s, abs(%g) !< %g'%(sv(project),sv(X),phi,sv(normal),phi2,small)
       assert shape.lazy_inside(X)==(phi<=0)
       surface = shape.surface(X)
@@ -68,8 +68,8 @@ def test_consistency():
     assert box.lazy_inside(inner_box.max)
     box_error = max(box.sizes()-inner_box.sizes())/scale
     if box_error>5e-3:
-      print 'box error %g'%box_error
-      print 'box %s, sizes %s, volume %g\ninner box %s, sizes %s, volume %g'%(box,box.sizes(),box.volume(),inner_box,inner_box.sizes(),inner_box.volume())
+      print('box error %g'%box_error)
+      print('box %s, sizes %s, volume %g\ninner box %s, sizes %s, volume %g'%(box,box.sizes(),box.volume(),inner_box,inner_box.sizes(),inner_box.volume()))
       assert False
 
 """

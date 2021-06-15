@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
-from __future__ import division,absolute_import
+
 from geode import *
 import random
 import numpy
 
 def test_monomials():
   monomials = polynomial_monomials
-  for n in xrange(4):
+  for n in range(4):
     assert all(monomials(0,n)==zeros((1,n)))
     assert all(monomials(1,n)==concatenate([zeros((1,n)),eye(n)[::-1]]))
   assert all(monomials(2,2)==[(0,0),(0,1),(1,0),(0,2),(1,1),(2,0)])
@@ -16,8 +16,8 @@ def test_monomials():
 def test_interpolation():
   numpy.random.seed(183181)
   bound = 10000
-  for d in xrange(1,5):
-    for n in xrange(1,6):
+  for d in range(1,5):
+    for n in range(1,6):
       beta = polynomial_monomials(d,n)
       coefs = numpy.random.randint(2*bound,size=len(beta))-bound
       coefs = asarray(coefs,dtype=ExactInt) # in_place_interpolating_polynomial_test expects coefs to be same type as geode::ExactInt
@@ -32,14 +32,14 @@ def test_snap_divs():
   def limbs(n,count):
     assert abs(n)<2**(bits*count)
     mask = 2**bits-1
-    return [n>>bits*i&mask for i in xrange(count)]
+    return [n>>bits*i&mask for i in range(count)]
   hi = bound*3//2
   overflow = 0
   imaginary = 0
   for p in 1,2:
     lo = 0 if p==2 else -hi
     for c in 1,2,3,4:
-      for i in xrange(10):
+      for i in range(10):
         x = random.randrange(lo,hi)
         d = random.getrandbits(bits*c-1)*random.choice([-1,1])
         n = x**p*d + random.randrange(abs(x**(p-1)*d//(3-p)))*random.choice([-1,1])

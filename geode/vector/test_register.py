@@ -3,7 +3,7 @@ from numpy import *
 
 def test_register():
   random.seed(217301)
-  for _ in xrange(10):
+  for _ in range(10):
     for d in 2,3:
       X0 = random.randn(10,d)
       t = random.randn(d)

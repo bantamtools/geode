@@ -12,8 +12,8 @@ def test_curry():
 
 def test_base64():
   random.seed(73101)
-  for i in xrange(6):
-    for n in xrange(20):
+  for i in range(6):
+    for n in range(20):
       s = random.bytes(n)
       ours = base64_encode(s)
       theirs = base64.b64encode(s)
@@ -48,7 +48,7 @@ def test_cache_method():
   a = A(5)
   b = A(7)
   assert a.n==b.n==0
-  for i in xrange(2):
+  for i in range(2):
     assert a.f()==5
     assert b.f()==7
     assert a.n==b.n==1

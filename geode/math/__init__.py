@@ -1,6 +1,6 @@
 """math module"""
 
-from __future__ import absolute_import
+
 
 speed_of_light = 2.99792458e8 # m/s
 plancks_constant = 6.6260755e-34 # J*s

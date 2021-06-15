@@ -159,7 +159,7 @@ def from_angle_axis(angle,axis):
 def from_sv(*args):
     assert len(args)<=2
     if len(args)==2:
-      s,v = map(asarray,args)
+      s,v = list(map(asarray,args))
     else:
       sv = asarray(args[0])
       s = sv[...,0]

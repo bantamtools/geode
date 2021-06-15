@@ -1,6 +1,6 @@
 '''Exact geometric computation'''
 
-from __future__ import absolute_import
+
 import platform
 from geode.array import *
 from geode.mesh import merge_meshes, meshify

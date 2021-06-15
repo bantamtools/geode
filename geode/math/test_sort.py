@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from __future__ import division,print_function
+
 from geode import *
 
 def test_optimal_sort():

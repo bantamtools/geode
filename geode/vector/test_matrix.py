@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from __future__ import absolute_import
+
 
 import geode
 from numpy import *
@@ -53,7 +53,7 @@ def test_sparse():
   assert all(M.J.offsets==J.offsets)
   assert all(M.J.flat==[0,1,0,1,2,1,2])
   assert all(M.A.flat==A)
-  print M.J,M.A
+  print(M.J,M.A)
   b=array([pi,3,e],dtype=geode.real)
   C=M.incomplete_cholesky_factorization(0,0)
   t=empty_like(b)
@@ -62,7 +62,7 @@ def test_sparse():
   C.solve_backward_substitution(t,x)
   b2=empty_like(b)
   M.multiply(x,b2)
-  print b,b2
+  print(b,b2)
   assert all(abs(b-b2)<1e-6)
   b3=2*x-[x[1],x[0]+x[2],x[1]]
   assert all(abs(b2-b3)<1e-6)

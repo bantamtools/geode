@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from __future__ import division
+
 from geode import *
 import sys
 
@@ -20,9 +20,9 @@ def draw_circle_arcs(arcs,n=100,label=False,full=False,dots=False,jitter=None):
     l = magnitudes(Xn-X)
     center = .5*(X+Xn)+.25*(1/q-q).reshape(-1,1)*rotate_left_90(Xn-X)
     if 0:
-      print 'draw %d: x0 %s, x1 %s, center %s'%(0,X[0],Xn[0],center[0])
+      print('draw %d: x0 %s, x1 %s, center %s'%(0,X[0],Xn[0],center[0]))
       radius = .25*l*(1/q+q)
-      print 'radius = %s'%radius
+      print('radius = %s'%radius)
       assert allclose(magnitudes(X-center),abs(radius))
     theta = array([2*pi]) if full else 4*atan(q)
     points = center.reshape(-1,1,2)+Rotation.from_angle(theta[:,None]*arange(n+1)/n)*(X-center).reshape(-1,1,2)
@@ -36,7 +36,7 @@ def draw_circle_arcs(arcs,n=100,label=False,full=False,dots=False,jitter=None):
           pylab.annotate(str(arcs.offsets[p]+i),center[i])
     else:
       if label:
-        for i in xrange(len(poly)):
+        for i in range(len(poly)):
           pylab.annotate(str(arcs.offsets[p]+i),points[i,n//2])
       points = concatenate([points.reshape(-1,2),[points[-1,-1]]])
       if jitter is not None:
@@ -80,7 +80,7 @@ def test_circle_quantize():
   q0,q1 = arcs0.flat['q'][i],arcs1.flat['q'][i]
   eq = abs(q0-q1)
   comparison_str = 'ex = %g, eq = %g (%d: %g to %g)'%(ex,eq,i,q0,q1)
-  print comparison_str
+  print(comparison_str)
   show_results = False # Enable this if you want comparisons between expected and actual results
   if show_results and not (ex<1e-6 and eq<3e-5):
     plot_args = dict(full=False, label=True, dots=True)
@@ -139,17 +139,17 @@ def test_circles():
   k = 3
   plot_args = dict(full=False, label=True, dots=True)
   for n in 1,2,3,10,40,100:
-    for i in xrange({1:10,2:5,3:4,10:6,40:20,100:10}[n]):
+    for i in range({1:10,2:5,3:4,10:6,40:20,100:10}[n]):
       correct = known.get((k,n,i))
       if correct=='boring':
         continue
-      print '(k,n,i) (%d,%d,%d)'%(k,n,i)
+      print('(k,n,i) (%d,%d,%d)'%(k,n,i))
       random.seed(18183181+1000*k+10*n+i)
       arcs0 = canonicalize_circle_arcs(random_circle_arcs(n,k))
       circle_arc_quantize_test(arcs0);
       if (k,n,i)==None: # Enable to visualize before union
-        print
-        print 'arcs0 = %s'%compact_str(arcs0)
+        print()
+        print('arcs0 = %s'%compact_str(arcs0))
         import pylab
         pylab.suptitle('k %d, n %d, i %d'%(k,n,i))
         subplot_arcs(arcs0,**plot_args)
@@ -157,12 +157,12 @@ def test_circles():
       arcs1 = canonicalize_circle_arcs(circle_arc_union(arcs0))
       error = 0 if n>=40 else inf if correct is None else arc_error(correct,arcs1)
       if error>2e-5:
-        print 'error = %f' % error
-        print 'expected area = %f' % circle_arc_area(to_arcs(correct))
-        print 'result area = %f' % circle_arc_area(arcs1)
-        print 'arcs0 = %s'%compact_str(arcs0)
-        print '\narcs1 = %s'%compact_str(arcs1)
-        print '\ncorrect = %s'%compact_str(correct)
+        print('error = %f' % error)
+        print('expected area = %f' % circle_arc_area(to_arcs(correct)))
+        print('result area = %f' % circle_arc_area(arcs1))
+        print('arcs0 = %s'%compact_str(arcs0))
+        print('\narcs1 = %s'%compact_str(arcs1))
+        print('\ncorrect = %s'%compact_str(correct))
         if 0: # Enable this if you want comparisons between expected and actual results
           import pylab
           pylab.suptitle('k %d, n %d, i %d, error %g'%(k,n,i,error))
@@ -241,9 +241,9 @@ def check_offset_error(arcs):
   if not thickness_ok(new_arcs, expected_new_thickness, error_per_offset):
     new_thickness = find_thickness(new_arcs, quantization_unit)
     error = abs(new_thickness - expected_new_thickness)
-    print "Starting thickness:",starting_thickness
-    print "New thickness:",new_thickness
-    print "Expected new thickness:",expected_new_thickness
+    print("Starting thickness:",starting_thickness)
+    print("New thickness:",new_thickness)
+    print("Expected new thickness:",expected_new_thickness)
     error_msg = "For delta of %s, resulting error = %s (%s quantization units)" % (delta, error, error/quantization_unit)
     if 0:
       import pylab
@@ -282,12 +282,12 @@ def fuzzy_arcs_equal(arcs0, arcs1, allowed_error_multiplier):
 def check_positive_offsets(test_arcs, shell_delta=0.2, num_shells=5):
   assert circle_arc_area(test_arcs) > 0 # These tests assume we start with a positive shape
   assert shell_delta > 0 # These tests assume positive offsets
-  print "Offsetting arcs"
+  print("Offsetting arcs")
   # Test a single outward offset
   outward_arcs = offset_arcs(test_arcs, 0.5*shell_delta)
   assert circle_arc_area(outward_arcs) > circle_arc_area(test_arcs)
 
-  print "Offsetting arcs with shells"
+  print("Offsetting arcs with shells")
   shells = offset_shells(test_arcs, shell_delta, num_shells)
   assert num_shells == len(shells) # For positive input arcs and offset we should always get back requested number of shells
   shells = [(shells[i], shell_delta*(i+1)) for i in range(len(shells))] # Zip shells and offsets
@@ -296,7 +296,7 @@ def check_positive_offsets(test_arcs, shell_delta=0.2, num_shells=5):
     area = circle_arc_area(shell)
     if not (area > prev_area):
       error = "Positive offset caused decrease in area from %g to %g" % (prev_area, area)
-      print error
+      print(error)
       if 0: # Enable this to visualize arcs
         import pylab
         pylab.suptitle(error)
@@ -316,7 +316,7 @@ def check_positive_offsets(test_arcs, shell_delta=0.2, num_shells=5):
         delta = split_arcs_by_parity(combined)
         quantization_unit = circle_arc_quantization_unit(combined)
         t = find_thickness(delta, quantization_unit)
-        print "Error size: %s (%s quantization units)" % (t, t/quantization_unit)
+        print("Error size: %s (%s quantization units)" % (t, t/quantization_unit))
         if 0: # Enable this to visualize arcs
           import pylab
           pylab.suptitle("Area difference: %s" % abs(circle_arc_area(shell)-circle_arc_area(single_step_offset)))
@@ -330,7 +330,7 @@ def check_positive_offsets(test_arcs, shell_delta=0.2, num_shells=5):
         assert False
     prev_area, prev_arcs = area, shell
 
-  print "Offsetting open arcs"
+  print("Offsetting open arcs")
   open_offset = offset_open_arcs(test_arcs, 0.001) # Mostly this just ensures we don't hit any asserts
   assert circle_arc_area(open_offset) > 0 # We should at least have a positive area
   total_offset = 0
@@ -362,9 +362,9 @@ def check_negative_offsets(test_arcs):
       import pylab
       area_error = abs(outer_area - reset_area)
       pylab.suptitle("Offset: %s, Area error:%s" % (sub_d, area_error))
-      print "outer_area:",outer_area
-      print "inset_area:",inset_area
-      print "reset_area:",reset_area
+      print("outer_area:",outer_area)
+      print("inset_area:",inset_area)
+      print("reset_area:",reset_area)
       subplot_arcs(outer, 131, "outer", full=False)
       subplot_arcs(inset, 132, "inset", full=False)
       subplot_arcs(reset, 133, "reset", full=False)
@@ -388,7 +388,7 @@ def fuzz_offsets():
   seed = random.randint(0,2<<30)
   while True:
     # Put our random sequence in an easy to recreate state
-    print "Testing with seed",seed
+    print("Testing with seed",seed)
     random.seed(seed)
     # This would benefit from a smarter version of random_circle_arcs that generates more special cases (full circles, straight lines, etc)
     raw_random_arcs = random_circle_arcs(10,10)

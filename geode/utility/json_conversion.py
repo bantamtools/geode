@@ -4,10 +4,10 @@ from numpy import *
 from geode import *
 
 def from_ndarray(v, typ = float):
-  return map(typ, v.flatten())
+  return list(map(typ, v.flatten()))
 
 def from_array(v, typ = float):
-  return map(typ, v)
+  return list(map(typ, v))
 
 
 to_json_fn = {}
@@ -68,8 +68,8 @@ to_json_fn[Matrix] = lambda v: {
 to_json_fn[Frames] = lambda v: {
   't': ('frame%s') % (len(v.t)),
   'v': {
-    't': map(float, v.t),
-    'r': map(float, v.r.sv)
+    't': list(map(float, v.t)),
+    'r': list(map(float, v.r.sv))
   }
 }
 

@@ -4,7 +4,7 @@ Implemented using coroutines (generators) to allow integration with a false time
 We assume function evaluations are extremely slow, so we can afford to be very lazy otherwise.
 See http://en.wikipedia.org/wiki/Nelder-Mead_method for details."""
 
-from __future__ import division
+
 from numpy import *
 from geode.vector import *
 from geode.utility import Log
@@ -14,10 +14,10 @@ def optimize_generator(x0,step0,tolerance,verbose=False):
   d = len(x0)
   x = empty((d+1,d))
   x[:] = asarray(x0).reshape(1,d)
-  for i in xrange(d):
+  for i in range(d):
     x[i+1,i] += step0
   f = empty(d+1)
-  for i in xrange(d+1):
+  for i in range(d+1):
     f[i] = yield x[i],False
     if verbose:
       Log.write('nelder-mead: initialized f(%s) = %g'%(x[i],f[i]))
@@ -31,7 +31,7 @@ def optimize_generator(x0,step0,tolerance,verbose=False):
   # Loop until convergence
   while 1:
     # Sort vertices in increasing order of f
-    p = sorted(xrange(d+1),key=lambda i:f[i])
+    p = sorted(range(d+1),key=lambda i:f[i])
     f = f[p]
     x = x[p]
 
@@ -40,7 +40,7 @@ def optimize_generator(x0,step0,tolerance,verbose=False):
       Log.write('nelder-mead: worst x = %s, f(x) = %g'%(x[-1],f[-1]))
 
     # Check if we're converged 
-    diameter = max(magnitude(x[i]-x[j]) for i in xrange(d+1) for j in xrange(i+1,d+1))
+    diameter = max(magnitude(x[i]-x[j]) for i in range(d+1) for j in range(i+1,d+1))
     if verbose:
       Log.write('nelder-mead: diameter = %g'%diameter)
     if diameter <= tolerance:
@@ -80,7 +80,7 @@ def optimize_generator(x0,step0,tolerance,verbose=False):
       else: # All else failed; perform reduction
         if verbose:
           Log.write('nelder-mead: reduced')
-        for i in xrange(1,d+1):
+        for i in range(1,d+1):
           x[i] = x[0] + sigma*(x[i]-x[0])
           f[i] = yield x[i],False
 
@@ -91,9 +91,9 @@ def optimize(f,x0,step0,tolerance,verbose=False):
     x,done = gen.send(fx)
     if done:
       if verbose:
-        print 'converged: x = %s'%x
+        print('converged: x = %s'%x)
       return x
     else:
       fx = f(x)
       if verbose:
-        print 'f(%s) = %g'%(x,fx)
+        print('f(%s) = %g'%(x,fx))

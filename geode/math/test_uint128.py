@@ -12,7 +12,7 @@ def test_uint128():
     pass
   m64 = (1<<64)-1
   m128 = (1<<128)-1
-  for i in xrange(100):
+  for i in range(100):
     x = threefry(0,i)
     y = threefry(1,i)
     r = uint128_test(x,y)

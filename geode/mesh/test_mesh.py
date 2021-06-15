@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from __future__ import division
+
 
 from numpy import *
 from geode import Nested, PolygonSoup, SegmentSoup, TriangleSoup
@@ -33,15 +33,15 @@ def test_bad():
 def test_incident_segments():
   mesh = SegmentSoup([(0,1),(0,2)])
   incident = mesh.incident_elements()
-  print incident.offsets
-  print incident.flat
-  incident = map(list,mesh.incident_elements())
+  print(incident.offsets)
+  print(incident.flat)
+  incident = list(map(list,mesh.incident_elements()))
   assert incident==[[0,1],[0],[1]]
 
 def test_incident_triangles():
   mesh = TriangleSoup([(0,1,2),(0,3,4)])
   incident =  mesh.incident_elements()
-  incident = map(list,incident)
+  incident = list(map(list,incident))
   assert incident==[[0,1],[0],[0],[1],[1]]
 
 def test_boundary_mesh():
@@ -85,7 +85,7 @@ def test_polygons():
     p = asarray(p)
     i = argmin(p)
     return tuple(hstack([p[i:],p[:i]]))
-  for _ in xrange(4):
+  for _ in range(4):
     inj = injection(11)
     segs = inj[segments]
     random.shuffle(segs)
@@ -120,7 +120,7 @@ def test_nonmanifold_segments():
                                   (4,5),(4,6), # two outgoing segments
                                   (8,7),(9,7), # two incoming segments
                                   (10,11),(11,10)],int32)]) # closed loop
-  assert all(mesh.nonmanifold_nodes(False)==sort(map[asarray(xrange(10))]))
+  assert all(mesh.nonmanifold_nodes(False)==sort(map[asarray(range(10))]))
   assert all(mesh.nonmanifold_nodes(True)==sort(map[asarray([0,4,7])]))
 
 def test_nonmanifold_triangles():
@@ -132,9 +132,9 @@ def test_nonmanifold_triangles():
                      (17,18,19),(17,19,18),(17,20,21),(17,21,20), # touching spheres
                      (22,23,24),(22,25,26), # touching triangles
                      (27,28,29),(27,29,28)],int32) # manifold sphere
-  closed = asarray(range(18)+range(22,27))
-  open = asarray(range(6)+[14,15,17,22])
-  for _ in xrange(5):
+  closed = asarray(list(range(18))+list(range(22,27)))
+  open = asarray(list(range(6))+[14,15,17,22])
+  for _ in range(5):
     # Results should be covariant under sparsity and permutation
     map = injection(30)
     tris = map[triangles]
