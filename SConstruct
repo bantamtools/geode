@@ -222,7 +222,7 @@ gnuc = is_gnuc(env.subst('$cxx'))
 # If we're using gcc, insist on 4.6 or higher
 if re.match(r'\bg\+\+',env['cxx']):
   version = subprocess.Popen([env['cxx'],'--version'], stdout=subprocess.PIPE).communicate()[0]
-  m = re.search(r'\s+([\d\.]+)(\s+|\n|$)',version)
+  m = re.search(r'\s+([\d\.]+)(\s+|\n|$)', version.decode('utf-8'))
   if not m:
     die('weird version line: %s'%version[:-1])
   version_tuple = tuple(map(int, m.group(1).split('.')))
