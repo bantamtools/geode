@@ -10,7 +10,7 @@ except ImportError:
     from pipes import quote # Python 2.7
 
 def die(message):
-  print>>sys.stderr,'fatal:',message
+  print(sys.stderr,'fatal:',message)
   sys.exit(1)
 
 # Require a recent version of scons
@@ -222,7 +222,7 @@ gnuc = is_gnuc(env.subst('$cxx'))
 # If we're using gcc, insist on 4.6 or higher
 if re.match(r'\bg\+\+',env['cxx']):
   version = subprocess.Popen([env['cxx'],'--version'], stdout=subprocess.PIPE).communicate()[0]
-  m = re.search(r'\s+([\d\.]+)(\s+|\n|$)',version)
+  m = re.search(r'\s+([\d\.]+)(\s+|\n|$)',version.decode('utf-8'))
   if not m:
     die('weird version line: %s'%version[:-1])
   version_tuple = tuple(map(int, m.group(1).split('.')))
@@ -346,7 +346,7 @@ if env['openmp']:
   elif not clang:
     env.Append(CXXFLAGS='-fopenmp',LINKFLAGS='-fopenmp')
   else:
-    print>>sys.stderr, 'Warning: clang doesn\'t know how to do OpenMP, so many things will be slower'
+    print(sys.stderr, 'Warning: clang doesn\'t know how to do OpenMP, so many things will be slower')
 
 # Work around apparent bug in variable expansion
 env.Replace(prefix_lib=env.subst(env['prefix_lib']))
@@ -367,7 +367,7 @@ def external(env,name,lazy=1,**kwargs):
     if name in lazy_externals:
       del lazy_externals[name]
     if kwargs.get('required'):
-      print>>sys.stderr, 'FATAL: %s is required.  See config.log for error details.'%name
+      print(sys.stderr, 'FATAL: %s is required.  See config.log for error details.'%name)
       Exit(1)
 
   # Do we want to use this external?
@@ -404,7 +404,7 @@ def external_helper(env,name,default=0,dir=0,flags=(),cxxflags='',linkflags='',c
     force_external(r)
     if not env['use_'+r]:
       if verbose:
-        print 'disabling %s: no %s'%(name,r)
+        print('disabling %s: no %s'%(name,r))
       fail()
       return
 
@@ -480,7 +480,7 @@ def external_helper(env,name,default=0,dir=0,flags=(),cxxflags='',linkflags='',c
     env_conf = link_flags(env_conf)
     libraries = [externals[n] for n in externals.keys() if env_conf.get('need_'+n)]
     def absorb(source,**kwargs):
-      for k,v in kwargs.iteritems():
+      for k,v in kwargs.items():
         env_conf[k] = v
     objects_helper(env_conf,'',libraries,absorb)
 
@@ -506,10 +506,10 @@ if posix:
 # Account for library dependencies
 def add_dependencies(env):
   libs = []
-  for name in tuple(lazy_externals.iterkeys()):
+  for name in tuple(lazy_externals.keys()):
     if env.get('need_'+name):
       force_external(name)
-  for name,lib in externals.iteritems():
+  for name,lib in externals.items():
     if env.get('need_'+name):
       libs += lib['requires']
   while libs:
@@ -539,7 +539,7 @@ def link_flags(env):
       env_link.PrependUnique(LIBPATH=lib['libpath'])
       if workaround: # Prevent qt tool from dropping include paths when building moc files
         env_link.PrependUnique(CPPPATH=lib['cpppath'])
-      if lib.has_key('rpath'):
+      if 'rpath' in lib:
         env_link.PrependUnique(RPATH=lib['rpath'])
       if lib['callback'] is not None:
         lib['callback'](env_link)
@@ -641,7 +641,7 @@ def library(env,name,libs=(),skip=(),extra=(),skip_all=False,no_exports=False,py
     elif f.endswith('.h'):
       headers.append(f)
   if not sources and not headers:
-    print 'Warning: library %s has no input source files'%name
+    print('Warning: library %s has no input source files'%name)
   if env.get('need_qt',0) and env['use_qt']: # Qt gets confused if we only set options on the builder
     env = env.Clone()
     force_external('qt')
@@ -830,7 +830,7 @@ def configure_mpi(env,mpi):
           break
       else:
         if verbose:
-          print 'disabling mpi: mpicc not found'
+          print('disabling mpi: mpicc not found')
         return 0
 
   # Configure MPI if it exists
@@ -853,9 +853,9 @@ def configure_mpi(env,mpi):
         else:
           flags.append(f)
       mpi['linkflags'] = ' '+' '.join(flags)
-  except OSError,e:
+  except OSError as e:
     if verbose:
-      print 'disabling mpi: %s'%e
+      print('disabling mpi: %s'%e)
     return 0
   return 1
 
@@ -881,10 +881,10 @@ def configure_blas(env,blas):
   for kind in kinds:
     force_external(kind)
     if env['use_'+kind]:
-      print 'configuring blas: using %s'%kind
+      print('configuring blas: using %s'%kind)
       blas['requires'] = [kind]
       return 1
-  print>>sys.stderr, "disabling blas: can't find any variant, tried %s, and %s"%(', '.join(kinds[:-1]),kinds[-1])
+  print(sys.stderr, "disabling blas: can't find any variant, tried %s, and %s"%(', '.join(kinds[:-1]),kinds[-1]))
   return 0
 external(env,'blas',default=1,flags=['GEODE_BLAS'],configure=configure_blas)
 
