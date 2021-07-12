@@ -278,7 +278,7 @@ elif env['cxx'].endswith('icc') or env['cxx'].endswith('icpc'):
   env.Append(CXXFLAGS=' -w -vec-report0 -Wall -Winit-self -Woverloaded-virtual',LINKFLAGS=' -w')
 else:
   # Machine flags
-  def ifsse(s):
+  def ifsse(s): 
     return s if env['sse'] else ' -mno-sse'
   if env['arch']=='athlon':    machine_flags = ' -march=athlon-xp '+ifsse('-msse')
   elif env['arch']=='nocona':  machine_flags = ' -march=nocona '+ifsse('-msse2')
@@ -287,6 +287,7 @@ else:
   elif env['arch']=='x86-64':  machine_flags = ' -march=x86-64 -mtune=generic '
   elif env['arch']=='powerpc': machine_flags = ''
   elif env['arch']=='native':  machine_flags = ' -march=native -mtune=native '+ifsse('')
+  elif env['arch']=='arm': machine_flags = ' -march=armv7 -mtune=arm7' #Added by not smart intern
   else: machine_flags = ''
   env.Append(CXXFLAGS=machine_flags)
   # Type specific flags
